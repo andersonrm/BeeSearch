@@ -61,50 +61,23 @@ What is this analysis about?
 # Load Packages
 library(tidyverse) # Needed for data wrangling: dplyr, tidyr, ggplot2
 library(cowplot) # Needed for publication-quality ggplots
-
+library(vegan)
 
 # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 # @@@@@ Data Preparation
 # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 # Import datasets
-d <- read.csv("data/2019 GCA BLH.csv")
+dat1 <- read.csv("data/CABS1.csv")
 
-# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-# @@@@@ ggPlot Theme
-# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+comp.sites <- read.csv("data/comparable.sites.csv")
 
-ggplot.theme <- theme(
-    
-    # Serif fonts to approximate theme_tufte()
-    text = element_text(family = "serif"),
-    
-    # Text size for axis ticks
-    axis.text.y = element_text(size = 14),
-    axis.text.x = element_text(size = 14),
-    
-    # Text size for axis labels
-    # Also move them away from the axes a bit for more space
-    axis.title.x = element_text(size = 18, face = "bold", vjust = -1),
-    axis.title.y = element_text(size = 18, face = "bold", vjust = 1.5),
-    
-    # Plot title size, move away from plot
-    plot.title = element_text(size = 20, face = "bold", vjust = 5),
-    
-    # Margins for top, right, bottom, left
-    plot.margin = grid::unit(c(1.5, 1.5, 1.5, 1.2), "lines"), 
-    
-    # Legend text size
-    legend.text = element_text(size = 14),
-    legend.text.align = 0, 
-    legend.title = element_text(size = 16, face = "bold"),
-    legend.key.size = grid::unit(1.4, "line"),
-    legend.key = element_blank(), 
-    
-    # Facet label text size and background
-    strip.text = element_text(size = 18, face = "bold"),
-    strip.background = element_rect(fill = NA)
-    )
+
+####################################
+# Funtions
+####################################
+
+source("functions/TES.R")
 
 
 ```
@@ -112,16 +85,221 @@ ggplot.theme <- theme(
 
 ```{r Data_Wrangling, echo = F, comment = ""}
 
-# Put data wrangling code here
+# general cleaning and conversion:
+dat1 <- dat1 %>% 
+  mutate(across(c(Station : Sex, Site), as.factor),
+         Date = ymd(Label.Date),
+         Year = year(Date),
+         Month = month(Date),
+         # DoY --- Day of year
+         DoY = yday(Date),
+         # ToY --- Time of Year
+         ToY = case_when(DoY < 135 ~ "early",
+                         DoY > 205 ~ "late",
+                         TRUE ~ "mid"),
+         StationYear = paste(Station, Year, sep = "_"))
+
+# Sites with comparable sampling:
+comp.sites <- comp.sites %>% 
+  mutate(StationYear = paste(Station, Year, sep = "_"))
+
+# filter the site with incompatible sampling efforts:
+comp.data <- semi_join(dat1, comp.sites, by = "StationYear")
+
+comp.data <- comp.data %>% 
+  mutate(across(c(Year, StationYear), as.factor))
+
+
+
+##################################################
+# matrix data
+
+mat1 <- comp.data %>%
+  group_by(StationYear, Short.label.name) %>%
+  summarise(n = sum(Count)) %>%
+  pivot_wider(names_from = Short.label.name,
+              values_from = n) %>%
+  replace(is.na(.), 0) %>%
+  column_to_rownames("StationYear")
+
+# 
+# mat.meta <- comp.data %>% 
+#   select(StationYear, Year, Station, DoY,
+#          Month, ToY, Site) %>% 
+#   distinct() %>% 
+#   column_to_rownames('StationYear')
+
+## matices by year:
+
+mat2017 <- comp.data %>% 
+  filter(Year == "2017") %>% 
+  group_by(Station, Short.label.name, ToY) %>%
+  summarise(n = sum(Count)) %>% 
+  pivot_wider(names_from = Short.label.name,
+              values_from = n) %>% 
+  replace(is.na(.), 0) %>% 
+  mutate(StationTime = paste(Station, ToY, sep = "_")) %>% 
+  column_to_rownames("StationTime") %>% 
+  select(-Station, -ToY)
+
+meta2017 <- comp.data %>% 
+  filter(Year == "2017") %>% 
+  select(Station, ToY) %>% 
+  distinct() %>% 
+  mutate(StationTime = paste(Station, ToY, sep = "_")) %>% 
+  column_to_rownames("StationTime")
+
+```
+
+# How many species do we have at each location? How much variability is there in richness?
+
+```{r Q1, echo = F}
+
+rich.year <- comp.data %>% 
+  select(Year, Short.label.name) %>% 
+  group_by(Year) %>% 
+  distinct() %>% 
+  tally()
+
+rich.site <- comp.data %>% 
+  select(Station, Short.label.name) %>% 
+  group_by(Station) %>% 
+  distinct() %>% 
+  tally()
+
+rich.year.site <- comp.data %>% 
+  select(StationYear, Short.label.name) %>% 
+  group_by(StationYear) %>% 
+  distinct() %>% 
+  tally()
+
+rich.site.year.sep <- comp.data %>% 
+  select(Station, Year, Short.label.name) %>% 
+  group_by(Station, Year) %>% 
+  distinct() %>% 
+  tally()
+
+rich.site.year.sep %>% 
+  ggplot(aes(x = Year, y = n, color = Station, group = Station)) +
+  geom_point() +
+  geom_line() +
+  labs(y = "Richness") +
+  theme_classic()
+
+```
+
+## Rarefaction curves:
+
+What scale do we want?
+```{r Rarefaction, echo = F}
+
+tes1 <- TES(t(mat1[,1]))
+
+plot.TES(tes1)
+
+
+
+tes2 <- TES(t(mat1[,2]))
+
+plot.TES(tes2)
+
+
+tes4 <- TES(t(mat1[,4]))
+
+plot.TES(tes4)
+
+tes5 <- TES(t(mat1[,5]))
+
+plot.TES(tes5)
 
 ```
 
 
-```{r Graph_name, echo = F}
 
-# Put each graph in a separate code block with a different name
+# What bee groups drive changes in abundance from early to mid to late year?
+
+```{r NMDS, echo = F}
+# 
+# bee.nmds2d <- metaMDS(mat1, distance = "bray",
+#                       k = 2, try = 250, autotransform = F)
+# 
+# bee.nmds3d <- metaMDS(mat1, distance = "bray",
+#                       k = 3, try = 250, autotransform = F)
+# 
+# bee.nmds2d$stress
+# stressplot(bee.nmds2d)
 
 ```
+
+NMDS 2017
+
+```{r NMDS_2017_stress, include = F}
+
+nmds2017 <- metaMDS(mat2017, distance = "bray",
+                      k = 2, try = 250, autotransform = F)
+
+
+nmds2017$stress
+stressplot(nmds2017)
+
+```
+
+```{r nmds2017_meta_merge, echo = F}
+
+# site scores
+site_scores2017 <- as.data.frame(scores(nmds2017)$sites)
+
+site_scores2017 <- merge(site_scores2017,
+                        select(meta2017, c(Station, ToY)),
+                        by.x = "row.names", by.y = "row.names")
+
+# species scores
+spp_scores2017 <- as.data.frame(scores(nmds2017)$species)
+
+spp_scores2017 <- cbind(spp_scores2017,
+                       Species = row.names(spp_scores2017))
+
+
+```
+
+```{r nmds2017_plot, echo = F}
+
+
+site_scores2017 %>%  
+  ggplot(aes(x = NMDS1, y = NMDS2)) +
+  geom_point(aes(NMDS1, NMDS2, color = ToY),
+             size = 4) +
+  labs(color = "Time of Season") +
+  ggrepel::geom_text_repel(data = spp_scores2017,
+                           aes(x = NMDS1, y = NMDS2, label = Species),
+                           size = 2.0) +
+  theme_cowplot()
+
+```
+
+
+# Can we do analysis with and without major species (H. tripartitus; A. texanus; M. microsticta/us)
+
+## - Is there anything we can do to figure out why these species are abundant in certain year?
+
+
+# What is the turnover of species within sub-sites within years?
+
+# What is the turnover of species within major sites across years?
+
+# How similar are populations within sites based on distance (spatial autocorrelation), and can we assess this for particular bee groups
+
+## Interesting groups: Osmia (lots of species, not abundant), Halictus
+
+# Can we assess why groups like Halictus have so much variability in abundance, and whether this has anything to do with the sex of the individuals collected?
+
+# Is there greater overall diversity at SCL vs POS vs PBF?
+
+# Distance effects – can we estimate flight
+
+# Can we compare to Eli’s study?
+
+# What species are persistent?
 
 
 ## Session Information
