@@ -62,6 +62,7 @@ What is this analysis about?
 library(tidyverse) # Needed for data wrangling: dplyr, tidyr, ggplot2
 library(cowplot) # Needed for publication-quality ggplots
 library(vegan)
+library(adespatial)
 
 # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 # @@@@@ Data Preparation
@@ -91,11 +92,11 @@ dat1 <- dat1 %>%
          Date = ymd(Label.Date),
          Year = year(Date),
          Month = month(Date),
-         # DoY --- Day of year
-         DoY = yday(Date),
+         # JD --- Day of year (julian day)
+         JD = yday(Date),
          # ToY --- Time of Year
-         ToY = case_when(DoY < 135 ~ "early",
-                         DoY > 205 ~ "late",
+         ToY = case_when(JD < 135 ~ "early",
+                         JD > 205 ~ "late",
                          TRUE ~ "mid"),
          StationYear = paste(Station, Year, sep = "_"))
 
@@ -103,7 +104,7 @@ dat1 <- dat1 %>%
 comp.sites <- comp.sites %>% 
   mutate(StationYear = paste(Station, Year, sep = "_"))
 
-# filter the site with incompatible sampling efforts:
+# filter out the site with incompatible sampling efforts:
 comp.data <- semi_join(dat1, comp.sites, by = "StationYear")
 
 comp.data <- comp.data %>% 
@@ -117,20 +118,34 @@ comp.data <- comp.data %>%
 mat1 <- comp.data %>%
   group_by(StationYear, Short.label.name) %>%
   summarise(n = sum(Count)) %>%
+  ungroup() %>% 
   pivot_wider(names_from = Short.label.name,
               values_from = n) %>%
   replace(is.na(.), 0) %>%
   column_to_rownames("StationYear")
 
-# 
-# mat.meta <- comp.data %>% 
-#   select(StationYear, Year, Station, DoY,
-#          Month, ToY, Site) %>% 
-#   distinct() %>% 
-#   column_to_rownames('StationYear')
 
-## matices by year:
+## matrices by year:
 
+get_matrix_sites_within_years <- function(input_year){
+  matrix.site.years <- comp.data %>% 
+  filter(Year == input_year) %>% 
+  group_by(Station, Short.label.name) %>% 
+  summarise(n = sum(Count)) %>% 
+  pivot_wider(names_from = Short.label.name,
+              values_from = n) %>% 
+  replace(is.na(.), 0) %>% 
+  column_to_rownames("Station")
+  
+  return(matrix.site.years)
+}
+
+matrix.site.years.list <- lapply(levels(comp.data$Year),
+                                 get_matrix_sites_within_years)
+
+
+
+## matrices by year and time of season:
 mat2017 <- comp.data %>% 
   filter(Year == "2017") %>% 
   group_by(Station, Short.label.name, ToY) %>%
@@ -239,12 +254,16 @@ nmds2017 <- metaMDS(mat2017, distance = "bray",
                       k = 2, try = 250, autotransform = F)
 
 
-nmds2017$stress
+nmds2017$dist
 stressplot(nmds2017)
 
 ```
 
 ```{r nmds2017_meta_merge, echo = F}
+
+nmds2017dist <- mat2017 %>% 
+  avgdist(sample = 5)
+
 
 # site scores
 site_scores2017 <- as.data.frame(scores(nmds2017)$sites)
@@ -260,23 +279,43 @@ spp_scores2017 <- cbind(spp_scores2017,
                        Species = row.names(spp_scores2017))
 
 
+adonis2(nmds2017dist ~ meta2017$ToY)
+permutest(betadisper(nmds2017dist, meta2017$ToY))
+
+
 ```
 
+Within the Port of Seattle sites in 2017, species composition changes significantly throughout the season with distinct groups of species in early, mid, and late season sampling.
+
 ```{r nmds2017_plot, echo = F}
+site_scores2017 <- site_scores2017 %>%  
+  mutate(ToY = factor(ToY)) %>% 
+  as.data.frame()
 
 
-site_scores2017 %>%  
-  ggplot(aes(x = NMDS1, y = NMDS2)) +
+spp_scores2017 <- as.data.frame(spp_scores2017)
+
+centroid2017 <- site_scores2017 %>% 
+  group_by(ToY) %>% 
+  summarise(NMDS1  = mean(NMDS1), NMDS2 = mean(NMDS2))
+
+site_scores2017 %>% 
+  ggplot(aes(x = NMDS1, y = NMDS2, color = ToY)) +
   geom_point(aes(NMDS1, NMDS2, color = ToY),
-             size = 4) +
+             size = 2) +
+  stat_ellipse() +
+  geom_point(data = centroid2017, size = 5, shape = 21,
+             color = 'black', aes(fill = ToY), show.legend = F) +
   labs(color = "Time of Season") +
   ggrepel::geom_text_repel(data = spp_scores2017,
                            aes(x = NMDS1, y = NMDS2, label = Species),
-                           size = 2.0) +
+                           size = 1.5, inherit.aes = FALSE,
+                           max.overlaps = 20) +
   theme_cowplot()
 
-```
 
+```
+**Non-metric multidimensional scaling of bee species in Port of Seattle in 2017.** Points are sub-sites within the port of Seattle in 2017. They are separated by time of season with the 8 sub sites at the early season in red, the same 8 sub sites at the middle season in blue, and the same 8 sub sites at the end of the season in green. The NMDS space represents total bee species composition and the labels are specific bee species and their position in NMDS space. Large points are the centroids (means) of the points in NMDS space. Ellipses are 95% confidence intervals around the centroids. 
 
 # Can we do analysis with and without major species (H. tripartitus; A. texanus; M. microsticta/us)
 
@@ -285,7 +324,78 @@ site_scores2017 %>%
 
 # What is the turnover of species within sub-sites within years?
 
+```{r species_turnover_site_years,echo = F}
+
+bdiv.list <- lapply(seq_along(matrix.site.years.list), function(i){
+  beta.div.comp(matrix.site.years.list[[i]],
+                coef = "J", quant = T)
+})
+
+extract_and_combine <- function(list_of_lists, part_name) {
+  # Extract the specified part from each sublist and combine into a single data frame
+  combined_df <- map2_df(list_of_lists, seq_along(list_of_lists), ~ {
+    part_df <- .x[[part_name]]
+    part_df <- as.data.frame(part_df)
+    part_df <- part_df %>%
+      mutate(ListID = .y)  # Add a unique identifier column
+    
+    return(part_df)
+  })
+  
+  return(combined_df)
+}
+
+site.year.part <- extract_and_combine(bdiv.list, "part")
+
+site.year.part <- site.year.part %>% 
+  mutate(year = factor(ListID + 2013)) %>% 
+  rownames_to_column(var = "metric") %>% 
+  mutate(metric = str_remove(metric, "\\.\\.\\..*$")) %>% 
+  select(-ListID) %>% 
+  pivot_wider(names_from = metric,
+              values_from = part_df)
+
+```
+
+```{r POS_beta_div_across_sites_within_years, echo = F}
+
+inset <- site.year.part %>% 
+  pivot_longer(cols = c(`Repl/BDtotal`, `RichDif/BDtotal`),
+               names_to = "type.contr",
+               values_to = "contribution") %>% 
+  ggplot(aes(x = year, y = contribution, fill = type.contr)) +
+  geom_col() +
+  theme_cowplot() +
+  scale_fill_discrete(labels = c("species\nturnover",
+                                 "richness\ndifferences"),
+                      name = "") +
+  labs(x = "", y = "Contribution to\nBeta Diversity") +
+  theme(axis.text.y = element_text(size = 8),
+        axis.text.x = element_text(size = 8, angle = 45),
+        axis.title = element_text(size = 10))
+
+plot.y <- site.year.part %>% 
+  mutate(year = as.numeric(year) + 2013) %>% 
+  ggplot(aes(x = year, y = BDtotal)) +
+  geom_line() +
+  theme_cowplot() +
+  ylim(.24, .40) +
+  labs(x = "Year", y = "Beta diversity")
+
+ggdraw(plot.y) +
+  draw_plot(inset, .25, .49, .7, .45)
+
+```
+
+
 # What is the turnover of species within major sites across years?
+
+Can we answer this question if the sampling was not the same across major sites?
+
+
+
+
+
 
 # How similar are populations within sites based on distance (spatial autocorrelation), and can we assess this for particular bee groups
 

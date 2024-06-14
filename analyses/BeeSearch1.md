@@ -1,7 +1,7 @@
 BeeSearch initial
 ================
 Dr. Riley M. Anderson
-April 26, 2024
+June 14, 2024
 
   
 
@@ -61,7 +61,42 @@ What scale do we want?
 
 NMDS 2017
 
+    ## Permutation test for adonis under reduced model
+    ## Terms added sequentially (first to last)
+    ## Permutation: free
+    ## Number of permutations: 999
+    ## 
+    ## adonis2(formula = nmds2017dist ~ meta2017$ToY)
+    ##              Df SumOfSqs      R2     F Pr(>F)  
+    ## meta2017$ToY  2   0.7970 0.12317 1.475  0.029 *
+    ## Residual     21   5.6735 0.87683               
+    ## Total        23   6.4704 1.00000               
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Permutation test for homogeneity of multivariate dispersions
+    ## Permutation: free
+    ## Number of permutations: 999
+    ## 
+    ## Response: Distances
+    ##           Df   Sum Sq   Mean Sq      F N.Perm Pr(>F)
+    ## Groups     2 0.011462 0.0057310 1.7038    999  0.201
+    ## Residuals 21 0.070636 0.0033636
+
+Within the Port of Seattle sites in 2017, species composition changes
+significantly throughout the season with distinct groups of species in
+early, mid, and late season sampling.
+
 ![](BeeSearch1_files/figure-gfm/nmds2017_plot-1.png)<!-- -->
+**Non-metric multidimensional scaling of bee species in Port of Seattle
+in 2017.** Points are sub-sites within the port of Seattle in 2017. They
+are separated by time of season with the 8 sub sites at the early season
+in red, the same 8 sub sites at the middle season in blue, and the same
+8 sub sites at the end of the season in green. The NMDS space represents
+total bee species composition and the labels are specific bee species
+and their position in NMDS space. Large points are the centroids (means)
+of the points in NMDS space. Ellipses are 95% confidence intervals
+around the centroids.
 
 # Can we do analysis with and without major species (H. tripartitus; A. texanus; M. microsticta/us)
 
@@ -69,7 +104,12 @@ NMDS 2017
 
 # What is the turnover of species within sub-sites within years?
 
+![](BeeSearch1_files/figure-gfm/POS_beta_div_across_sites_within_years-1.png)<!-- -->
+
 # What is the turnover of species within major sites across years?
+
+Can we answer this question if the sampling was not the same across
+major sites?
 
 # How similar are populations within sites based on distance (spatial autocorrelation), and can we assess this for particular bee groups
 
