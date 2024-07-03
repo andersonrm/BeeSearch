@@ -104,7 +104,7 @@ dat1 <- dat1 %>%
 comp.sites <- comp.sites %>% 
   mutate(StationYear = paste(Station, Year, sep = "_"))
 
-# filter out the site with incompatible sampling efforts:
+# filter out the sites with incompatible sampling efforts:
 comp.data <- semi_join(dat1, comp.sites, by = "StationYear")
 
 comp.data <- comp.data %>% 
@@ -123,6 +123,10 @@ mat1 <- comp.data %>%
               values_from = n) %>%
   replace(is.na(.), 0) %>%
   column_to_rownames("StationYear")
+
+mat1meta <- comp.data %>% 
+  select(StationYear, Year) %>% 
+  distinct()
 
 
 ## matrices by year:
@@ -164,6 +168,26 @@ meta2017 <- comp.data %>%
   mutate(StationTime = paste(Station, ToY, sep = "_")) %>% 
   column_to_rownames("StationTime")
 
+
+## matrix by time of season:
+mat.seasons <- comp.data %>% 
+  group_by(Station, Short.label.name, ToY, Year) %>%
+  summarise(n = sum(Count)) %>% 
+  ungroup() %>% 
+  pivot_wider(names_from = Short.label.name,
+              values_from = n) %>% 
+  replace(is.na(.), 0) %>% 
+  mutate(StationTimeYear = paste(Station, ToY, Year, sep = "_")) %>% 
+  column_to_rownames("StationTimeYear") %>% 
+  select(-Station, -ToY, -Year)
+
+meta.seasons <- comp.data %>% 
+  select(Station, ToY, Year) %>% 
+  distinct() %>% 
+  mutate(StationTimeYear = paste(Station, ToY, Year, sep = "_")) %>% 
+  column_to_rownames("StationTimeYear")
+
+
 ```
 
 # How many species do we have at each location? How much variability is there in richness?
@@ -203,6 +227,105 @@ rich.site.year.sep %>%
 
 ```
 
+# Does community composition change over time?
+
+```{r composition_over_time, echo = F}
+
+adonis2(avgdist(mat1, sample = 5) ~ mat1meta$Year)
+
+permutest(betadisper(avgdist(mat1, sample = 5), mat1meta$Year))
+
+```
+No, overall, communities in the POS sites have similar composition across years.
+
+# How does community composition change across seasons?
+```{r composition_across_seasons, echo = F}
+
+adonis2(avgdist(mat.seasons, sample = 5) ~ meta.seasons$ToY * 
+          meta.seasons$Year)
+
+permutest(
+  betadisper(
+    avgdist(mat.seasons, sample = 5),
+    meta.seasons$Year
+  )
+)
+
+
+nmds.seasons <- metaMDS(mat.seasons, distance = "bray", k = 2,
+                        autotransform = F, try = 250)
+
+stressplot(nmds.seasons)
+
+
+# site scores
+site_scores_seasons <- as.data.frame(scores(nmds.seasons)$sites)
+
+site_scores_seasons <- merge(site_scores_seasons,
+                        select(meta.seasons, c(Station, ToY, Year)),
+                        by.x = "row.names", by.y = "row.names")
+
+# species scores
+spp_scores_seasons <- as.data.frame(scores(nmds.seasons)$species)
+
+spp_scores_seasons <- cbind(spp_scores_seasons,
+                       Species = row.names(spp_scores_seasons))
+```
+
+```{r nmds_fig_seasons, echo = F}
+
+site_scores_seasons <- site_scores_seasons %>%  
+  mutate(ToY = factor(ToY)) %>% 
+  as.data.frame()
+
+
+spp_scores_seasons <- as.data.frame(spp_scores_seasons)
+
+centroid_seasons <- site_scores_seasons %>% 
+  group_by(ToY) %>% 
+  summarise(NMDS1  = mean(NMDS1), NMDS2 = mean(NMDS2))
+
+site_scores_seasons %>% 
+  ggplot(aes(x = NMDS1, y = NMDS2, color = ToY)) +
+  geom_point(aes(NMDS1, NMDS2, color = ToY),
+             size = 2) +
+  stat_ellipse() +
+  geom_point(data = centroid_seasons, size = 5, shape = 21,
+             color = 'black', aes(fill = ToY), show.legend = F) +
+  labs(color = "Time of Season") +
+  ggrepel::geom_text_repel(data = spp_scores_seasons,
+                           aes(x = NMDS1, y = NMDS2, label = Species),
+                           size = 1.5, inherit.aes = FALSE,
+                           max.overlaps = 20) +
+  theme_cowplot()
+
+
+```
+
+```{r nmds_fig_years, echo = F}
+
+centroid_years <- site_scores_seasons %>% 
+  group_by(Year) %>% 
+  summarise(NMDS1  = mean(NMDS1), NMDS2 = mean(NMDS2))
+
+site_scores_seasons %>% 
+  ggplot(aes(x = NMDS1, y = NMDS2, color = Year)) +
+  geom_point(aes(NMDS1, NMDS2, color = Year),
+             size = 2) +
+  stat_ellipse() +
+  geom_point(data = centroid_years, size = 5, shape = 21,
+             color = 'black', aes(fill = Year), show.legend = F) +
+  labs(color = "Year") +
+  ggrepel::geom_text_repel(data = spp_scores_seasons,
+                           aes(x = NMDS1, y = NMDS2, label = Species),
+                           size = 1.5, inherit.aes = FALSE,
+                           max.overlaps = 20) +
+  theme_cowplot()
+
+```
+
+
+
 ## Rarefaction curves:
 
 What scale do we want?
@@ -233,18 +356,6 @@ plot.TES(tes5)
 
 # What bee groups drive changes in abundance from early to mid to late year?
 
-```{r NMDS, echo = F}
-# 
-# bee.nmds2d <- metaMDS(mat1, distance = "bray",
-#                       k = 2, try = 250, autotransform = F)
-# 
-# bee.nmds3d <- metaMDS(mat1, distance = "bray",
-#                       k = 3, try = 250, autotransform = F)
-# 
-# bee.nmds2d$stress
-# stressplot(bee.nmds2d)
-
-```
 
 NMDS 2017
 
@@ -398,6 +509,8 @@ Can we answer this question if the sampling was not the same across major sites?
 
 
 # How similar are populations within sites based on distance (spatial autocorrelation), and can we assess this for particular bee groups
+
+
 
 ## Interesting groups: Osmia (lots of species, not abundant), Halictus
 

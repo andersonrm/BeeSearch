@@ -1,7 +1,7 @@
 BeeSearch initial
 ================
 Dr. Riley M. Anderson
-June 14, 2024
+July 03, 2024
 
   
 
@@ -10,6 +10,10 @@ June 14, 2024
 - [How many species do we have at each location? How much variability is
   there in
   richness?](#how-many-species-do-we-have-at-each-location-how-much-variability-is-there-in-richness)
+- [Does community composition change over
+  time?](#does-community-composition-change-over-time)
+- [How does community composition change across
+  seasons?](#how-does-community-composition-change-across-seasons)
   - [Rarefaction curves:](#rarefaction-curves)
 - [What bee groups drive changes in abundance from early to mid to late
   year?](#what-bee-groups-drive-changes-in-abundance-from-early-to-mid-to-late-year)
@@ -51,6 +55,94 @@ What is this analysis about?
 # How many species do we have at each location? How much variability is there in richness?
 
 ![](BeeSearch1_files/figure-gfm/Q1-1.png)<!-- -->
+
+# Does community composition change over time?
+
+    ## Permutation test for adonis under reduced model
+    ## Terms added sequentially (first to last)
+    ## Permutation: free
+    ## Number of permutations: 999
+    ## 
+    ## adonis2(formula = avgdist(mat1, sample = 5) ~ mat1meta$Year)
+    ##               Df SumOfSqs      R2      F Pr(>F)
+    ## mat1meta$Year  6   1.4405 0.13985 0.9484  0.618
+    ## Residual      35   8.8597 0.86015              
+    ## Total         41  10.3001 1.00000
+    ## 
+    ## Permutation test for homogeneity of multivariate dispersions
+    ## Permutation: free
+    ## Number of permutations: 999
+    ## 
+    ## Response: Distances
+    ##           Df   Sum Sq   Mean Sq      F N.Perm Pr(>F)
+    ## Groups     6 0.040242 0.0067069 0.8237    999  0.558
+    ## Residuals 35 0.284989 0.0081425
+
+No, overall, communities in the POS sites have similar composition
+across years.
+
+# How does community composition change across seasons?
+
+    ## Permutation test for adonis under reduced model
+    ## Terms added sequentially (first to last)
+    ## Permutation: free
+    ## Number of permutations: 999
+    ## 
+    ## adonis2(formula = avgdist(mat.seasons, sample = 5) ~ meta.seasons$ToY * meta.seasons$Year)
+    ##                                     Df SumOfSqs      R2      F Pr(>F)   
+    ## meta.seasons$ToY                     2    0.689 0.02177 1.2783  0.126   
+    ## meta.seasons$Year                    6    2.347 0.07414 1.4513  0.009 **
+    ## meta.seasons$ToY:meta.seasons$Year  10    2.748 0.08681 1.0197  0.408   
+    ## Residual                            96   25.873 0.81729                 
+    ## Total                              114   31.657 1.00000                 
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Permutation test for homogeneity of multivariate dispersions
+    ## Permutation: free
+    ## Number of permutations: 999
+    ## 
+    ## Response: Distances
+    ##            Df  Sum Sq  Mean Sq      F N.Perm Pr(>F)
+    ## Groups      6 0.09832 0.016387 1.3721    999  0.229
+    ## Residuals 108 1.28985 0.011943
+    ## Run 0 stress 0.1594718 
+    ## Run 1 stress 0.175697 
+    ## Run 2 stress 0.1660445 
+    ## Run 3 stress 0.1594705 
+    ## ... New best solution
+    ## ... Procrustes: rmse 0.0009669284  max resid 0.008992791 
+    ## ... Similar to previous best
+    ## Run 4 stress 0.1767066 
+    ## Run 5 stress 0.1594709 
+    ## ... Procrustes: rmse 0.0009294008  max resid 0.008775719 
+    ## ... Similar to previous best
+    ## Run 6 stress 0.1656687 
+    ## Run 7 stress 0.1594235 
+    ## ... New best solution
+    ## ... Procrustes: rmse 0.0070564  max resid 0.07340902 
+    ## Run 8 stress 0.1767511 
+    ## Run 9 stress 0.169461 
+    ## Run 10 stress 0.1659143 
+    ## Run 11 stress 0.1617597 
+    ## Run 12 stress 0.1839546 
+    ## Run 13 stress 0.1656965 
+    ## Run 14 stress 0.1659141 
+    ## Run 15 stress 0.1656658 
+    ## Run 16 stress 0.203966 
+    ## Run 17 stress 0.1616523 
+    ## Run 18 stress 0.1656317 
+    ## Run 19 stress 0.1594756 
+    ## ... Procrustes: rmse 0.007345529  max resid 0.07545158 
+    ## Run 20 stress 0.1981387 
+    ## *** Best solution was not repeated -- monoMDS stopping criteria:
+    ##     20: stress ratio > sratmax
+
+![](BeeSearch1_files/figure-gfm/composition_across_seasons-1.png)<!-- -->
+
+![](BeeSearch1_files/figure-gfm/nmds_fig_seasons-1.png)<!-- -->
+
+![](BeeSearch1_files/figure-gfm/nmds_fig_years-1.png)<!-- -->
 
 ## Rarefaction curves:
 
