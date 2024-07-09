@@ -171,6 +171,7 @@ meta2017 <- comp.data %>%
 
 ## matrix by time of season:
 mat.seasons <- comp.data %>% 
+  filter(Year != "2014" & Year != "2020") %>% 
   group_by(Station, Short.label.name, ToY, Year) %>%
   summarise(n = sum(Count)) %>% 
   ungroup() %>% 
@@ -182,6 +183,7 @@ mat.seasons <- comp.data %>%
   select(-Station, -ToY, -Year)
 
 meta.seasons <- comp.data %>% 
+  filter(Year != "2014" & Year != "2020") %>% 
   select(Station, ToY, Year) %>% 
   distinct() %>% 
   mutate(StationTimeYear = paste(Station, ToY, Year, sep = "_")) %>% 
@@ -219,6 +221,7 @@ rich.site.year.sep <- comp.data %>%
   tally()
 
 rich.site.year.sep %>% 
+  filter(Year != "2014" & Year != "2020") %>% 
   ggplot(aes(x = Year, y = n, color = Station, group = Station)) +
   geom_point() +
   geom_line() +
@@ -239,7 +242,7 @@ permutest(betadisper(avgdist(mat1, sample = 5), mat1meta$Year))
 No, overall, communities in the POS sites have similar composition across years.
 
 # How does community composition change across seasons?
-```{r composition_across_seasons, echo = F}
+```{r composition_across_seasons, echo = F, cache=F}
 
 adonis2(avgdist(mat.seasons, sample = 5) ~ meta.seasons$ToY * 
           meta.seasons$Year)
@@ -272,7 +275,7 @@ spp_scores_seasons <- cbind(spp_scores_seasons,
                        Species = row.names(spp_scores_seasons))
 ```
 
-```{r nmds_fig_seasons, echo = F}
+```{r nmds_fig_seasons, echo = F, cache=F}
 
 site_scores_seasons <- site_scores_seasons %>%  
   mutate(ToY = factor(ToY)) %>% 
@@ -302,7 +305,7 @@ site_scores_seasons %>%
 
 ```
 
-```{r nmds_fig_years, echo = F}
+```{r nmds_fig_years, echo = F, cache=F}
 
 centroid_years <- site_scores_seasons %>% 
   group_by(Year) %>% 

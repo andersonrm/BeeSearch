@@ -1,7 +1,7 @@
 BeeSearch initial
 ================
 Dr. Riley M. Anderson
-July 03, 2024
+July 09, 2024
 
   
 
@@ -89,12 +89,12 @@ across years.
     ## Number of permutations: 999
     ## 
     ## adonis2(formula = avgdist(mat.seasons, sample = 5) ~ meta.seasons$ToY * meta.seasons$Year)
-    ##                                     Df SumOfSqs      R2      F Pr(>F)   
-    ## meta.seasons$ToY                     2    0.689 0.02177 1.2783  0.126   
-    ## meta.seasons$Year                    6    2.347 0.07414 1.4513  0.009 **
-    ## meta.seasons$ToY:meta.seasons$Year  10    2.748 0.08681 1.0197  0.408   
-    ## Residual                            96   25.873 0.81729                 
-    ## Total                              114   31.657 1.00000                 
+    ##                                    Df SumOfSqs      R2      F Pr(>F)  
+    ## meta.seasons$ToY                    2   0.6635 0.02805 1.3295  0.110  
+    ## meta.seasons$Year                   4   1.3691 0.05789 1.3718  0.062 .
+    ## meta.seasons$ToY:meta.seasons$Year  8   2.1574 0.09122 1.0808  0.251  
+    ## Residual                           78  19.4615 0.82285                
+    ## Total                              92  23.6515 1.00000                
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
@@ -103,40 +103,48 @@ across years.
     ## Number of permutations: 999
     ## 
     ## Response: Distances
-    ##            Df  Sum Sq  Mean Sq      F N.Perm Pr(>F)
-    ## Groups      6 0.09832 0.016387 1.3721    999  0.229
-    ## Residuals 108 1.28985 0.011943
-    ## Run 0 stress 0.1594718 
-    ## Run 1 stress 0.175697 
-    ## Run 2 stress 0.1660445 
-    ## Run 3 stress 0.1594705 
+    ##           Df  Sum Sq  Mean Sq      F N.Perm Pr(>F)  
+    ## Groups     4 0.14759 0.036896 2.1219    999   0.07 .
+    ## Residuals 88 1.53016 0.017388                       
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## Run 0 stress 0.1477685 
+    ## Run 1 stress 0.1477589 
     ## ... New best solution
-    ## ... Procrustes: rmse 0.0009669284  max resid 0.008992791 
-    ## ... Similar to previous best
-    ## Run 4 stress 0.1767066 
-    ## Run 5 stress 0.1594709 
-    ## ... Procrustes: rmse 0.0009294008  max resid 0.008775719 
-    ## ... Similar to previous best
-    ## Run 6 stress 0.1656687 
-    ## Run 7 stress 0.1594235 
+    ## ... Procrustes: rmse 0.003816107  max resid 0.0262514 
+    ## Run 2 stress 0.1708236 
+    ## Run 3 stress 0.1673017 
+    ## Run 4 stress 0.1477685 
+    ## ... Procrustes: rmse 0.003817727  max resid 0.02627458 
+    ## Run 5 stress 0.1544392 
+    ## Run 6 stress 0.1477685 
+    ## ... Procrustes: rmse 0.003827634  max resid 0.02613307 
+    ## Run 7 stress 0.1477869 
+    ## ... Procrustes: rmse 0.005297361  max resid 0.03100532 
+    ## Run 8 stress 0.1477589 
     ## ... New best solution
-    ## ... Procrustes: rmse 0.0070564  max resid 0.07340902 
-    ## Run 8 stress 0.1767511 
-    ## Run 9 stress 0.169461 
-    ## Run 10 stress 0.1659143 
-    ## Run 11 stress 0.1617597 
-    ## Run 12 stress 0.1839546 
-    ## Run 13 stress 0.1656965 
-    ## Run 14 stress 0.1659141 
-    ## Run 15 stress 0.1656658 
-    ## Run 16 stress 0.203966 
-    ## Run 17 stress 0.1616523 
-    ## Run 18 stress 0.1656317 
-    ## Run 19 stress 0.1594756 
-    ## ... Procrustes: rmse 0.007345529  max resid 0.07545158 
-    ## Run 20 stress 0.1981387 
-    ## *** Best solution was not repeated -- monoMDS stopping criteria:
-    ##     20: stress ratio > sratmax
+    ## ... Procrustes: rmse 3.868764e-05  max resid 0.0003068434 
+    ## ... Similar to previous best
+    ## Run 9 stress 0.1477589 
+    ## ... New best solution
+    ## ... Procrustes: rmse 1.169835e-05  max resid 7.766916e-05 
+    ## ... Similar to previous best
+    ## Run 10 stress 0.1545526 
+    ## Run 11 stress 0.1674094 
+    ## Run 12 stress 0.1477849 
+    ## ... Procrustes: rmse 0.003583495  max resid 0.03060495 
+    ## Run 13 stress 0.1544393 
+    ## Run 14 stress 0.1477848 
+    ## ... Procrustes: rmse 0.003582522  max resid 0.03058834 
+    ## Run 15 stress 0.1545538 
+    ## Run 16 stress 0.1544392 
+    ## Run 17 stress 0.1477869 
+    ## ... Procrustes: rmse 0.005296265  max resid 0.0309405 
+    ## Run 18 stress 0.1708236 
+    ## Run 19 stress 0.1477869 
+    ## ... Procrustes: rmse 0.005300482  max resid 0.03098729 
+    ## Run 20 stress 0.1544401 
+    ## *** Best solution repeated 1 times
 
 ![](BeeSearch1_files/figure-gfm/composition_across_seasons-1.png)<!-- -->
 
