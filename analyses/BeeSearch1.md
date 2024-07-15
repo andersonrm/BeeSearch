@@ -1,7 +1,7 @@
 BeeSearch initial
 ================
 Dr. Riley M. Anderson
-July 09, 2024
+July 15, 2024
 
   
 
@@ -10,38 +10,22 @@ July 09, 2024
 - [How many species do we have at each location? How much variability is
   there in
   richness?](#how-many-species-do-we-have-at-each-location-how-much-variability-is-there-in-richness)
+- [Sex ratio in trap vs. netting collection
+  method:](#sex-ratio-in-trap-vs-netting-collection-method)
+- [Chao indices](#chao-indices)
 - [Does community composition change over
   time?](#does-community-composition-change-over-time)
 - [How does community composition change across
   seasons?](#how-does-community-composition-change-across-seasons)
-  - [Rarefaction curves:](#rarefaction-curves)
 - [What bee groups drive changes in abundance from early to mid to late
   year?](#what-bee-groups-drive-changes-in-abundance-from-early-to-mid-to-late-year)
 - [Can we do analysis with and without major species (H. tripartitus; A.
   texanus; M.
   microsticta/us)](#can-we-do-analysis-with-and-without-major-species-h-tripartitus-a-texanus-m-microstictaus)
-  - [- Is there anything we can do to figure out why these species are
-    abundant in certain
-    year?](#--is-there-anything-we-can-do-to-figure-out-why-these-species-are-abundant-in-certain-year)
 - [What is the turnover of species within sub-sites within
   years?](#what-is-the-turnover-of-species-within-sub-sites-within-years)
-- [What is the turnover of species within major sites across
-  years?](#what-is-the-turnover-of-species-within-major-sites-across-years)
-- [How similar are populations within sites based on distance (spatial
-  autocorrelation), and can we assess this for particular bee
-  groups](#how-similar-are-populations-within-sites-based-on-distance-spatial-autocorrelation-and-can-we-assess-this-for-particular-bee-groups)
-  - [Interesting groups: Osmia (lots of species, not abundant),
-    Halictus](#interesting-groups-osmia-lots-of-species-not-abundant-halictus)
-- [Can we assess why groups like Halictus have so much variability in
-  abundance, and whether this has anything to do with the sex of the
-  individuals
-  collected?](#can-we-assess-why-groups-like-halictus-have-so-much-variability-in-abundance-and-whether-this-has-anything-to-do-with-the-sex-of-the-individuals-collected)
 - [Is there greater overall diversity at SCL vs POS vs
   PBF?](#is-there-greater-overall-diversity-at-scl-vs-pos-vs-pbf)
-- [Distance effects – can we estimate
-  flight](#distance-effects--can-we-estimate-flight)
-- [Can we compare to Eli’s study?](#can-we-compare-to-elis-study)
-- [What species are persistent?](#what-species-are-persistent)
   - [Session Information](#session-information)
 
 ## Overview
@@ -54,7 +38,246 @@ What is this analysis about?
 
 # How many species do we have at each location? How much variability is there in richness?
 
-![](BeeSearch1_files/figure-gfm/Q1-1.png)<!-- -->
+![](BeeSearch1_files/figure-gfm/Q1-1.png)<!-- --> This is purely species
+counts, no kind of offset for sampling effort (other than excluding 2014
+and 2020).
+
+# Sex ratio in trap vs. netting collection method:
+
+- Ratios \> 1 represent male bias
+
+- Ratios \< 1 represent female bias
+
+- Overall:
+
+| Collection.Method | female | male | sex_ratio |
+|:------------------|-------:|-----:|----------:|
+| N                 |    737 |  421 |      0.57 |
+| T                 |   6155 | 1497 |      0.24 |
+
+- By site:
+
+| Collection.Method | Site | female | male | sex_ratio |
+|:------------------|:-----|-------:|-----:|----------:|
+| N                 | BPF  |     61 |   92 |      1.51 |
+| N                 | POS  |    624 |  272 |      0.44 |
+| N                 | SCL  |     52 |   57 |      1.10 |
+| T                 | BPF  |    751 |  278 |      0.37 |
+| T                 | POS  |   4478 |  917 |      0.20 |
+| T                 | SCL  |    926 |  302 |      0.33 |
+
+- By season:
+
+| Collection.Method | ToY   | female | male | sex_ratio |
+|:------------------|:------|-------:|-----:|----------:|
+| N                 | early |    129 |   82 |      0.64 |
+| N                 | late  |    226 |  210 |      0.93 |
+| N                 | mid   |    382 |  129 |      0.34 |
+| T                 | early |   1471 |  322 |      0.22 |
+| T                 | late  |   1461 |  415 |      0.28 |
+| T                 | mid   |   3223 |  760 |      0.24 |
+
+- By season and site:
+
+| Collection.Method | ToY   | Site | female | male | sex_ratio |
+|:------------------|:------|:-----|-------:|-----:|----------:|
+| N                 | early | BPF  |     15 |   59 |      3.93 |
+| N                 | early | POS  |    114 |   23 |      0.20 |
+| N                 | late  | BPF  |     28 |   22 |      0.79 |
+| N                 | late  | POS  |    198 |  186 |      0.94 |
+| N                 | mid   | BPF  |     18 |   11 |      0.61 |
+| N                 | mid   | POS  |    312 |   63 |      0.20 |
+| N                 | mid   | SCL  |     52 |   55 |      1.06 |
+| T                 | early | BPF  |    147 |   33 |      0.22 |
+| T                 | early | POS  |    998 |  148 |      0.15 |
+| T                 | early | SCL  |    326 |  141 |      0.43 |
+| T                 | late  | BPF  |    190 |  108 |      0.57 |
+| T                 | late  | POS  |   1058 |  260 |      0.25 |
+| T                 | late  | SCL  |    213 |   47 |      0.22 |
+| T                 | mid   | BPF  |    414 |  137 |      0.33 |
+| T                 | mid   | POS  |   2422 |  509 |      0.21 |
+| T                 | mid   | SCL  |    387 |  114 |      0.29 |
+| N                 | late  | SCL  |      0 |    2 |       Inf |
+
+# Chao indices
+
+- Chao indices by site
+
+|  chao1 |  chao2 | Site |
+|-------:|-------:|:-----|
+| 107.18 | 107.18 | BPF  |
+| 192.06 | 192.06 | POS  |
+| 120.13 | 120.13 | SCL  |
+
+- Chao indices by site and season
+
+|  chao1 |  chao2 | Site | ToY  |
+|-------:|-------:|:-----|:-----|
+|  73.50 |  73.50 | BPF  | 2018 |
+|  86.96 |  86.96 | BPF  | 2019 |
+|  43.75 |  43.75 | POS  | 2014 |
+|  87.56 |  87.56 | POS  | 2015 |
+|  72.06 |  72.06 | POS  | 2016 |
+| 100.39 | 100.39 | POS  | 2017 |
+| 145.07 | 145.07 | POS  | 2018 |
+| 125.56 | 125.56 | POS  | 2019 |
+|  81.20 |  81.20 | POS  | 2020 |
+|  52.00 |  52.00 | SCL  | 2014 |
+| 148.10 | 148.10 | SCL  | 2015 |
+| 107.04 | 107.04 | SCL  | 2016 |
+
+- Chao indices by station
+
+|  chao1 |  chao2 | Station |
+|-------:|-------:|:--------|
+|  44.64 |  44.64 | BPF1    |
+|  68.67 |  68.67 | BPF2    |
+|  34.33 |  34.33 | BPF3    |
+|  95.00 |  95.00 | BPF4    |
+|  58.00 |  58.00 | BPF5    |
+|  55.12 |  55.12 | BPF6    |
+|  40.56 |  40.56 | BPF7    |
+|  31.67 |  31.67 | BPF8    |
+|  47.00 |  47.00 | BPFX    |
+|   3.00 |   3.00 | POS     |
+|  98.72 |  98.72 | POS1    |
+|   6.00 |   6.00 | POS1/5  |
+|  20.00 |  20.00 | POS10   |
+|  62.67 |  62.67 | POS11   |
+| 136.25 | 136.25 | POS12   |
+|  70.50 |  70.50 | POS13   |
+|  45.25 |  45.25 | POS14   |
+|  18.00 |  18.00 | POS15   |
+|  46.00 |  46.00 | POS16   |
+|  61.00 |  61.00 | POS17   |
+|  26.00 |  26.00 | POS18   |
+|  43.00 |  43.00 | POS19   |
+| 119.08 | 119.08 | POS2    |
+|  19.50 |  19.50 | POS2/3  |
+| 103.00 | 103.00 | POS20   |
+|  64.20 |  64.20 | POS21   |
+|  45.33 |  45.33 | POS22   |
+|  56.40 |  56.40 | POS23   |
+|  69.00 |  69.00 | POS24   |
+|  56.33 |  56.33 | POS25   |
+|  48.00 |  48.00 | POS26   |
+|  39.00 |  39.00 | POS27   |
+|  26.90 |  26.90 | POS28   |
+|  91.50 |  91.50 | POS3    |
+|  70.06 |  70.06 | POS4    |
+|  92.00 |  92.00 | POS5    |
+|  61.33 |  61.33 | POS6    |
+|   1.00 |   1.00 | POS6/7  |
+|  33.33 |  33.33 | POS7    |
+|   2.00 |   2.00 | POS7/8  |
+|  85.75 |  85.75 | POS8    |
+|  95.00 |  95.00 | POS9    |
+|  45.08 |  45.08 | POSX    |
+| 104.08 | 104.08 | SCL1    |
+| 113.50 | 113.50 | SCL2    |
+|  83.50 |  83.50 | SCL3    |
+|  90.14 |  90.14 | SCL4    |
+|  44.17 |  44.17 | SCL5    |
+
+- Chao indices by station and year
+
+|  chao1 |  chao2 | Station | Year |
+|-------:|-------:|:--------|:-----|
+|  52.50 |  52.50 | BPF1    | 2018 |
+|  61.67 |  61.67 | BPF1    | 2019 |
+|  45.00 |  45.00 | BPF2    | 2018 |
+|  47.17 |  47.17 | BPF2    | 2019 |
+|  32.00 |  32.00 | BPF3    | 2018 |
+|  38.12 |  38.12 | BPF3    | 2019 |
+|  27.75 |  27.75 | BPF4    | 2018 |
+|  44.12 |  44.12 | BPF4    | 2019 |
+|  32.10 |  32.10 | BPF5    | 2018 |
+|  63.60 |  63.60 | BPF5    | 2019 |
+|  24.08 |  24.08 | BPF6    | 2018 |
+| 102.25 | 102.25 | BPF6    | 2019 |
+|  40.56 |  40.56 | BPF7    | 2019 |
+|  31.67 |  31.67 | BPF8    | 2019 |
+|  11.00 |  11.00 | BPFX    | 2018 |
+|  19.00 |  19.00 | BPFX    | 2019 |
+|   6.00 |   6.00 | POS1/5  | 2017 |
+|  22.17 |  22.17 | POS10   | 2017 |
+|  10.00 |  10.00 | POS10   | 2019 |
+|  42.67 |  42.67 | POS11   | 2017 |
+|  14.25 |  14.25 | POS11   | 2018 |
+|  30.12 |  30.12 | POS12   | 2017 |
+|  75.50 |  75.50 | POS12   | 2019 |
+|  58.50 |  58.50 | POS13   | 2017 |
+|  52.67 |  52.67 | POS13   | 2018 |
+|  55.50 |  55.50 | POS13   | 2020 |
+|  45.25 |  45.25 | POS14   | 2017 |
+|  18.00 |  18.00 | POS15   | 2017 |
+|  46.00 |  46.00 | POS16   | 2017 |
+|  61.00 |  61.00 | POS17   | 2017 |
+|  26.00 |  26.00 | POS18   | 2017 |
+|  43.00 |  43.00 | POS19   | 2017 |
+|  30.06 |  30.06 | POS1    | 2014 |
+|  43.08 |  43.08 | POS1    | 2015 |
+|  55.17 |  55.17 | POS1    | 2016 |
+|  16.00 |  16.00 | POS1    | 2017 |
+|   6.00 |   6.00 | POS1    | 2018 |
+|  84.00 |  84.00 | POS1    | 2019 |
+|  19.50 |  19.50 | POS2/3  | 2015 |
+|  13.00 |  13.00 | POS20   | 2017 |
+|  53.06 |  53.06 | POS20   | 2018 |
+|  18.50 |  18.50 | POS20   | 2019 |
+|  40.56 |  40.56 | POS20   | 2020 |
+|   6.00 |   6.00 | POS21   | 2017 |
+|  64.20 |  64.20 | POS21   | 2019 |
+|  46.00 |  46.00 | POS22   | 2018 |
+|   9.50 |   9.50 | POS22   | 2019 |
+|  55.40 |  55.40 | POS23   | 2018 |
+|  31.25 |  31.25 | POS23   | 2019 |
+|  79.00 |  79.00 | POS24   | 2018 |
+|  24.60 |  24.60 | POS24   | 2020 |
+|  56.33 |  56.33 | POS25   | 2019 |
+|  48.00 |  48.00 | POS26   | 2020 |
+|  39.00 |  39.00 | POS27   | 2020 |
+|  26.90 |  26.90 | POS28   | 2020 |
+|  36.00 |  36.00 | POS2    | 2014 |
+|  60.07 |  60.07 | POS2    | 2015 |
+|  86.17 |  86.17 | POS2    | 2016 |
+|  39.25 |  39.25 | POS2    | 2019 |
+|  39.12 |  39.12 | POS3    | 2014 |
+|  50.17 |  50.17 | POS3    | 2015 |
+|  48.90 |  48.90 | POS3    | 2016 |
+|  50.33 |  50.33 | POS3    | 2018 |
+|  57.25 |  57.25 | POS4    | 2016 |
+|  45.00 |  45.00 | POS4    | 2018 |
+|  48.06 |  48.06 | POS4    | 2020 |
+|  90.25 |  90.25 | POS5    | 2017 |
+|  56.00 |  56.00 | POS5    | 2019 |
+|   1.00 |   1.00 | POS6/7  | 2017 |
+|  70.25 |  70.25 | POS6    | 2017 |
+|  47.00 |  47.00 | POS6    | 2019 |
+|   2.00 |   2.00 | POS7/8  | 2017 |
+|  33.33 |  33.33 | POS7    | 2017 |
+|  45.00 |  45.00 | POS8    | 2017 |
+|  67.90 |  67.90 | POS8    | 2019 |
+| 144.50 | 144.50 | POS9    | 2017 |
+|  72.67 |  72.67 | POS9    | 2018 |
+|  39.29 |  39.29 | POS9    | 2020 |
+|   7.50 |   7.50 | POSX    | 2017 |
+|  41.07 |  41.07 | POSX    | 2018 |
+|   7.00 |   7.00 | POSX    | 2019 |
+|   3.00 |   3.00 | POS     | 2017 |
+|  32.00 |  32.00 | SCL1    | 2014 |
+|  59.90 |  59.90 | SCL1    | 2015 |
+|  91.90 |  91.90 | SCL1    | 2016 |
+|  56.00 |  56.00 | SCL2    | 2014 |
+|  66.17 |  66.17 | SCL2    | 2015 |
+|  42.00 |  42.00 | SCL2    | 2016 |
+|  19.00 |  19.00 | SCL3    | 2014 |
+|  64.00 |  64.00 | SCL3    | 2015 |
+| 142.50 | 142.50 | SCL3    | 2016 |
+|  25.40 |  25.40 | SCL4    | 2014 |
+| 231.00 | 231.00 | SCL4    | 2015 |
+|  43.12 |  43.12 | SCL4    | 2016 |
+|  44.17 |  44.17 | SCL5    | 2016 |
 
 # Does community composition change over time?
 
@@ -152,11 +375,6 @@ across years.
 
 ![](BeeSearch1_files/figure-gfm/nmds_fig_years-1.png)<!-- -->
 
-## Rarefaction curves:
-
-What scale do we want?
-![](BeeSearch1_files/figure-gfm/Rarefaction-1.png)<!-- -->![](BeeSearch1_files/figure-gfm/Rarefaction-2.png)<!-- -->![](BeeSearch1_files/figure-gfm/Rarefaction-3.png)<!-- -->![](BeeSearch1_files/figure-gfm/Rarefaction-4.png)<!-- -->
-
 # What bee groups drive changes in abundance from early to mid to late year?
 
 NMDS 2017
@@ -200,30 +418,21 @@ around the centroids.
 
 # Can we do analysis with and without major species (H. tripartitus; A. texanus; M. microsticta/us)
 
-## - Is there anything we can do to figure out why these species are abundant in certain year?
+What analysis?
 
 # What is the turnover of species within sub-sites within years?
 
 ![](BeeSearch1_files/figure-gfm/POS_beta_div_across_sites_within_years-1.png)<!-- -->
 
-# What is the turnover of species within major sites across years?
-
-Can we answer this question if the sampling was not the same across
-major sites?
-
-# How similar are populations within sites based on distance (spatial autocorrelation), and can we assess this for particular bee groups
-
-## Interesting groups: Osmia (lots of species, not abundant), Halictus
-
-# Can we assess why groups like Halictus have so much variability in abundance, and whether this has anything to do with the sex of the individuals collected?
-
 # Is there greater overall diversity at SCL vs POS vs PBF?
 
-# Distance effects – can we estimate flight
+| Site | Shannon | Simpson | InvSimpson | UnbiasedSimpson | FisherAlpha |
+|:-----|--------:|--------:|-----------:|----------------:|------------:|
+| POS  |    3.57 |    0.95 |      22.14 |            0.95 |       26.49 |
+| BPF  |    3.51 |    0.96 |      22.35 |            0.96 |       19.71 |
+| SCL  |    3.48 |    0.95 |      20.40 |            0.95 |       23.05 |
 
-# Can we compare to Eli’s study?
-
-# What species are persistent?
+Diversity is similar across all 3 sites.
 
 ## Session Information
 

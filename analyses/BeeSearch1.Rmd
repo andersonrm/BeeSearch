@@ -63,6 +63,8 @@ library(tidyverse) # Needed for data wrangling: dplyr, tidyr, ggplot2
 library(cowplot) # Needed for publication-quality ggplots
 library(vegan)
 library(adespatial)
+library(knitr)
+library(fossil)
 
 # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 # @@@@@ Data Preparation
@@ -98,7 +100,14 @@ dat1 <- dat1 %>%
          ToY = case_when(JD < 135 ~ "early",
                          JD > 205 ~ "late",
                          TRUE ~ "mid"),
-         StationYear = paste(Station, Year, sep = "_"))
+         StationYear = paste(Station, Year, sep = "_")) %>% 
+  filter(Station != "") %>% 
+  mutate(Sex = case_when(
+      Sex == "M" ~ "male",
+      Sex == "F" ~ "female",
+      TRUE ~ NA_character_ # Handle any unexpected values
+    ))
+
 
 # Sites with comparable sampling:
 comp.sites <- comp.sites %>% 
@@ -229,6 +238,148 @@ rich.site.year.sep %>%
   theme_classic()
 
 ```
+This is purely species counts, no kind of offset for sampling effort (other than excluding 2014 and 2020).
+
+
+
+# Sex ratio in trap vs. netting collection method:
+```{r sex_ratios_function, echo = F}
+
+sex_ratio_function <- function(data, group){
+  data  %>%
+    group_by(across(all_of(group))) %>%
+    tally(name = "count") %>%
+    pivot_wider(names_from = Sex,
+                values_from = count,
+                values_fill = list(count = 0)) %>%
+    mutate(sex_ratio = male/female)
+}
+
+```
+* Ratios > 1 represent male bias
+* Ratios < 1 represent female bias
+
+
+* Overall:
+```{r overall_sex_ratios, echo = F}
+kable(sex_ratio_function(dat1, c("Sex", "Collection.Method")),
+      format = "markdown", digits = 2)
+```
+
+* By site:
+```{r sex_ratios_by_site, echo = F}
+kable(sex_ratio_function(dat1, c("Sex", "Collection.Method", "Site")),
+      format = "markdown", digits = 2)
+```
+
+* By season:
+```{r sex_ratios_by_season, echo = F}
+kable(sex_ratio_function(dat1, c("Sex", "Collection.Method", "ToY")),
+      format = "markdown", digits = 2)
+```
+
+* By season and site:
+```{r sex_ratios_by_season_and_site, echo = F}
+kable(sex_ratio_function(dat1, c("Sex", "Collection.Method",
+                                 "ToY", "Site")),
+      format = "markdown", digits = 2)
+```
+
+# Chao indices
+```{r chao_indices, echo = F}
+
+# Sites by season
+chao_site_season <- dat1 %>% 
+  unite("SiteToY", c(Site, Year), sep = "_") %>% 
+  group_by(SiteToY, Short.label.name) %>% 
+  tally(name = "count") %>% 
+  pivot_wider(names_from = SiteToY,
+              values_from = count,
+              values_fill = list(count = 0)) %>% 
+  column_to_rownames("Short.label.name")
+
+chao_site_season <- data.frame(
+  chao1 = sapply(seq_along(chao_site_season), function(i){
+    chao1(chao_site_season[[i]])}),
+  chao2 = sapply(seq_along(chao_site_season), function(i){
+    chao2(chao_site_season[[i]])}),
+  SiteToY = colnames(chao_site_season)) %>% 
+  separate_wider_delim(SiteToY, delim = "_",
+                       names = c("Site", "ToY"))
+
+# Sites
+chao_site <- dat1 %>% 
+  group_by(Site, Short.label.name) %>% 
+  tally(name = "count") %>% 
+  pivot_wider(names_from = Site,
+              values_from = count,
+              values_fill = list(count = 0)) %>% 
+  column_to_rownames("Short.label.name")
+
+chao_site <- data.frame(
+  chao1 = sapply(seq_along(chao_site), function(i){
+    chao1(chao_site[[i]])}),
+  chao2 = sapply(seq_along(chao_site), function(i){
+    chao2(chao_site[[i]])}),
+  Site = colnames(chao_site))
+
+# Stations
+
+chao_stations <- dat1 %>% 
+  group_by(Station, Short.label.name) %>% 
+  tally(name = "count") %>% 
+  pivot_wider(names_from = Station,
+              values_from = count,
+              values_fill = list(count = 0)) %>% 
+  column_to_rownames("Short.label.name")
+
+chao_stations <- data.frame(
+  chao1 = sapply(seq_along(chao_stations), function(i){
+    chao1(chao_stations[[i]])}),
+  chao2 = sapply(seq_along(chao_stations), function(i){
+    chao2(chao_stations[[i]])}),
+  Station = colnames(chao_stations))
+
+
+# Station by year
+
+chao_station_year <- dat1 %>% 
+  group_by(StationYear, Short.label.name) %>% 
+  tally(name = "count") %>% 
+  pivot_wider(names_from = StationYear,
+              values_from = count,
+              values_fill = list(count = 0)) %>% 
+  column_to_rownames("Short.label.name")
+
+chao_station_year <- data.frame(
+  chao1 = sapply(seq_along(chao_station_year), function(i){
+    chao1(chao_station_year[[i]])}),
+  chao2 = sapply(seq_along(chao_station_year), function(i){
+    chao2(chao_station_year[[i]])}),
+  StationYear = colnames(chao_station_year)) %>% 
+  separate_wider_delim(StationYear, delim = "_",
+                       names = c("Station", "Year"))
+```
+
+* Chao indices by site
+```{r chao_site, echo = F}
+kable(chao_site, format = "markdown", digits = 2)
+```
+
+* Chao indices by site and season
+```{r chao_site_season, echo = F}
+kable(chao_site_season, format = "markdown", digits = 2)
+```
+
+* Chao indices by station
+```{r chao_station, echo = F}
+kable(chao_stations, format = "markdown", digits = 2)
+```
+
+* Chao indices by station and year
+```{r chao_station_year, echo = F}
+kable(chao_station_year, format = "markdown", digits = 2)
+```
 
 # Does community composition change over time?
 
@@ -328,35 +479,6 @@ site_scores_seasons %>%
 ```
 
 
-
-## Rarefaction curves:
-
-What scale do we want?
-```{r Rarefaction, echo = F}
-
-tes1 <- TES(t(mat1[,1]))
-
-plot.TES(tes1)
-
-
-
-tes2 <- TES(t(mat1[,2]))
-
-plot.TES(tes2)
-
-
-tes4 <- TES(t(mat1[,4]))
-
-plot.TES(tes4)
-
-tes5 <- TES(t(mat1[,5]))
-
-plot.TES(tes5)
-
-```
-
-
-
 # What bee groups drive changes in abundance from early to mid to late year?
 
 
@@ -433,7 +555,7 @@ site_scores2017 %>%
 
 # Can we do analysis with and without major species (H. tripartitus; A. texanus; M. microsticta/us)
 
-## - Is there anything we can do to figure out why these species are abundant in certain year?
+What analysis?
 
 
 # What is the turnover of species within sub-sites within years?
@@ -502,30 +624,43 @@ ggdraw(plot.y) +
 ```
 
 
-# What is the turnover of species within major sites across years?
-
-Can we answer this question if the sampling was not the same across major sites?
-
-
-
-
-
-
-# How similar are populations within sites based on distance (spatial autocorrelation), and can we assess this for particular bee groups
-
-
-
-## Interesting groups: Osmia (lots of species, not abundant), Halictus
-
-# Can we assess why groups like Halictus have so much variability in abundance, and whether this has anything to do with the sex of the individuals collected?
-
 # Is there greater overall diversity at SCL vs POS vs PBF?
+```{r diversity_among_sites, echo = F}
+# Site level matrix
+site_matrix <- dat1 %>% 
+  group_by(Short.label.name, Site) %>% 
+  tally(n = "count") %>% 
+  pivot_wider(names_from = Short.label.name,
+              values_from = count,
+              values_fill = list(count = 0)) %>% 
+  column_to_rownames("Site")
 
-# Distance effects – can we estimate flight
+h <- diversity(site_matrix) %>% 
+  enframe(name = "Site", value = "Shannon")
 
-# Can we compare to Eli’s study?
+simp <- diversity(site_matrix, index = "simpson") %>% 
+  enframe(name = "Site", value = "Simpson") %>% 
+  select(-Site)
 
-# What species are persistent?
+invsimp <- diversity(site_matrix, index = "inv") %>% 
+  enframe(name = "Site", value = "InvSimpson") %>% 
+  select(-Site)
+
+unbias.simp <- simpson.unb(site_matrix) %>% 
+  enframe(name = "Site", value = "UnbiasedSimpson") %>% 
+  select(-Site)
+
+f.alpha <- fisher.alpha(site_matrix) %>% 
+  enframe(name = "Site", value = "FisherAlpha") %>% 
+  select(-Site)
+
+
+
+kable(bind_cols(h, simp, invsimp, unbias.simp, f.alpha),
+      format = "markdown", digits = 2)
+```
+Diversity is similar across all 3 sites.
+
 
 
 ## Session Information
