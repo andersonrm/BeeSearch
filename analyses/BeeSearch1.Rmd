@@ -286,14 +286,14 @@ kable(sex_ratio_function(dat1, c("Sex", "Collection.Method",
 ```
 
 # Chao indices
-```{r chao_indices, echo = F}
+```{r chao_indices, echo = F, cache = F}
 
 # Sites by season
 chao_site_season <- dat1 %>% 
-  unite("SiteToY", c(Site, Year), sep = "_") %>% 
-  group_by(SiteToY, Short.label.name) %>% 
+  unite("SiteSeason", c(Site, ToY), sep = "_") %>% 
+  group_by(SiteSeason, Short.label.name) %>% 
   tally(name = "count") %>% 
-  pivot_wider(names_from = SiteToY,
+  pivot_wider(names_from = SiteSeason,
               values_from = count,
               values_fill = list(count = 0)) %>% 
   column_to_rownames("Short.label.name")
@@ -303,9 +303,9 @@ chao_site_season <- data.frame(
     chao1(chao_site_season[[i]])}),
   chao2 = sapply(seq_along(chao_site_season), function(i){
     chao2(chao_site_season[[i]])}),
-  SiteToY = colnames(chao_site_season)) %>% 
-  separate_wider_delim(SiteToY, delim = "_",
-                       names = c("Site", "ToY"))
+  SiteSeason = colnames(chao_site_season)) %>% 
+  separate_wider_delim(SiteSeason, delim = "_",
+                       names = c("Site", "Season"))
 
 # Sites
 chao_site <- dat1 %>% 
@@ -367,7 +367,7 @@ kable(chao_site, format = "markdown", digits = 2)
 ```
 
 * Chao indices by site and season
-```{r chao_site_season, echo = F}
+```{r chao_site_season, echo = F, cache = F}
 kable(chao_site_season, format = "markdown", digits = 2)
 ```
 
