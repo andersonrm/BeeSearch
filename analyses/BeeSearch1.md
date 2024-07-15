@@ -374,6 +374,74 @@ across years.
 
 # What bee groups drive changes in abundance from early to mid to late year?
 
+    ## Permutation test for adonis under reduced model
+    ## Terms added sequentially (first to last)
+    ## Permutation: free
+    ## Number of permutations: 999
+    ## 
+    ## adonis2(formula = site_matrix ~ Site + Year, data = site_meta, method = "bray")
+    ##          Df SumOfSqs      R2      F Pr(>F)    
+    ## Site      2   1.0216 0.04365 1.8410  0.008 ** 
+    ## Year      1   1.2940 0.05529 4.6636  0.001 ***
+    ## Residual 76  21.0878 0.90105                  
+    ## Total    79  23.4035 1.00000                  
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Permutation test for homogeneity of multivariate dispersions
+    ## Permutation: free
+    ## Number of permutations: 999
+    ## 
+    ## Response: Distances
+    ##           Df  Sum Sq  Mean Sq      F N.Perm Pr(>F)    
+    ## Groups     4 0.64073 0.160183 16.285    999  0.001 ***
+    ## Residuals 75 0.73772 0.009836                         
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Permutation test for homogeneity of multivariate dispersions
+    ## Permutation: free
+    ## Number of permutations: 999
+    ## 
+    ## Response: Distances
+    ##           Df Sum Sq  Mean Sq      F N.Perm Pr(>F)  
+    ## Groups     2 0.1789 0.089449 4.3768    999  0.018 *
+    ## Residuals 77 1.5736 0.020437                       
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## Run 0 stress 0.1553111 
+    ## Run 1 stress 0.1510452 
+    ## ... New best solution
+    ## ... Procrustes: rmse 0.07413382  max resid 0.2395836 
+    ## Run 2 stress 0.1592268 
+    ## Run 3 stress 0.1614855 
+    ## Run 4 stress 0.1564014 
+    ## Run 5 stress 0.1569258 
+    ## Run 6 stress 0.1578329 
+    ## Run 7 stress 0.1480831 
+    ## ... New best solution
+    ## ... Procrustes: rmse 0.08366469  max resid 0.2758437 
+    ## Run 8 stress 0.149421 
+    ## Run 9 stress 0.1472032 
+    ## ... New best solution
+    ## ... Procrustes: rmse 0.06580304  max resid 0.442211 
+    ## Run 10 stress 0.1480685 
+    ## Run 11 stress 0.1524812 
+    ## Run 12 stress 0.1521472 
+    ## Run 13 stress 0.1543276 
+    ## Run 14 stress 0.1520092 
+    ## Run 15 stress 0.1518745 
+    ## Run 16 stress 0.1608472 
+    ## Run 17 stress 0.1599767 
+    ## Run 18 stress 0.1551282 
+    ## Run 19 stress 0.1528374 
+    ## Run 20 stress 0.1536999 
+    ## *** Best solution was not repeated -- monoMDS stopping criteria:
+    ##     17: no. of iterations >= maxit
+    ##      3: stress ratio > sratmax
+
+![](BeeSearch1_files/figure-gfm/nmds_all-1.png)<!-- -->
+
 NMDS 2017
 
     ## Permutation test for adonis under reduced model

@@ -481,6 +481,82 @@ site_scores_seasons %>%
 
 # What bee groups drive changes in abundance from early to mid to late year?
 
+```{r nmds_all, echo = F}
+
+#####################################################
+# matrix assembly
+site_matrix <- dat1 %>% 
+  filter(Year != 2014 & Year != 2020) %>% 
+  group_by(Short.label.name, StationYear) %>% 
+  tally(n = "count") %>% 
+  pivot_wider(names_from = Short.label.name,
+              values_from = count,
+              values_fill = list(count = 0)) %>% 
+  column_to_rownames("StationYear")
+
+site_meta <- dat1 %>% 
+  filter(Year != 2014 & Year != 2020) %>% 
+  select(Site, Station, StationYear, Year) %>% 
+  distinct()
+#####################################################
+
+
+
+#############################################################
+# Stats
+adonis2(site_matrix ~ Site + Year,
+        data = site_meta, method = "bray")
+
+permutest(betadisper(vegdist(site_matrix, method = "bray"),
+                     site_meta$Year))
+
+permutest(betadisper(vegdist(site_matrix, method = "bray"),
+                     site_meta$Site))
+#############################################################
+
+
+########################################################
+# NMDS scores
+nmds_SSY <- metaMDS(site_matrix, distance = "bray",
+                    k = 2, try = 250, autotransform = F)
+# nmds_SSY$stress
+# 
+# stressplot(nmds_SSY)
+
+site_scores <- data.frame(scores(nmds_SSY)$sites) %>%
+  rownames_to_column("StationYear") %>% 
+  left_join(site_meta, by = "StationYear") %>%
+  unite(SiteYear, c("Site", "Year"), sep = "_", remove = F) %>% 
+  mutate(across(c(SiteYear:Year), as.factor)) %>% 
+  filter(Site != "") %>% 
+  droplevels()
+
+spp_scores <- data.frame(scores(nmds_SSY)$species) %>% 
+  rownames_to_column("Species")
+
+centroids_SSY <- site_scores %>% 
+  group_by(SiteYear) %>% 
+  summarise(NMDS1 = mean(NMDS1),
+            NMDS2 = mean(NMDS2))
+
+site_scores %>% 
+  ggplot(aes(x = NMDS1, y = NMDS2, color = SiteYear)) +
+  geom_point(aes(NMDS1, NMDS2, color = SiteYear),
+             size = 2) +
+  stat_ellipse() +
+  theme_cowplot()
+
+  # geom_point(data = centroid2017, size = 5, shape = 21,
+  #            color = 'black', aes(fill = ToY), show.legend = F) +
+  # labs(color = "Time of Season") +
+  # ggrepel::geom_text_repel(data = spp_scores2017,
+  #                          aes(x = NMDS1, y = NMDS2, label = Species),
+  #                          size = 1.5, inherit.aes = FALSE,
+  #                          max.overlaps = 20) +
+  # theme_cowplot()
+```
+
+
 
 NMDS 2017
 
