@@ -360,6 +360,12 @@ chao_station_year <- data.frame(
   separate_wider_delim(StationYear, delim = "_",
                        names = c("Station", "Year"))
 ```
+From Anne Chao 1989:
+
+Chao1 minimum species richness is defined non-parametrically as:
+
+$$S_{est} = S_{obs} + f_{1}^{2}/(2f_{2})$$
+
 
 * Chao indices by site
 ```{r chao_site, echo = F}
@@ -504,8 +510,11 @@ site_meta <- dat1 %>%
 
 #############################################################
 # Stats
-adonis2(site_matrix ~ Site + Year,
-        data = site_meta, method = "bray")
+site_year_mod <- adonis2(site_matrix ~ Site + Year,
+        data = site_meta, method = "bray",
+        strata = site_meta$Station)
+
+
 
 permutest(betadisper(vegdist(site_matrix, method = "bray"),
                      site_meta$Year))
