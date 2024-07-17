@@ -290,6 +290,7 @@ kable(sex_ratio_function(dat1, c("Sex", "Collection.Method",
 
 # Sites by season
 chao_site_season <- dat1 %>% 
+  filter(Collection.Method == "T") %>% 
   unite("SiteSeason", c(Site, ToY), sep = "_") %>% 
   group_by(SiteSeason, Short.label.name) %>% 
   tally(name = "count") %>% 
@@ -309,6 +310,7 @@ chao_site_season <- data.frame(
 
 # Sites
 chao_site <- dat1 %>% 
+  filter(Collection.Method == "T") %>% 
   group_by(Site, Short.label.name) %>% 
   tally(name = "count") %>% 
   pivot_wider(names_from = Site,
@@ -326,6 +328,7 @@ chao_site <- data.frame(
 # Stations
 
 chao_stations <- dat1 %>% 
+  filter(Collection.Method == "T") %>% 
   group_by(Station, Short.label.name) %>% 
   tally(name = "count") %>% 
   pivot_wider(names_from = Station,
@@ -344,6 +347,7 @@ chao_stations <- data.frame(
 # Station by year
 
 chao_station_year <- dat1 %>% 
+  filter(Collection.Method == "T") %>% 
   group_by(StationYear, Short.label.name) %>% 
   tally(name = "count") %>% 
   pivot_wider(names_from = StationYear,

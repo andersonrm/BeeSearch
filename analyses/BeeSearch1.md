@@ -119,15 +119,15 @@ Chao1 minimum species richness is defined non-parametrically as:
 
 |  chao1 |  chao2 | Site | Season |
 |-------:|-------:|:-----|:-------|
-|  54.00 |  54.00 | BPF  | early  |
-|  95.50 |  95.50 | BPF  | late   |
-|  90.45 |  90.45 | BPF  | mid    |
-| 100.00 | 100.00 | POS  | early  |
-|  76.90 |  76.90 | POS  | late   |
-| 140.04 | 140.04 | POS  | mid    |
+|  50.07 |  50.07 | BPF  | early  |
+|  88.00 |  88.00 | BPF  | late   |
+|  92.80 |  92.80 | BPF  | mid    |
+|  95.56 |  95.56 | POS  | early  |
+|  70.00 |  70.00 | POS  | late   |
+| 135.45 | 135.45 | POS  | mid    |
 | 102.14 | 102.14 | SCL  | early  |
-|  56.60 |  56.60 | SCL  | late   |
-|  98.45 |  98.45 | SCL  | mid    |
+|  65.12 |  65.12 | SCL  | late   |
+|  85.39 |  85.39 | SCL  | mid    |
 
 - Chao indices by station
 
