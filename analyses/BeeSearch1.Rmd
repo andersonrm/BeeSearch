@@ -37,7 +37,7 @@ knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
 # Set default knitr options: 
 # Suppress warnings and messages, cache chunks, 
 #  set default figure size to 6x8 at 300 dpi, and save a png and pdf
-knitr::opts_chunk$set(warning = F, message = F, collapse = T, cache = T,
+knitr::opts_chunk$set(warning = F, message = F, collapse = T, cache = F,
     fig.height = 6, fig.width = 8, dpi = 300, # 6x8" @ 300dpi:1800x2400=4.3MP
     dev = c('png', 'pdf'), dev.args = list(pdf = list(onefile = F)))
 
@@ -65,6 +65,10 @@ library(vegan)
 library(adespatial)
 library(knitr)
 library(fossil)
+library(geosphere)
+library(randomForest)
+library(caret)
+
 
 # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 # @@@@@ Data Preparation
@@ -75,7 +79,7 @@ dat1 <- read.csv("data/CABS1.csv")
 
 comp.sites <- read.csv("data/comparable.sites.csv")
 
-
+site.locs <- read.csv("data/site.locations.csv")
 ####################################
 # Funtions
 ####################################
@@ -108,6 +112,26 @@ dat1 <- dat1 %>%
       TRUE ~ NA_character_ # Handle any unexpected values
     ))
 
+incomp.sites <- dat1 %>% 
+  select(StationYear) %>% 
+  filter(StationYear == "POS1_2018" |
+           StationYear == "POS10_2019" |
+           StationYear == "POS11_2018" |
+           StationYear == "POS13_2017" |
+           StationYear == "POS14_2017" |
+           StationYear == "POS15_2017" |
+           StationYear == "POS16_2017" |
+           StationYear == "POS17_2017" |
+           StationYear == "POS18_2017" |
+           StationYear == "POS19_2017" |
+           StationYear == "POS20_2017" |
+           StationYear == "POS20_2019" |
+           StationYear == "POS21_2017" |
+           StationYear == "POS22_2019" |
+           StationYear == "POS23_2019") %>% 
+  distinct() %>% 
+  mutate(StationYear = factor(StationYear))
+
 
 # Sites with comparable sampling:
 comp.sites <- comp.sites %>% 
@@ -116,51 +140,82 @@ comp.sites <- comp.sites %>%
 # filter out the sites with incompatible sampling efforts:
 comp.data <- semi_join(dat1, comp.sites, by = "StationYear")
 
+dat2 <- anti_join(dat1, incomp.sites, by = "StationYear") %>% 
+  filter(Year != 2014 & Year != 2020) %>% 
+  mutate(Year = factor(Year))
+
 comp.data <- comp.data %>% 
   mutate(across(c(Year, StationYear), as.factor))
+
+
+######################################################
+# pairwise distances
+
+# Create a data frame with all combinations of stations
+combinations <- expand.grid(Station1 = site.locs$Station,
+                            Station2 = site.locs$Station)
+
+# Merge to get lat/long for both stations in each combination
+distances <- combinations %>%
+  left_join(site.locs, by = c("Station1" = "Station")) %>%
+  left_join(site.locs, by = c("Station2" = "Station"),
+            suffix = c("_1", "_2"))
+
+# Calculate the pairwise distances
+distances <- distances %>%
+  mutate(distance = distHaversine(cbind(long_1, lat_1),
+                                  cbind(long_2, lat_2)))
+
+distances <- distances %>%
+  rowwise() %>%
+  mutate(
+    Station1 = min(as.character(Station1), as.character(Station2)),
+    Station2 = max(as.character(Station1), as.character(Station2))
+  ) %>%
+  ungroup()
+
+# Remove duplicate rows and selct relevant columns
+distances <- distances %>%
+  distinct(Station1, Station2, .keep_all = TRUE) %>% 
+  select(Station1, Station2, distance) %>% 
+  filter(distance != 0) %>% 
+  mutate(temp.id = case_when(
+    Station1 == Station2 ~ 0,
+    TRUE ~ 1
+  )) %>% 
+  filter(temp.id == 1) %>% 
+  select(-temp.id)
+
+dist.matrix <- distances %>% 
+  pivot_wider(names_from = Station2,
+              values_from = distance,
+              values_fill = list(distance = 0))
 
 
 
 ##################################################
 # matrix data
 
-mat1 <- comp.data %>%
-  group_by(StationYear, Short.label.name) %>%
-  summarise(n = sum(Count)) %>%
-  ungroup() %>% 
-  pivot_wider(names_from = Short.label.name,
-              values_from = n) %>%
-  replace(is.na(.), 0) %>%
-  column_to_rownames("StationYear")
-
-mat1meta <- comp.data %>% 
-  select(StationYear, Year) %>% 
-  distinct()
-
-
 ## matrices by year:
 
-get_matrix_sites_within_years <- function(input_year){
-  matrix.site.years <- comp.data %>% 
+get_matrix_sites_within_years <- function(input_year, data){
+  matrix.site.years <- data %>% 
   filter(Year == input_year) %>% 
   group_by(Station, Short.label.name) %>% 
   summarise(n = sum(Count)) %>% 
   pivot_wider(names_from = Short.label.name,
-              values_from = n) %>% 
-  replace(is.na(.), 0) %>% 
+              values_from = n,
+              values_fill = list(n = 0))  %>% 
   column_to_rownames("Station")
   
   return(matrix.site.years)
 }
 
-matrix.site.years.list <- lapply(levels(comp.data$Year),
-                                 get_matrix_sites_within_years)
-
-
 
 ## matrices by year and time of season:
-mat2017 <- comp.data %>% 
-  filter(Year == "2017") %>% 
+mat2017 <- dat2 %>% 
+  filter(Year == "2017" & Site == "POS" &
+           Collection.Method == "T") %>% 
   group_by(Station, Short.label.name, ToY) %>%
   summarise(n = sum(Count)) %>% 
   pivot_wider(names_from = Short.label.name,
@@ -170,8 +225,9 @@ mat2017 <- comp.data %>%
   column_to_rownames("StationTime") %>% 
   select(-Station, -ToY)
 
-meta2017 <- comp.data %>% 
-  filter(Year == "2017") %>% 
+meta2017 <- dat2 %>% 
+  filter(Year == "2017" & Site == "POS" &
+           Collection.Method == "T") %>% 
   select(Station, ToY) %>% 
   distinct() %>% 
   mutate(StationTime = paste(Station, ToY, sep = "_")) %>% 
@@ -179,8 +235,9 @@ meta2017 <- comp.data %>%
 
 
 ## matrix by time of season:
-mat.seasons <- comp.data %>% 
-  filter(Year != "2014" & Year != "2020") %>% 
+mat.seasons <- dat2 %>% 
+  filter(Collection.Method == "T" &
+           Site == "POS") %>% 
   group_by(Station, Short.label.name, ToY, Year) %>%
   summarise(n = sum(Count)) %>% 
   ungroup() %>% 
@@ -191,8 +248,9 @@ mat.seasons <- comp.data %>%
   column_to_rownames("StationTimeYear") %>% 
   select(-Station, -ToY, -Year)
 
-meta.seasons <- comp.data %>% 
-  filter(Year != "2014" & Year != "2020") %>% 
+meta.seasons <- dat2 %>% 
+  filter(Site == "POS" &
+           Collection.Method == "T") %>% 
   select(Station, ToY, Year) %>% 
   distinct() %>% 
   mutate(StationTimeYear = paste(Station, ToY, Year, sep = "_")) %>% 
@@ -262,25 +320,25 @@ sex_ratio_function <- function(data, group){
 
 * Overall:
 ```{r overall_sex_ratios, echo = F}
-kable(sex_ratio_function(dat1, c("Sex", "Collection.Method")),
+kable(sex_ratio_function(dat2, c("Sex", "Collection.Method")),
       format = "markdown", digits = 2)
 ```
 
 * By site:
 ```{r sex_ratios_by_site, echo = F}
-kable(sex_ratio_function(dat1, c("Sex", "Collection.Method", "Site")),
+kable(sex_ratio_function(dat2, c("Sex", "Collection.Method", "Site")),
       format = "markdown", digits = 2)
 ```
 
 * By season:
 ```{r sex_ratios_by_season, echo = F}
-kable(sex_ratio_function(dat1, c("Sex", "Collection.Method", "ToY")),
+kable(sex_ratio_function(dat2, c("Sex", "Collection.Method", "ToY")),
       format = "markdown", digits = 2)
 ```
 
 * By season and site:
 ```{r sex_ratios_by_season_and_site, echo = F}
-kable(sex_ratio_function(dat1, c("Sex", "Collection.Method",
+kable(sex_ratio_function(dat2, c("Sex", "Collection.Method",
                                  "ToY", "Site")),
       format = "markdown", digits = 2)
 ```
@@ -289,7 +347,7 @@ kable(sex_ratio_function(dat1, c("Sex", "Collection.Method",
 ```{r chao_indices, echo = F, cache = F}
 
 # Sites by season
-chao_site_season <- dat1 %>% 
+chao_site_season <- dat2 %>% 
   filter(Collection.Method == "T") %>% 
   unite("SiteSeason", c(Site, ToY), sep = "_") %>% 
   group_by(SiteSeason, Short.label.name) %>% 
@@ -302,14 +360,12 @@ chao_site_season <- dat1 %>%
 chao_site_season <- data.frame(
   chao1 = sapply(seq_along(chao_site_season), function(i){
     chao1(chao_site_season[[i]])}),
-  chao2 = sapply(seq_along(chao_site_season), function(i){
-    chao2(chao_site_season[[i]])}),
   SiteSeason = colnames(chao_site_season)) %>% 
   separate_wider_delim(SiteSeason, delim = "_",
                        names = c("Site", "Season"))
 
 # Sites
-chao_site <- dat1 %>% 
+chao_site <- dat2 %>% 
   filter(Collection.Method == "T") %>% 
   group_by(Site, Short.label.name) %>% 
   tally(name = "count") %>% 
@@ -321,13 +377,11 @@ chao_site <- dat1 %>%
 chao_site <- data.frame(
   chao1 = sapply(seq_along(chao_site), function(i){
     chao1(chao_site[[i]])}),
-  chao2 = sapply(seq_along(chao_site), function(i){
-    chao2(chao_site[[i]])}),
   Site = colnames(chao_site))
 
 # Stations
 
-chao_stations <- dat1 %>% 
+chao_stations <- dat2 %>% 
   filter(Collection.Method == "T") %>% 
   group_by(Station, Short.label.name) %>% 
   tally(name = "count") %>% 
@@ -339,14 +393,12 @@ chao_stations <- dat1 %>%
 chao_stations <- data.frame(
   chao1 = sapply(seq_along(chao_stations), function(i){
     chao1(chao_stations[[i]])}),
-  chao2 = sapply(seq_along(chao_stations), function(i){
-    chao2(chao_stations[[i]])}),
   Station = colnames(chao_stations))
 
 
 # Station by year
 
-chao_station_year <- dat1 %>% 
+chao_station_year <- dat2 %>% 
   filter(Collection.Method == "T") %>% 
   group_by(StationYear, Short.label.name) %>% 
   tally(name = "count") %>% 
@@ -358,8 +410,6 @@ chao_station_year <- dat1 %>%
 chao_station_year <- data.frame(
   chao1 = sapply(seq_along(chao_station_year), function(i){
     chao1(chao_station_year[[i]])}),
-  chao2 = sapply(seq_along(chao_station_year), function(i){
-    chao2(chao_station_year[[i]])}),
   StationYear = colnames(chao_station_year)) %>% 
   separate_wider_delim(StationYear, delim = "_",
                        names = c("Station", "Year"))
@@ -389,38 +439,40 @@ kable(chao_stations, format = "markdown", digits = 2)
 * Chao indices by station and year
 ```{r chao_station_year, echo = F}
 kable(chao_station_year, format = "markdown", digits = 2)
+
+chao_station_year %>% 
+  mutate(Year = as.numeric(Year),
+         Site = substr(Station, 1,3)) %>% 
+  ggplot(aes(x = Year, y = chao1, color = Site)) +
+  geom_jitter(shape = 21, width = 0.05) +
+  geom_smooth(aes(fill = Site),
+              method = "lm", alpha = 0.25) +
+  theme_cowplot() +
+  labs(y = "Chao1\n(minimum species richness)")
+
 ```
+** Minimum species richness (Chao1) across time.** Points are stations (sub sites), lines are fit by linear regression, and the shaded regions are 95% confidence intervals. The data exclude 2014 and 2020, and all net caught records.
+
+
 
 # Does community composition change over time?
 
-```{r composition_over_time, echo = F}
-
-adonis2(avgdist(mat1, sample = 5) ~ mat1meta$Year)
-
-permutest(betadisper(avgdist(mat1, sample = 5), mat1meta$Year))
-
-```
-No, overall, communities in the POS sites have similar composition across years.
 
 # How does community composition change across seasons?
 ```{r composition_across_seasons, echo = F, cache=F}
 
-adonis2(avgdist(mat.seasons, sample = 5) ~ meta.seasons$ToY * 
-          meta.seasons$Year)
+adonis2(mat.seasons ~ ToY * Year,
+        data = meta.seasons, method = "bray")
 
-permutest(
-  betadisper(
-    avgdist(mat.seasons, sample = 5),
-    meta.seasons$Year
-  )
-)
+permutest(betadisper(vegdist(mat.seasons, method = "bray"),
+    meta.seasons$Year))
 
 
 nmds.seasons <- metaMDS(mat.seasons, distance = "bray", k = 2,
                         autotransform = F, try = 250)
 
-stressplot(nmds.seasons)
-
+# stressplot(nmds.seasons)
+nmds.seasons$stress
 
 # site scores
 site_scores_seasons <- as.data.frame(scores(nmds.seasons)$sites)
@@ -436,10 +488,12 @@ spp_scores_seasons <- cbind(spp_scores_seasons,
                        Species = row.names(spp_scores_seasons))
 ```
 
+# What bee groups drive changes in abundance from early to mid to late year?
 ```{r nmds_fig_seasons, echo = F, cache=F}
 
 site_scores_seasons <- site_scores_seasons %>%  
-  mutate(ToY = factor(ToY)) %>% 
+  mutate(ToY = factor(ToY),
+         Year = factor(Year)) %>% 
   as.data.frame()
 
 
@@ -466,6 +520,8 @@ site_scores_seasons %>%
 
 ```
 
+
+# How does community composition change over time?
 ```{r nmds_fig_years, echo = F, cache=F}
 
 centroid_years <- site_scores_seasons %>% 
@@ -489,14 +545,15 @@ site_scores_seasons %>%
 ```
 
 
-# What bee groups drive changes in abundance from early to mid to late year?
+# All sites NMDS
 
-```{r nmds_all, echo = F}
+* By Site/Year
+```{r nmds_all_sites, echo = F}
 
 #####################################################
 # matrix assembly
-site_matrix <- dat1 %>% 
-  filter(Year != 2014 & Year != 2020) %>% 
+site_matrix <- dat2 %>% 
+  filter(Collection.Method == "T") %>% 
   group_by(Short.label.name, StationYear) %>% 
   tally(n = "count") %>% 
   pivot_wider(names_from = Short.label.name,
@@ -504,8 +561,8 @@ site_matrix <- dat1 %>%
               values_fill = list(count = 0)) %>% 
   column_to_rownames("StationYear")
 
-site_meta <- dat1 %>% 
-  filter(Year != 2014 & Year != 2020) %>% 
+site_meta <- dat2 %>% 
+  filter(Collection.Method == "T") %>% 
   select(Site, Station, StationYear, Year) %>% 
   distinct()
 #####################################################
@@ -514,11 +571,8 @@ site_meta <- dat1 %>%
 
 #############################################################
 # Stats
-site_year_mod <- adonis2(site_matrix ~ Site + Year,
-        data = site_meta, method = "bray",
-        strata = site_meta$Station)
-
-
+adonis2(site_matrix ~ Site + Year,
+        data = site_meta, method = "bray")
 
 permutest(betadisper(vegdist(site_matrix, method = "bray"),
                      site_meta$Year))
@@ -531,8 +585,8 @@ permutest(betadisper(vegdist(site_matrix, method = "bray"),
 ########################################################
 # NMDS scores
 nmds_SSY <- metaMDS(site_matrix, distance = "bray",
-                    k = 2, try = 250, autotransform = F)
-# nmds_SSY$stress
+                    k = 3, try = 250, autotransform = F)
+nmds_SSY$stress
 # 
 # stressplot(nmds_SSY)
 
@@ -559,19 +613,77 @@ site_scores %>%
   stat_ellipse() +
   theme_cowplot()
 
-  # geom_point(data = centroid2017, size = 5, shape = 21,
-  #            color = 'black', aes(fill = ToY), show.legend = F) +
-  # labs(color = "Time of Season") +
-  # ggrepel::geom_text_repel(data = spp_scores2017,
-  #                          aes(x = NMDS1, y = NMDS2, label = Species),
-  #                          size = 1.5, inherit.aes = FALSE,
-  #                          max.overlaps = 20) +
-  # theme_cowplot()
+```
+
+## NMDS by Site
+```{r nmds_all_sites_year, echo = F}
+site_scores %>% 
+  ggplot(aes(x = NMDS1, y = NMDS2, color = Site)) +
+  geom_point(aes(NMDS1, NMDS2, color = Site),
+             size = 2) +
+  stat_ellipse() +
+  theme_cowplot() +
+  ggrepel::geom_text_repel(aes(label = Station))
 ```
 
 
+### Site classification by species composition (Random Forest)
+```{r random_forest_sites, echo = F}
 
-NMDS 2017
+rf_matrix <- site_matrix %>% 
+  rownames_to_column("StationYear") %>% 
+  separate_wider_delim(StationYear, delim = "_",
+                       cols_remove = F,
+                       names = c("Station", "Year")) %>% 
+  separate_wider_position(Station,
+                          widths = c(Site = 3, 3, StationID = 2),
+                          cols_remove = F,
+                          too_few = "debug") %>% 
+  select(-StationID, -Station_width,
+         -Station_remainder, -Station_ok) %>% 
+  mutate(across(c(Site:StationYear), as.factor))
+
+rfmod_site <- randomForest(y = rf_matrix$Site,
+                           x = select(rf_matrix,
+                                      -Year, -Station,
+                                      -StationYear, -Site),
+                           importance = T, nPerm = 999)
+
+
+train(y = rf_matrix$Site,
+      x = select(rf_matrix,
+                 -Year, -Station,
+                 -StationYear, -Site),
+      method = "rf", na.action = na.omit)
+
+update(rfmod_site, mtry = 73)
+
+plot(rfmod_site)
+
+imp_vals_top <- data.frame(importance(rfmod_site)) %>% 
+  arrange(desc(MeanDecreaseGini)) %>% 
+  filter(MeanDecreaseGini > quantile(MeanDecreaseGini, 0.9))
+
+kable(imp_vals_top, format = "markdown", digits = 3)
+
+```
+** Random Forest classification of site by species composition.** The model was tuned without pre-processing. Bootstrapped resampling used 25 replicates. Overall model accuracy was 76.4%. The model clearly delineated the BPF sites with 0.00 class error. Similarly, POS sites were near perfect with 0.029 class error. However, the SCL sites were never classified correctly (1.00 class error), with most (8/9) identified as POS. This lends further support to the NMDS figure above, species composition is very similar across SCL and POS, but BPF sites have different community composition compared to the other two sites.
+
+The table above shows the species most representative of the community differences used to make the above classifications. These species are the top 10th percentile of ranked variable importance (mean decrease in Gini score). Take this with a grain of salt, the model didn't do a great job, overall Out of Bag error rate = 19.3%. This is almost unacceptable, especially because Random Forest more often overfits the data.
+
+
+
+* By year
+```{r nmds_all_year, echo = F}
+site_scores %>% 
+  ggplot(aes(x = NMDS1, y = NMDS2, color = Year)) +
+  geom_point(aes(NMDS1, NMDS2, color = Year),
+             size = 2) +
+  stat_ellipse() +
+  theme_cowplot()
+```
+
+# POS 2017 Changes over seasons
 
 ```{r NMDS_2017_stress, include = F}
 
@@ -604,13 +716,13 @@ spp_scores2017 <- cbind(spp_scores2017,
                        Species = row.names(spp_scores2017))
 
 
-adonis2(nmds2017dist ~ meta2017$ToY)
+adonis2(nmds2017dist ~ meta2017$ToY, method = "bray")
 permutest(betadisper(nmds2017dist, meta2017$ToY))
 
 
 ```
 
-Within the Port of Seattle sites in 2017, species composition changes significantly throughout the season with distinct groups of species in early, mid, and late season sampling.
+Within the Port of Seattle sites in 2017 and only 2017, species composition changes significantly throughout the season with distinct groups of species in early, mid, and late season sampling.
 
 ```{r nmds2017_plot, echo = F}
 site_scores2017 <- site_scores2017 %>%  
@@ -649,7 +761,12 @@ What analysis?
 
 # What is the turnover of species within sub-sites within years?
 
-```{r species_turnover_site_years,echo = F}
+```{r species_turnover_site_years_POS, echo = F}
+
+
+matrix.site.years.list <- lapply(levels(comp.data$Year),
+                                 data = comp.data,
+                                 get_matrix_sites_within_years)
 
 bdiv.list <- lapply(seq_along(matrix.site.years.list), function(i){
   beta.div.comp(matrix.site.years.list[[i]],
@@ -682,6 +799,7 @@ site.year.part <- site.year.part %>%
 
 ```
 
+### POS
 ```{r POS_beta_div_across_sites_within_years, echo = F}
 
 inset <- site.year.part %>% 
@@ -711,6 +829,126 @@ ggdraw(plot.y) +
   draw_plot(inset, .25, .49, .7, .45)
 
 ```
+
+### SCL
+```{r species_turnover_site_years_SCL, echo = F}
+
+SCL <- dat2 %>% 
+  filter(Site == "SCL") %>% 
+  droplevels()
+
+scl.matrix.list <- lapply(levels(SCL$Year),
+                                 data = SCL,
+                                 get_matrix_sites_within_years)
+
+
+bdiv.list.scl <- lapply(seq_along(scl.matrix.list), function(i){
+  beta.div.comp(scl.matrix.list[[i]],
+                coef = "J", quant = T)
+})
+
+site.year.part.scl <- extract_and_combine(bdiv.list.scl, "part")
+
+site.year.part.scl <- site.year.part.scl %>% 
+  mutate(year = factor(ListID + 2014)) %>% 
+  rownames_to_column(var = "metric") %>% 
+  mutate(metric = str_remove(metric, "\\.\\.\\..*$")) %>% 
+  select(-ListID) %>% 
+  pivot_wider(names_from = metric,
+              values_from = part_df)
+
+```
+
+```{r SCL_beta_div_across_sites_within_years, echo = F}
+
+inset.scl <- site.year.part.scl %>% 
+  pivot_longer(cols = c(`Repl/BDtotal`, `RichDif/BDtotal`),
+               names_to = "type.contr",
+               values_to = "contribution") %>% 
+  ggplot(aes(x = year, y = contribution, fill = type.contr)) +
+  geom_col() +
+  theme_cowplot() +
+  scale_fill_discrete(labels = c("species\nturnover",
+                                 "richness\ndifferences"),
+                      name = "") +
+  labs(x = "", y = "Contribution to\nBeta Diversity") +
+  theme(axis.text.y = element_text(size = 8),
+        axis.text.x = element_text(size = 8, angle = 45),
+        axis.title = element_text(size = 10))
+
+plot.y.scl <- site.year.part.scl %>% 
+  mutate(year = as.numeric(year) + 2014) %>% 
+  ggplot(aes(x = year, y = BDtotal)) +
+  geom_line() +
+  theme_cowplot() +
+  ylim(.27, .45) +
+  labs(x = "Year", y = "Beta diversity") +
+  scale_x_continuous(breaks = c(2015, 2016))
+
+ggdraw(plot.y.scl) +
+  draw_plot(inset.scl, .25, .49, .7, .45)
+
+```
+
+
+### BPF
+```{r species_turnover_site_years_BPF, echo = F}
+BPF <- dat2 %>% 
+  filter(Site == "BPF") %>% 
+  droplevels()
+
+BPF.matrix.list <- lapply(levels(BPF$Year),
+                          data = BPF,
+                          get_matrix_sites_within_years)
+
+bdiv.list.bpf <- lapply(seq_along(BPF.matrix.list), function(i){
+  beta.div.comp(BPF.matrix.list[[i]],
+                coef = "J", quant = T)
+})
+
+site.year.part.bpf <- extract_and_combine(bdiv.list.bpf, "part")
+
+site.year.part.bpf <- site.year.part.bpf %>% 
+  mutate(year = factor(ListID + 2017)) %>% 
+  rownames_to_column(var = "metric") %>% 
+  mutate(metric = str_remove(metric, "\\.\\.\\..*$")) %>% 
+  select(-ListID) %>% 
+  pivot_wider(names_from = metric,
+              values_from = part_df)
+
+```
+
+```{r BPF_beta_div_across_sites_within_years, echo = F}
+
+inset.bpf <- site.year.part.bpf %>% 
+  pivot_longer(cols = c(`Repl/BDtotal`, `RichDif/BDtotal`),
+               names_to = "type.contr",
+               values_to = "contribution") %>% 
+  ggplot(aes(x = year, y = contribution, fill = type.contr)) +
+  geom_col() +
+  theme_cowplot() +
+  scale_fill_discrete(labels = c("species\nturnover",
+                                 "richness\ndifferences"),
+                      name = "") +
+  labs(x = "", y = "Contribution to\nBeta Diversity") +
+  theme(axis.text.y = element_text(size = 8),
+        axis.text.x = element_text(size = 8, angle = 45),
+        axis.title = element_text(size = 10))
+
+plot.y.bpf <- site.year.part.bpf %>% 
+  mutate(year = as.numeric(year) + 2017) %>% 
+  ggplot(aes(x = year, y = BDtotal)) +
+  geom_line() +
+  theme_cowplot() +
+  ylim(.33, .50) +
+  labs(x = "Year", y = "Beta diversity") +
+  scale_x_continuous(breaks = c(2018, 2019))
+
+ggdraw(plot.y.bpf) +
+  draw_plot(inset.bpf, .25, .49, .7, .45)
+
+```
+
 
 
 # Is there greater overall diversity at SCL vs POS vs PBF?

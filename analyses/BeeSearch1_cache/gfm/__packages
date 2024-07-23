@@ -19,3 +19,6 @@ maps
 foreign
 shapefiles
 fossil
+geosphere
+randomForest
+caret
