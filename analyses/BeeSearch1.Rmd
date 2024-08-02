@@ -94,24 +94,40 @@ source("functions/TES.R")
 
 # general cleaning and conversion:
 dat1 <- dat1 %>% 
-  mutate(across(c(Station : Sex, Site), as.factor),
-         Date = ymd(Label.Date),
-         Year = year(Date),
-         Month = month(Date),
+  mutate(across(c(Station : Sex, Site), as.factor), # convert to factors
+         Date = ymd(Label.Date), # Convert to date
+         Year = year(Date), # Create year column
+         Month = month(Date), # create month column
          # JD --- Day of year (julian day)
          JD = yday(Date),
          # ToY --- Time of Year
          ToY = case_when(JD < 135 ~ "early",
                          JD > 205 ~ "late",
                          TRUE ~ "mid"),
+         # Create a station/year column for grouping
          StationYear = paste(Station, Year, sep = "_")) %>% 
-  filter(Station != "") %>% 
+  filter(Station != "",
+         Site != "") %>% # remove empty station & site records
+  # convert M/F to male/female to avoid "F = FALSE" misinterpretation
   mutate(Sex = case_when(
       Sex == "M" ~ "male",
       Sex == "F" ~ "female",
       TRUE ~ NA_character_ # Handle any unexpected values
-    ))
+    )) %>% 
+  # correct misidentification record
+  mutate(Short.label.name = case_when(
+    Short.label.name == "Megachile apicalis" ~ "Megachile rotundata",
+    TRUE ~ as.character(Short.label.name)
+  )) %>% 
+  # correct misindentification sex classification
+  mutate(Sex = case_when(
+    Unique.Specimen.Number == 678 |
+      Unique.Specimen.Number == 679 ~ "Male",
+    TRUE ~ as.character(Sex)
+  ))
 
+
+# Create data with all the incompatible sites (unequal sampling effort)
 incomp.sites <- dat1 %>% 
   select(StationYear) %>% 
   filter(StationYear == "POS1_2018" |
@@ -128,68 +144,45 @@ incomp.sites <- dat1 %>%
            StationYear == "POS20_2019" |
            StationYear == "POS21_2017" |
            StationYear == "POS22_2019" |
-           StationYear == "POS23_2019") %>% 
+           StationYear == "POS23_2019" |
+           StationYear == "POS1_2014" |
+           StationYear == "POS2_2014" |
+           StationYear == "POS3_2014") %>% 
   distinct() %>% 
   mutate(StationYear = factor(StationYear))
 
 
-# Sites with comparable sampling:
-comp.sites <- comp.sites %>% 
-  mutate(StationYear = paste(Station, Year, sep = "_"))
-
-# filter out the sites with incompatible sampling efforts:
-comp.data <- semi_join(dat1, comp.sites, by = "StationYear")
-
+# filter out the sites with incompatible sampling effort
 dat2 <- anti_join(dat1, incomp.sites, by = "StationYear") %>% 
-  filter(Year != 2014 & Year != 2020) %>% 
-  mutate(Year = factor(Year))
+  # unequal sampling in 2020
+  filter(Year != 2020) %>% 
+  mutate(Year = factor(Year)) %>% 
+  droplevels()
 
-comp.data <- comp.data %>% 
-  mutate(across(c(Year, StationYear), as.factor))
+# keep the single record of morphospecies "Hylaeus sp. 2023_1"
+keep.Hylaeus <- dat2 %>% 
+  filter(str_detect(Short.label.name, "Hylaeus sp. 2023"))
+
+# remove any records where species is undetermined:
+dat2 <- dat2 %>% 
+  filter(!str_detect(Short.label.name, "(?<!m)sp\\.")) %>% 
+  bind_rows(keep.Hylaeus)
+# ^^^ this data will be used when analyses do not depend on number of species
+
+
+# Filter out certain morphospecies that could inflate richness
+dat.ex.msp <- dat2 %>% 
+  filter(!(Sex == "male" & str_detect(Short.label.name,
+                                    "Sphecodes msp\\.")),
+         !(Sex == "female" & str_detect(Short.label.name,
+                                       "Osmia msp\\.")),
+         !(Sex == "female" & str_detect(Short.label.name,
+                                        "Nomada msp\\.")))
+# ^^^ this data will be used for analyses involving species counts
 
 
 ######################################################
-# pairwise distances
 
-# Create a data frame with all combinations of stations
-combinations <- expand.grid(Station1 = site.locs$Station,
-                            Station2 = site.locs$Station)
-
-# Merge to get lat/long for both stations in each combination
-distances <- combinations %>%
-  left_join(site.locs, by = c("Station1" = "Station")) %>%
-  left_join(site.locs, by = c("Station2" = "Station"),
-            suffix = c("_1", "_2"))
-
-# Calculate the pairwise distances
-distances <- distances %>%
-  mutate(distance = distHaversine(cbind(long_1, lat_1),
-                                  cbind(long_2, lat_2)))
-
-distances <- distances %>%
-  rowwise() %>%
-  mutate(
-    Station1 = min(as.character(Station1), as.character(Station2)),
-    Station2 = max(as.character(Station1), as.character(Station2))
-  ) %>%
-  ungroup()
-
-# Remove duplicate rows and selct relevant columns
-distances <- distances %>%
-  distinct(Station1, Station2, .keep_all = TRUE) %>% 
-  select(Station1, Station2, distance) %>% 
-  filter(distance != 0) %>% 
-  mutate(temp.id = case_when(
-    Station1 == Station2 ~ 0,
-    TRUE ~ 1
-  )) %>% 
-  filter(temp.id == 1) %>% 
-  select(-temp.id)
-
-dist.matrix <- distances %>% 
-  pivot_wider(names_from = Station2,
-              values_from = distance,
-              values_fill = list(distance = 0))
 
 
 
@@ -263,40 +256,48 @@ meta.seasons <- dat2 %>%
 
 ```{r Q1, echo = F}
 
-rich.year <- comp.data %>% 
+rich.year <- dat.ex.msp %>% 
   select(Year, Short.label.name) %>% 
   group_by(Year) %>% 
   distinct() %>% 
   tally()
 
-rich.site <- comp.data %>% 
+rich.site <- dat.ex.msp %>% 
   select(Station, Short.label.name) %>% 
   group_by(Station) %>% 
   distinct() %>% 
   tally()
 
-rich.year.site <- comp.data %>% 
+rich.year.site <- dat.ex.msp %>% 
   select(StationYear, Short.label.name) %>% 
   group_by(StationYear) %>% 
   distinct() %>% 
   tally()
 
-rich.site.year.sep <- comp.data %>% 
-  select(Station, Year, Short.label.name) %>% 
-  group_by(Station, Year) %>% 
+rich.site.year.sep <- dat.ex.msp %>% 
+  select(Station, Year, Short.label.name, Site) %>% 
+  group_by(Station, Site, Year) %>% 
   distinct() %>% 
   tally()
 
-rich.site.year.sep %>% 
-  filter(Year != "2014" & Year != "2020") %>% 
-  ggplot(aes(x = Year, y = n, color = Station, group = Station)) +
-  geom_point() +
-  geom_line() +
-  labs(y = "Richness") +
-  theme_classic()
+
+
+
+plots <- rich.site.year.sep %>%
+  split(.$Site) %>%
+  purrr::map(~ ggplot(.x, aes(x = Year, y = n,
+                              color = Station,
+                              group = Station)) +
+               geom_point() +
+               geom_line() +
+               labs(y = "Richness", title = unique(.x$Site)) +
+               theme_classic() +
+               theme(legend.position = "right"))
+
+plot_grid(plotlist = plots, nrow = 3)
 
 ```
-This is purely species counts, no kind of offset for sampling effort (other than excluding 2014 and 2020).
+Raw species counts (excluding incompatible year/stations with altered sampling efforts). Males and females are included. Collection method includes both trap and net.
 
 
 
@@ -328,7 +329,20 @@ kable(sex_ratio_function(dat2, c("Sex", "Collection.Method")),
 ```{r sex_ratios_by_site, echo = F}
 kable(sex_ratio_function(dat2, c("Sex", "Collection.Method", "Site")),
       format = "markdown", digits = 2)
+
+sex_ratio_function(dat2, c("Sex", "Collection.Method", "Site")) %>% 
+  ggplot(aes(x = Site, y = sex_ratio, fill = Collection.Method)) +
+  geom_col(position = position_dodge()) +
+  labs(y = "Sex ratio",
+       fill = "Collection\nmethod") +
+  scale_fill_discrete(labels = c("Net", "Trap")) +
+  theme_cowplot() +
+  geom_hline(yintercept = 1,
+             linetype = "dashed")
+
 ```
+**Sex ratios of bees by site and collection method.** Points above the dashed line represent male bias, whereas point below represent female bias.
+
 
 * By season:
 ```{r sex_ratios_by_season, echo = F}
@@ -341,13 +355,41 @@ kable(sex_ratio_function(dat2, c("Sex", "Collection.Method", "ToY")),
 kable(sex_ratio_function(dat2, c("Sex", "Collection.Method",
                                  "ToY", "Site")),
       format = "markdown", digits = 2)
+
+sex_ratio_function(dat2, c("Sex",
+                           "Collection.Method",
+                           "ToY")) %>% 
+  ggplot(aes(x = ToY, y = sex_ratio)) +
+  geom_point(aes(fill = Collection.Method),
+             size = 3,
+             shape = 21) +
+  scale_x_discrete(limits = c("early", "mid", "late")) +
+  geom_jitter(data = filter(sex_ratio_function(dat2, c("Sex",
+                                               "Collection.Method",
+                                               "ToY", "Site")),
+                            sex_ratio < 5),
+             aes(x = ToY, y = sex_ratio, color = Collection.Method),
+             width = 0.2,
+             show.legend = F,
+             shape = 21) +
+  labs(x = "Time of season",
+       y = "Sex ratio",
+       fill = "Collection\nmethod") +
+  scale_fill_discrete(labels = c("Net", "Trap")) +
+  scale_y_continuous(limits = c(0, 5)) +
+  theme_cowplot() +
+  geom_hline(yintercept = 1,
+             linetype = "dashed")
+
 ```
+**Sex ratios of bees collected by either net or trap across the sampling season.** Points above the dashed line represent male bias, whereas point below represent female bias. Early season (late March - mid May), mid season (mid May to mid July), and late season (mid July - late September) time windows in the sampling effort are shown. Large solid points are sex ratios calculated at the season level. Small open points are sex ratios calculated at the sub-site level within each season. Small points are spread horizontally for visual clarity.
+
 
 # Chao indices
 ```{r chao_indices, echo = F, cache = F}
 
 # Sites by season
-chao_site_season <- dat2 %>% 
+chao_site_season <- dat.ex.msp %>% 
   filter(Collection.Method == "T") %>% 
   unite("SiteSeason", c(Site, ToY), sep = "_") %>% 
   group_by(SiteSeason, Short.label.name) %>% 
@@ -365,7 +407,7 @@ chao_site_season <- data.frame(
                        names = c("Site", "Season"))
 
 # Sites
-chao_site <- dat2 %>% 
+chao_site <- dat.ex.msp %>% 
   filter(Collection.Method == "T") %>% 
   group_by(Site, Short.label.name) %>% 
   tally(name = "count") %>% 
@@ -380,8 +422,7 @@ chao_site <- data.frame(
   Site = colnames(chao_site))
 
 # Stations
-
-chao_stations <- dat2 %>% 
+chao_stations <- dat.ex.msp %>% 
   filter(Collection.Method == "T") %>% 
   group_by(Station, Short.label.name) %>% 
   tally(name = "count") %>% 
@@ -397,8 +438,7 @@ chao_stations <- data.frame(
 
 
 # Station by year
-
-chao_station_year <- dat2 %>% 
+chao_station_year <- dat.ex.msp %>% 
   filter(Collection.Method == "T") %>% 
   group_by(StationYear, Short.label.name) %>% 
   tally(name = "count") %>% 
@@ -407,12 +447,15 @@ chao_station_year <- dat2 %>%
               values_fill = list(count = 0)) %>% 
   column_to_rownames("Short.label.name")
 
+
 chao_station_year <- data.frame(
   chao1 = sapply(seq_along(chao_station_year), function(i){
     chao1(chao_station_year[[i]])}),
   StationYear = colnames(chao_station_year)) %>% 
   separate_wider_delim(StationYear, delim = "_",
                        names = c("Station", "Year"))
+
+
 ```
 From Anne Chao 1989:
 
@@ -429,7 +472,19 @@ kable(chao_site, format = "markdown", digits = 2)
 * Chao indices by site and season
 ```{r chao_site_season, echo = F, cache = F}
 kable(chao_site_season, format = "markdown", digits = 2)
+
+
+chao_site_season %>% 
+  mutate(Season = factor(Season)) %>% 
+  ggplot(aes(x = Season, y = chao1, color = Site, group = Site)) +
+  geom_line(linewidth = 2) +
+  scale_x_discrete(limits = c("early", "mid", "late")) +
+  theme_cowplot()
+  
 ```
+
+**Overall Chao1 minimum species richness across the sampling season.** Estimated species richness in early (late March - mid May), mid (mid May to mid July), and late (mid July - late September) time windows in the sampling effort. Richness across sites converge in the mid-summer.
+
 
 * Chao indices by station
 ```{r chao_station, echo = F}
@@ -446,27 +501,24 @@ chao_station_year %>%
   ggplot(aes(x = Year, y = chao1, color = Site)) +
   geom_jitter(shape = 21, width = 0.05) +
   geom_smooth(aes(fill = Site),
-              method = "lm", alpha = 0.25) +
+              method = "lm", alpha = 0.15) +
   theme_cowplot() +
   labs(y = "Chao1\n(minimum species richness)")
 
 ```
-** Minimum species richness (Chao1) across time.** Points are stations (sub sites), lines are fit by linear regression, and the shaded regions are 95% confidence intervals. The data exclude 2014 and 2020, and all net caught records.
+**Minimum species richness (Chao1) across time.** Points are stations (sub sites), lines are fit by linear regression, and the shaded regions are 95% confidence intervals. The data exclude some morphospecies (see methods), and all net caught records.
 
 
 
-# Does community composition change over time?
+# Does community composition change across seasons, sites, or years?
 
+```{r composition_across_seasons, eval = T, include = F, cache=F}
 
-# How does community composition change across seasons?
-```{r composition_across_seasons, echo = F, cache=F}
-
-adonis2(mat.seasons ~ ToY * Year,
+season.mod <- adonis2(mat.seasons ~ ToY,
         data = meta.seasons, method = "bray")
 
 permutest(betadisper(vegdist(mat.seasons, method = "bray"),
-    meta.seasons$Year))
-
+    meta.seasons$ToY))
 
 nmds.seasons <- metaMDS(mat.seasons, distance = "bray", k = 2,
                         autotransform = F, try = 250)
@@ -488,8 +540,9 @@ spp_scores_seasons <- cbind(spp_scores_seasons,
                        Species = row.names(spp_scores_seasons))
 ```
 
-# What bee groups drive changes in abundance from early to mid to late year?
-```{r nmds_fig_seasons, echo = F, cache=F}
+
+## Across seasons: (I don't think we should include this)
+```{r nmds_seasons_prep, eval = T, include = F, cache=F}
 
 site_scores_seasons <- site_scores_seasons %>%  
   mutate(ToY = factor(ToY),
@@ -502,7 +555,9 @@ spp_scores_seasons <- as.data.frame(spp_scores_seasons)
 centroid_seasons <- site_scores_seasons %>% 
   group_by(ToY) %>% 
   summarise(NMDS1  = mean(NMDS1), NMDS2 = mean(NMDS2))
+```
 
+```{r ndms_fig_seasons, echo = F}
 site_scores_seasons %>% 
   ggplot(aes(x = NMDS1, y = NMDS2, color = ToY)) +
   geom_point(aes(NMDS1, NMDS2, color = ToY),
@@ -519,36 +574,12 @@ site_scores_seasons %>%
 
 
 ```
+**Community composition across time of season.** Strong overlap of composition across the early, mid, and late season sampling (PERMANOVA: F = `r round(season.mod[1,4], 2)`, `r round(season.mod[1,5], 2)`). Data include all compatible stations across all years.
 
 
-# How does community composition change over time?
-```{r nmds_fig_years, echo = F, cache=F}
 
-centroid_years <- site_scores_seasons %>% 
-  group_by(Year) %>% 
-  summarise(NMDS1  = mean(NMDS1), NMDS2 = mean(NMDS2))
-
-site_scores_seasons %>% 
-  ggplot(aes(x = NMDS1, y = NMDS2, color = Year)) +
-  geom_point(aes(NMDS1, NMDS2, color = Year),
-             size = 2) +
-  stat_ellipse() +
-  geom_point(data = centroid_years, size = 5, shape = 21,
-             color = 'black', aes(fill = Year), show.legend = F) +
-  labs(color = "Year") +
-  ggrepel::geom_text_repel(data = spp_scores_seasons,
-                           aes(x = NMDS1, y = NMDS2, label = Species),
-                           size = 1.5, inherit.aes = FALSE,
-                           max.overlaps = 20) +
-  theme_cowplot()
-
-```
-
-
-# All sites NMDS
-
-* By Site/Year
-```{r nmds_all_sites, echo = F}
+## Across sites
+```{r nmds_all_sites_prep_and_tests, echo = F}
 
 #####################################################
 # matrix assembly
@@ -571,7 +602,7 @@ site_meta <- dat2 %>%
 
 #############################################################
 # Stats
-adonis2(site_matrix ~ Site + Year,
+site.year.mod <- adonis2(site_matrix ~ Site * Year,
         data = site_meta, method = "bray")
 
 permutest(betadisper(vegdist(site_matrix, method = "bray"),
@@ -579,10 +610,11 @@ permutest(betadisper(vegdist(site_matrix, method = "bray"),
 
 permutest(betadisper(vegdist(site_matrix, method = "bray"),
                      site_meta$Site))
-#############################################################
+
+```
 
 
-########################################################
+```{r nmds_sites_calcs, eval = T, include = F}
 # NMDS scores
 nmds_SSY <- metaMDS(site_matrix, distance = "bray",
                     k = 3, try = 250, autotransform = F)
@@ -606,26 +638,16 @@ centroids_SSY <- site_scores %>%
   summarise(NMDS1 = mean(NMDS1),
             NMDS2 = mean(NMDS2))
 
-site_scores %>% 
-  ggplot(aes(x = NMDS1, y = NMDS2, color = SiteYear)) +
-  geom_point(aes(NMDS1, NMDS2, color = SiteYear),
-             size = 2) +
-  stat_ellipse() +
-  theme_cowplot()
+centroids_site <- site_scores %>% 
+  group_by(Site) %>% 
+  summarise(NMDS1 = mean(NMDS1),
+            NMDS2 = mean(NMDS2))
 
+centroids_year <- site_scores %>% 
+  group_by(Year) %>% 
+  summarise(NMDS1 = mean(NMDS1),
+            NMDS2 = mean(NMDS2))
 ```
-
-## NMDS by Site
-```{r nmds_all_sites_year, echo = F}
-site_scores %>% 
-  ggplot(aes(x = NMDS1, y = NMDS2, color = Site)) +
-  geom_point(aes(NMDS1, NMDS2, color = Site),
-             size = 2) +
-  stat_ellipse() +
-  theme_cowplot() +
-  ggrepel::geom_text_repel(aes(label = Station))
-```
-
 
 ### Site classification by species composition (Random Forest)
 ```{r random_forest_sites, echo = F}
@@ -647,7 +669,8 @@ rfmod_site <- randomForest(y = rf_matrix$Site,
                            x = select(rf_matrix,
                                       -Year, -Station,
                                       -StationYear, -Site),
-                           importance = T, nPerm = 999)
+                           importance = T, nPerm = 999,
+                           proximity = T)
 
 
 train(y = rf_matrix$Site,
@@ -656,9 +679,8 @@ train(y = rf_matrix$Site,
                  -StationYear, -Site),
       method = "rf", na.action = na.omit)
 
-update(rfmod_site, mtry = 73)
+update(rfmod_site, mtry = 68)
 
-plot(rfmod_site)
 
 imp_vals_top <- data.frame(importance(rfmod_site)) %>% 
   arrange(desc(MeanDecreaseGini)) %>% 
@@ -666,30 +688,75 @@ imp_vals_top <- data.frame(importance(rfmod_site)) %>%
 
 kable(imp_vals_top, format = "markdown", digits = 3)
 
+MDSplot(rfmod_site, rf_matrix$Site)
 ```
-** Random Forest classification of site by species composition.** The model was tuned without pre-processing. Bootstrapped resampling used 25 replicates. Overall model accuracy was 76.4%. The model clearly delineated the BPF sites with 0.00 class error. Similarly, POS sites were near perfect with 0.029 class error. However, the SCL sites were never classified correctly (1.00 class error), with most (8/9) identified as POS. This lends further support to the NMDS figure above, species composition is very similar across SCL and POS, but BPF sites have different community composition compared to the other two sites.
 
-The table above shows the species most representative of the community differences used to make the above classifications. These species are the top 10th percentile of ranked variable importance (mean decrease in Gini score). Take this with a grain of salt, the model didn't do a great job, overall Out of Bag error rate = 19.3%. This is almost unacceptable, especially because Random Forest more often overfits the data.
+**Random Forest classification of site by species composition.** The model was tuned without pre-processing. Bootstrapped resampling used 25 replicates. Overall model accuracy was 82%. The model clearly delineated the BPF sites with 0.`r rfmod_site$confusion[1,4]` class error. Similarly, POS sites were near perfect with `r round(rfmod_site$confusion[2,4], 3)` class error. However, the SCL sites were less accurately classified (`r round(rfmod_site$confusion[3,4], 3)` class error), with (`r rfmod_site$confusion[3,2]`/13) identified as POS. This lends further support to the NMDS figure below, species composition is very similar across SCL and POS, but BPF sites have different community composition compared to the other two sites. 
+
+The table above shows the species most representative of the community differences used to make the above classifications. These species are the top 10th percentile of ranked variable importance (mean decrease in Gini score).
 
 
+### NMDS by Site figure (include this)
+```{r nmds_all_sites_year, echo = F}
 
-* By year
+imp_spp <- imp_vals_top %>% 
+  rownames_to_column("Species") %>% 
+  select(Species, MeanDecreaseGini)
+
+spp_scores <- right_join(spp_scores, imp_spp, by = "Species")
+
+site_scores %>% 
+  ggplot(aes(x = NMDS1, y = NMDS2)) +
+  geom_point(aes(NMDS1, NMDS2, color = Site),
+             size = 1) +
+  stat_ellipse(aes(color = Site),
+               show.legend = F) +
+  geom_point(data = centroids_site,
+             aes(x = NMDS1, y = NMDS2, fill = Site),
+             size = 4,
+             shape = 21, show.legend = F) +
+  theme_cowplot() +
+  ggrepel::geom_text_repel(data = spp_scores,
+                           aes(x = NMDS1, y = NMDS2,
+                               label = Species,
+                               size = MeanDecreaseGini),
+                           max.overlaps = 20) +
+  scale_size_continuous(
+    name = "Mean decrease Gini",
+    limits = c(.4, 3),
+    breaks = c(0.75, 2, 3),
+    range = c(1, 6)) +
+  guides(color = guide_legend(override.aes = list(size = 4, shape = 16)))
+
+
+```
+**Variation in community composition across sites.** Bee species are plotted on the first two axes of a three-dimensional non-metric multidimensional scaling ordination of the 58 combinations of station (subsite) and year, across the three sites. Small points are the individual station/year combinations. Large points are the centroids of the three sites. Ellipses are 95% confidence intervals around the site centroids.  Bees species shown are the most representative (top 10th percentile of a random forest analysis) of the compositional differences among sites. Text size of the labels is proportional to variable importance score (mean decrease in Gini score).
+
+
+## Across years (I don't think we should include this)
 ```{r nmds_all_year, echo = F}
 site_scores %>% 
   ggplot(aes(x = NMDS1, y = NMDS2, color = Year)) +
   geom_point(aes(NMDS1, NMDS2, color = Year),
-             size = 2) +
-  stat_ellipse() +
+             size = 1) +
+  geom_point(data = centroids_year,
+             aes(x = NMDS1, y = NMDS2, fill = Year),
+             shape = 21,
+             color = 'black',
+             size = 4,
+             show.legend = F) +
+  stat_ellipse(aes(color = Year)) +
   theme_cowplot()
 ```
+**Community composition across years.** Most years have strong overlap of composition but the *year* term is highly significant (PERMANOVA: F = `r round(site.year.mod[2,4], 2)`, *P* = `r round(site.year.mod[2,5], 3)`). However, the only site in 2014 is SCL and the 2018 and 2019 years are heavily influenced by the BPF data. Essentially, the information in *years* is not sufficiently distinct from the information in *sites* and including *year* in the model is not informative. This is also the likely cause of the violation of homogeneity of multivariate dispersions for the *year* term but not the *site* term.
 
-# POS 2017 Changes over seasons
+
+# POS 2017 Changes over seasons (This is not interesting)
 
 ```{r NMDS_2017_stress, include = F}
 
 nmds2017 <- metaMDS(mat2017, distance = "bray",
                       k = 2, try = 250, autotransform = F)
-
 
 nmds2017$dist
 stressplot(nmds2017)
@@ -721,8 +788,8 @@ permutest(betadisper(nmds2017dist, meta2017$ToY))
 
 
 ```
+Within the Port of Seattle sites in 2017 and only 2017, species composition changes significantly throughout the season with distinct groups of species in early, mid, and late season sampling. **However, this model violates homogeneity of multivariate dispersions.**
 
-Within the Port of Seattle sites in 2017 and only 2017, species composition changes significantly throughout the season with distinct groups of species in early, mid, and late season sampling.
 
 ```{r nmds2017_plot, echo = F}
 site_scores2017 <- site_scores2017 %>%  
@@ -754,22 +821,23 @@ site_scores2017 %>%
 ```
 **Non-metric multidimensional scaling of bee species in Port of Seattle in 2017.** Points are sub-sites within the port of Seattle in 2017. They are separated by time of season with the 8 sub sites at the early season in red, the same 8 sub sites at the middle season in blue, and the same 8 sub sites at the end of the season in green. The NMDS space represents total bee species composition and the labels are specific bee species and their position in NMDS space. Large points are the centroids (means) of the points in NMDS space. Ellipses are 95% confidence intervals around the centroids. 
 
-# Can we do analysis with and without major species (H. tripartitus; A. texanus; M. microsticta/us)
-
-What analysis?
 
 
 # What is the turnover of species within sub-sites within years?
 
 ```{r species_turnover_site_years_POS, echo = F}
 
+POS <- dat2 %>% 
+  filter(Site == "POS") %>% 
+  droplevels()
 
-matrix.site.years.list <- lapply(levels(comp.data$Year),
-                                 data = comp.data,
+pos.matrix.list <- lapply(levels(POS$Year),
+                                 data = POS,
                                  get_matrix_sites_within_years)
 
-bdiv.list <- lapply(seq_along(matrix.site.years.list), function(i){
-  beta.div.comp(matrix.site.years.list[[i]],
+
+bdiv.list <- lapply(seq_along(pos.matrix.list), function(i){
+  beta.div.comp(pos.matrix.list[[i]],
                 coef = "J", quant = T)
 })
 
@@ -790,7 +858,7 @@ extract_and_combine <- function(list_of_lists, part_name) {
 site.year.part <- extract_and_combine(bdiv.list, "part")
 
 site.year.part <- site.year.part %>% 
-  mutate(year = factor(ListID + 2013)) %>% 
+  mutate(year = factor(ListID + 2014)) %>% 
   rownames_to_column(var = "metric") %>% 
   mutate(metric = str_remove(metric, "\\.\\.\\..*$")) %>% 
   select(-ListID) %>% 
@@ -818,11 +886,11 @@ inset <- site.year.part %>%
         axis.title = element_text(size = 10))
 
 plot.y <- site.year.part %>% 
-  mutate(year = as.numeric(year) + 2013) %>% 
+  mutate(year = as.numeric(year) + 2014) %>% 
   ggplot(aes(x = year, y = BDtotal)) +
   geom_line() +
   theme_cowplot() +
-  ylim(.24, .40) +
+  ylim(.24, .62) +
   labs(x = "Year", y = "Beta diversity")
 
 ggdraw(plot.y) +
@@ -850,7 +918,7 @@ bdiv.list.scl <- lapply(seq_along(scl.matrix.list), function(i){
 site.year.part.scl <- extract_and_combine(bdiv.list.scl, "part")
 
 site.year.part.scl <- site.year.part.scl %>% 
-  mutate(year = factor(ListID + 2014)) %>% 
+  mutate(year = factor(ListID + 2013)) %>% 
   rownames_to_column(var = "metric") %>% 
   mutate(metric = str_remove(metric, "\\.\\.\\..*$")) %>% 
   select(-ListID) %>% 
@@ -877,13 +945,13 @@ inset.scl <- site.year.part.scl %>%
         axis.title = element_text(size = 10))
 
 plot.y.scl <- site.year.part.scl %>% 
-  mutate(year = as.numeric(year) + 2014) %>% 
+  mutate(year = as.numeric(year) + 2013) %>% 
   ggplot(aes(x = year, y = BDtotal)) +
   geom_line() +
   theme_cowplot() +
   ylim(.27, .45) +
   labs(x = "Year", y = "Beta diversity") +
-  scale_x_continuous(breaks = c(2015, 2016))
+  scale_x_continuous(breaks = c(2014, 2015, 2016))
 
 ggdraw(plot.y.scl) +
   draw_plot(inset.scl, .25, .49, .7, .45)

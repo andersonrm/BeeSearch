@@ -1,7 +1,7 @@
 BeeSearch initial
 ================
 Dr. Riley M. Anderson
-July 23, 2024
+August 02, 2024
 
   
 
@@ -13,22 +13,19 @@ July 23, 2024
 - [Sex ratio in trap vs. netting collection
   method:](#sex-ratio-in-trap-vs-netting-collection-method)
 - [Chao indices](#chao-indices)
-- [Does community composition change over
-  time?](#does-community-composition-change-over-time)
-- [How does community composition change across
-  seasons?](#how-does-community-composition-change-across-seasons)
-- [What bee groups drive changes in abundance from early to mid to late
-  year?](#what-bee-groups-drive-changes-in-abundance-from-early-to-mid-to-late-year)
-- [How does community composition change over
-  time?](#how-does-community-composition-change-over-time)
-- [All sites NMDS](#all-sites-nmds)
-  - [NMDS by Site](#nmds-by-site)
+- [Does community composition change across seasons, sites, or
+  years?](#does-community-composition-change-across-seasons-sites-or-years)
+  - [Across seasons: (I don’t think we should include
+    this)](#across-seasons-i-dont-think-we-should-include-this)
+  - [Across sites](#across-sites)
     - [Site classification by species composition (Random
       Forest)](#site-classification-by-species-composition-random-forest)
-- [POS 2017 Changes over seasons](#pos-2017-changes-over-seasons)
-- [Can we do analysis with and without major species (H. tripartitus; A.
-  texanus; M.
-  microsticta/us)](#can-we-do-analysis-with-and-without-major-species-h-tripartitus-a-texanus-m-microstictaus)
+    - [NMDS by Site figure (include
+      this)](#nmds-by-site-figure-include-this)
+  - [Across years (I don’t think we should include
+    this)](#across-years-i-dont-think-we-should-include-this)
+- [POS 2017 Changes over seasons (This is not
+  interesting)](#pos-2017-changes-over-seasons-this-is-not-interesting)
 - [What is the turnover of species within sub-sites within
   years?](#what-is-the-turnover-of-species-within-sub-sites-within-years)
   - [POS](#pos)
@@ -48,9 +45,10 @@ What is this analysis about?
 
 # How many species do we have at each location? How much variability is there in richness?
 
-![](BeeSearch1_files/figure-gfm/Q1-1.png)<!-- --> This is purely species
-counts, no kind of offset for sampling effort (other than excluding 2014
-and 2020).
+![](BeeSearch1_files/figure-gfm/Q1-1.png)<!-- --> Raw species counts
+(excluding incompatible year/stations with altered sampling efforts).
+Males and females are included. Collection method includes both trap and
+net.
 
 # Sex ratio in trap vs. netting collection method:
 
@@ -60,53 +58,68 @@ and 2020).
 
 - Overall:
 
-| Collection.Method | female | male | sex_ratio |
-|:------------------|-------:|-----:|----------:|
-| N                 |    682 |  402 |      0.59 |
-| T                 |   5153 | 1255 |      0.24 |
+| Collection.Method | Male | female | male | sex_ratio |
+|:------------------|-----:|-------:|-----:|----------:|
+| T                 |    2 |   5278 | 1281 |      0.24 |
+| N                 |    0 |    676 |  401 |      0.59 |
 
 - By site:
 
-| Collection.Method | Site | female | male | sex_ratio |
-|:------------------|:-----|-------:|-----:|----------:|
-| N                 | BPF  |     61 |   92 |      1.51 |
-| N                 | POS  |    570 |  255 |      0.45 |
-| N                 | SCL  |     51 |   55 |      1.08 |
-| T                 | BPF  |    751 |  278 |      0.37 |
-| T                 | POS  |   3625 |  712 |      0.20 |
-| T                 | SCL  |    777 |  265 |      0.34 |
+| Collection.Method | Site | Male | female | male | sex_ratio |
+|:------------------|:-----|-----:|-------:|-----:|----------:|
+| T                 | SCL  |    2 |    920 |  300 |      0.33 |
+| N                 | BPF  |    0 |     61 |   92 |      1.51 |
+| N                 | POS  |    0 |    563 |  252 |      0.45 |
+| N                 | SCL  |    0 |     52 |   57 |      1.10 |
+| T                 | BPF  |    0 |    745 |  274 |      0.37 |
+| T                 | POS  |    0 |   3613 |  707 |      0.20 |
+
+![](BeeSearch1_files/figure-gfm/sex_ratios_by_site-1.png)<!-- --> **Sex
+ratios of bees by site and collection method.** Points above the dashed
+line represent male bias, whereas point below represent female bias.
 
 - By season:
 
-| Collection.Method | ToY   | female | male | sex_ratio |
-|:------------------|:------|-------:|-----:|----------:|
-| N                 | early |    129 |   82 |      0.64 |
-| N                 | late  |    192 |  195 |      1.02 |
-| N                 | mid   |    361 |  125 |      0.35 |
-| T                 | early |   1471 |  322 |      0.22 |
-| T                 | late  |   1150 |  337 |      0.29 |
-| T                 | mid   |   2532 |  596 |      0.24 |
+| Collection.Method | ToY   | Male | female | male | sex_ratio |
+|:------------------|:------|-----:|-------:|-----:|----------:|
+| T                 | mid   |    2 |   2583 |  612 |      0.24 |
+| N                 | early |    0 |    128 |   81 |      0.63 |
+| N                 | late  |    0 |    191 |  196 |      1.03 |
+| N                 | mid   |    0 |    357 |  124 |      0.35 |
+| T                 | early |    0 |   1469 |  315 |      0.21 |
+| T                 | late  |    0 |   1226 |  354 |      0.29 |
 
 - By season and site:
 
-| Collection.Method | ToY   | Site | female | male | sex_ratio |
-|:------------------|:------|:-----|-------:|-----:|----------:|
-| N                 | early | BPF  |     15 |   59 |      3.93 |
-| N                 | early | POS  |    114 |   23 |      0.20 |
-| N                 | late  | BPF  |     28 |   22 |      0.79 |
-| N                 | late  | POS  |    164 |  173 |      1.05 |
-| N                 | mid   | BPF  |     18 |   11 |      0.61 |
-| N                 | mid   | POS  |    292 |   59 |      0.20 |
-| N                 | mid   | SCL  |     51 |   55 |      1.08 |
-| T                 | early | BPF  |    147 |   33 |      0.22 |
-| T                 | early | POS  |    998 |  148 |      0.15 |
-| T                 | early | SCL  |    326 |  141 |      0.43 |
-| T                 | late  | BPF  |    190 |  108 |      0.57 |
-| T                 | late  | POS  |    825 |  199 |      0.24 |
-| T                 | late  | SCL  |    135 |   30 |      0.22 |
-| T                 | mid   | BPF  |    414 |  137 |      0.33 |
-| T                 | mid   | POS  |   1802 |  365 |      0.20 |
-| T                 | mid   | SCL  |    316 |   94 |      0.30 |
+| Collection.Method | ToY   | Site | Male | female | male | sex_ratio |
+|:------------------|:------|:-----|-----:|-------:|-----:|----------:|
+| T                 | mid   | SCL  |    2 |    382 |  113 |      0.30 |
+| N                 | early | BPF  |    0 |     15 |   59 |      3.93 |
+| N                 | early | POS  |    0 |    113 |   22 |      0.19 |
+| N                 | late  | BPF  |    0 |     28 |   22 |      0.79 |
+| N                 | late  | POS  |    0 |    163 |  172 |      1.06 |
+| N                 | mid   | BPF  |    0 |     18 |   11 |      0.61 |
+| N                 | mid   | POS  |    0 |    287 |   58 |      0.20 |
+| N                 | mid   | SCL  |    0 |     52 |   55 |      1.06 |
+| T                 | early | BPF  |    0 |    146 |   31 |      0.21 |
+| T                 | early | POS  |    0 |    997 |  144 |      0.14 |
+| T                 | early | SCL  |    0 |    326 |  140 |      0.43 |
+| T                 | late  | BPF  |    0 |    190 |  108 |      0.57 |
+| T                 | late  | POS  |    0 |    824 |  199 |      0.24 |
+| T                 | late  | SCL  |    0 |    212 |   47 |      0.22 |
+| T                 | mid   | BPF  |    0 |    409 |  135 |      0.33 |
+| T                 | mid   | POS  |    0 |   1792 |  364 |      0.20 |
+| N                 | late  | SCL  |    0 |      0 |    2 |       Inf |
+
+![](BeeSearch1_files/figure-gfm/sex_ratios_by_season_and_site-1.png)<!-- -->
+**Sex ratios of bees collected by either net or trap across the sampling
+season.** Points above the dashed line represent male bias, whereas
+point below represent female bias. Early season (late March - mid May),
+mid season (mid May to mid July), and late season (mid July - late
+September) time windows in the sampling effort are shown. Large solid
+points are sex ratios calculated at the season level. Small open points
+are sex ratios calculated at the sub-site level within each season.
+Small points are spread horizontally for visual clarity.
 
 # Chao indices
 
@@ -120,222 +133,148 @@ Chao1 minimum species richness is defined non-parametrically as:
 
 |  chao1 | Site |
 |-------:|:-----|
-| 103.89 | BPF  |
-| 135.44 | POS  |
-| 115.12 | SCL  |
+|  92.79 | BPF  |
+| 108.46 | POS  |
+| 104.35 | SCL  |
 
 - Chao indices by site and season
 
 |  chao1 | Site | Season |
 |-------:|:-----|:-------|
-|  50.07 | BPF  | early  |
-|  88.00 | BPF  | late   |
-|  92.80 | BPF  | mid    |
-|  95.56 | POS  | early  |
-|  84.00 | POS  | late   |
-| 117.00 | POS  | mid    |
-| 102.14 | SCL  | early  |
-|  42.10 | SCL  | late   |
-| 109.50 | SCL  | mid    |
+|  44.08 | BPF  | early  |
+|  87.00 | BPF  | late   |
+|  78.22 | BPF  | mid    |
+|  78.29 | POS  | early  |
+| 105.50 | POS  | late   |
+|  89.00 | POS  | mid    |
+|  97.79 | SCL  | early  |
+|  56.12 | SCL  | late   |
+|  84.33 | SCL  | mid    |
+
+![](BeeSearch1_files/figure-gfm/chao_site_season-1.png)<!-- -->
+
+**Overall Chao1 minimum species richness across the sampling season.**
+Estimated species richness in early (late March - mid May), mid (mid May
+to mid July), and late (mid July - late September) time windows in the
+sampling effort. Richness across sites converge in the mid-summer.
 
 - Chao indices by station
 
 | chao1 | Station |
 |------:|:--------|
-| 39.75 | BPF1    |
-| 68.67 | BPF2    |
-| 34.33 | BPF3    |
-| 95.00 | BPF4    |
-| 57.00 | BPF5    |
-| 50.90 | BPF6    |
-| 40.56 | BPF7    |
-| 31.67 | BPF8    |
-| 80.89 | POS1    |
+| 37.33 | BPF1    |
+| 62.17 | BPF2    |
+| 32.08 | BPF3    |
+| 86.25 | BPF4    |
+| 49.00 | BPF5    |
+| 43.10 | BPF6    |
+| 39.56 | BPF7    |
+| 28.17 | BPF8    |
+| 78.57 | POS1    |
 | 18.67 | POS10   |
 | 37.50 | POS11   |
-| 75.00 | POS12   |
+| 53.12 | POS12   |
 | 36.17 | POS13   |
-| 94.75 | POS2    |
-| 55.00 | POS20   |
-| 61.73 | POS21   |
+| 96.00 | POS2    |
+| 48.08 | POS20   |
+| 51.80 | POS21   |
 | 51.12 | POS22   |
-| 66.67 | POS23   |
-| 49.17 | POS24   |
-| 55.60 | POS25   |
-| 73.06 | POS3    |
-| 55.25 | POS4    |
-| 87.50 | POS5    |
-| 48.33 | POS6    |
+| 51.17 | POS23   |
+| 44.67 | POS24   |
+| 51.90 | POS25   |
+| 73.14 | POS3    |
+| 50.29 | POS4    |
+| 77.00 | POS5    |
+| 41.08 | POS6    |
 | 33.33 | POS7    |
-| 86.00 | POS8    |
-| 59.12 | POS9    |
-| 77.50 | SCL1    |
-| 94.17 | SCL2    |
-| 80.50 | SCL3    |
-| 75.33 | SCL4    |
-| 44.17 | SCL5    |
+| 75.40 | POS8    |
+| 51.12 | POS9    |
+| 87.79 | SCL1    |
+| 84.12 | SCL2    |
+| 58.12 | SCL3    |
+| 74.56 | SCL4    |
+| 35.50 | SCL5    |
 
 - Chao indices by station and year
 
 |  chao1 | Station | Year |
 |-------:|:--------|:-----|
 |  53.25 | BPF1    | 2018 |
-|  61.67 | BPF1    | 2019 |
-|  45.00 | BPF2    | 2018 |
-|  47.17 | BPF2    | 2019 |
+|  56.17 | BPF1    | 2019 |
+|  41.12 | BPF2    | 2018 |
+|  41.67 | BPF2    | 2019 |
 |  32.00 | BPF3    | 2018 |
-|  38.12 | BPF3    | 2019 |
-|  27.75 | BPF4    | 2018 |
+|  34.50 | BPF3    | 2019 |
+|  25.33 | BPF4    | 2018 |
 |  44.12 | BPF4    | 2019 |
-|  32.10 | BPF5    | 2018 |
-|  58.33 | BPF5    | 2019 |
-|  24.08 | BPF6    | 2018 |
-|  93.00 | BPF6    | 2019 |
-|  40.56 | BPF7    | 2019 |
-|  31.67 | BPF8    | 2019 |
+|  30.10 | BPF5    | 2018 |
+|  48.90 | BPF5    | 2019 |
+|  23.90 | BPF6    | 2018 |
+|  68.25 | BPF6    | 2019 |
+|  39.56 | BPF7    | 2019 |
+|  28.17 | BPF8    | 2019 |
 |  18.67 | POS10   | 2017 |
 |  37.50 | POS11   | 2017 |
-|  33.67 | POS12   | 2017 |
-|  63.17 | POS12   | 2019 |
+|  30.17 | POS12   | 2017 |
+|  44.50 | POS12   | 2019 |
 |  36.17 | POS13   | 2018 |
 |  40.00 | POS1    | 2015 |
-|  48.12 | POS1    | 2016 |
-|  55.07 | POS1    | 2019 |
-|  55.00 | POS20   | 2018 |
-|  61.73 | POS21   | 2019 |
+|  44.00 | POS1    | 2016 |
+|  55.60 | POS1    | 2019 |
+|  48.08 | POS20   | 2018 |
+|  51.80 | POS21   | 2019 |
 |  51.12 | POS22   | 2018 |
-|  66.67 | POS23   | 2018 |
-|  49.17 | POS24   | 2018 |
-|  55.60 | POS25   | 2019 |
+|  51.17 | POS23   | 2018 |
+|  44.67 | POS24   | 2018 |
+|  51.90 | POS25   | 2019 |
 |  46.08 | POS2    | 2015 |
 |  86.17 | POS2    | 2016 |
-|  39.25 | POS2    | 2019 |
+|  36.79 | POS2    | 2019 |
 |  45.67 | POS3    | 2015 |
-|  48.90 | POS3    | 2016 |
-|  55.50 | POS3    | 2018 |
-|  51.00 | POS4    | 2016 |
-|  42.56 | POS4    | 2018 |
+|  45.40 | POS3    | 2016 |
+|  52.00 | POS3    | 2018 |
+|  45.25 | POS4    | 2016 |
+|  40.14 | POS4    | 2018 |
 |  72.25 | POS5    | 2017 |
-|  55.00 | POS5    | 2019 |
-|  56.25 | POS6    | 2017 |
-|  40.40 | POS6    | 2019 |
+|  49.25 | POS5    | 2019 |
+|  50.00 | POS6    | 2017 |
+|  35.60 | POS6    | 2019 |
 |  33.33 | POS7    | 2017 |
-|  45.00 | POS8    | 2017 |
-|  68.00 | POS8    | 2019 |
-|  63.00 | POS9    | 2017 |
-|  47.12 | POS9    | 2018 |
+|  41.12 | POS8    | 2017 |
+|  62.12 | POS8    | 2019 |
+|  56.25 | POS9    | 2017 |
+|  43.50 | POS9    | 2018 |
+|  32.00 | SCL1    | 2014 |
 |  59.90 | SCL1    | 2015 |
 |  96.50 | SCL1    | 2016 |
-|  66.17 | SCL2    | 2015 |
+|  43.00 | SCL2    | 2014 |
+|  61.00 | SCL2    | 2015 |
 |  40.10 | SCL2    | 2016 |
-|  64.00 | SCL3    | 2015 |
-|  56.25 | SCL3    | 2016 |
-| 231.00 | SCL4    | 2015 |
+|  14.50 | SCL3    | 2014 |
+|  51.00 | SCL3    | 2015 |
+|  50.00 | SCL3    | 2016 |
+|  22.90 | SCL4    | 2014 |
+| 111.00 | SCL4    | 2015 |
 |  39.50 | SCL4    | 2016 |
-|  44.17 | SCL5    | 2016 |
+|  35.50 | SCL5    | 2016 |
 
-![](BeeSearch1_files/figure-gfm/chao_station_year-1.png)<!-- --> \*\*
-Minimum species richness (Chao1) across time.\*\* Points are stations
+![](BeeSearch1_files/figure-gfm/chao_station_year-1.png)<!-- -->
+**Minimum species richness (Chao1) across time.** Points are stations
 (sub sites), lines are fit by linear regression, and the shaded regions
-are 95% confidence intervals. The data exclude 2014 and 2020, and all
-net caught records.
+are 95% confidence intervals. The data exclude some morphospecies (see
+methods), and all net caught records.
 
-# Does community composition change over time?
+# Does community composition change across seasons, sites, or years?
 
-# How does community composition change across seasons?
+## Across seasons: (I don’t think we should include this)
 
-    ## Permutation test for adonis under reduced model
-    ## Terms added sequentially (first to last)
-    ## Permutation: free
-    ## Number of permutations: 999
-    ## 
-    ## adonis2(formula = mat.seasons ~ ToY * Year, data = meta.seasons, method = "bray")
-    ##          Df SumOfSqs      R2      F Pr(>F)  
-    ## ToY       2   0.3651 0.01546 0.7270  0.782  
-    ## Year      4   1.4458 0.06120 1.4393  0.064 .
-    ## ToY:Year  8   2.2250 0.09418 1.1074  0.277  
-    ## Residual 78  19.5887 0.82917                
-    ## Total    92  23.6246 1.00000                
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Permutation test for homogeneity of multivariate dispersions
-    ## Permutation: free
-    ## Number of permutations: 999
-    ## 
-    ## Response: Distances
-    ##           Df  Sum Sq  Mean Sq      F N.Perm Pr(>F)
-    ## Groups     4 0.04383 0.010957 0.7228    999  0.595
-    ## Residuals 88 1.33411 0.015160
-    ## Run 0 stress 0.1489251 
-    ## Run 1 stress 0.168991 
-    ## Run 2 stress 0.1737159 
-    ## Run 3 stress 0.1733901 
-    ## Run 4 stress 0.1556336 
-    ## Run 5 stress 0.1739859 
-    ## Run 6 stress 0.1733535 
-    ## Run 7 stress 0.1488932 
-    ## ... New best solution
-    ## ... Procrustes: rmse 0.004159155  max resid 0.02896881 
-    ## Run 8 stress 0.1557387 
-    ## Run 9 stress 0.1738632 
-    ## Run 10 stress 0.1557741 
-    ## Run 11 stress 0.1734864 
-    ## Run 12 stress 0.1489253 
-    ## ... Procrustes: rmse 0.004160093  max resid 0.02878677 
-    ## Run 13 stress 0.1488992 
-    ## ... Procrustes: rmse 0.003809408  max resid 0.03315956 
-    ## Run 14 stress 0.1685648 
-    ## Run 15 stress 0.1489255 
-    ## ... Procrustes: rmse 0.00417887  max resid 0.02871834 
-    ## Run 16 stress 0.2044408 
-    ## Run 17 stress 0.1489234 
-    ## ... Procrustes: rmse 0.005710341  max resid 0.0335781 
-    ## Run 18 stress 0.1557445 
-    ## Run 19 stress 0.1488933 
-    ## ... Procrustes: rmse 4.365978e-05  max resid 0.0001990057 
-    ## ... Similar to previous best
-    ## Run 20 stress 0.1489253 
-    ## ... Procrustes: rmse 0.004179056  max resid 0.02886394 
-    ## *** Best solution repeated 1 times
-    ## [1] 0.1488932
+![](BeeSearch1_files/figure-gfm/ndms_fig_seasons-1.png)<!-- -->
+**Community composition across time of season.** Strong overlap of
+composition across the early, mid, and late season sampling (PERMANOVA:
+F = 0.71, 0.79). Data include all compatible stations across all years.
 
-# What bee groups drive changes in abundance from early to mid to late year?
+## Across sites
 
-![](BeeSearch1_files/figure-gfm/nmds_fig_seasons-1.png)<!-- -->
-
-# How does community composition change over time?
-
-![](BeeSearch1_files/figure-gfm/nmds_fig_years-1.png)<!-- -->
-
-# All sites NMDS
-
-- By Site/Year
-
-<!-- -->
-
-    ## Permutation test for adonis under reduced model
-    ## Terms added sequentially (first to last)
-    ## Permutation: free
-    ## Number of permutations: 999
-    ## 
-    ## adonis2(formula = site_matrix ~ Site + Year, data = site_meta, method = "bray")
-    ##          Df SumOfSqs      R2      F Pr(>F)    
-    ## Site      2   0.8270 0.08587 2.5675  0.002 ** 
-    ## Year      4   1.2345 0.12818 1.9163  0.001 ***
-    ## Residual 47   7.5697 0.78595                  
-    ## Total    53   9.6313 1.00000                  
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## 
-    ## Permutation test for homogeneity of multivariate dispersions
-    ## Permutation: free
-    ## Number of permutations: 999
-    ## 
-    ## Response: Distances
-    ##           Df  Sum Sq   Mean Sq      F N.Perm Pr(>F)
-    ## Groups     4 0.04477 0.0111926 2.0206    999  0.112
-    ## Residuals 49 0.27142 0.0055391
     ## 
     ## Permutation test for homogeneity of multivariate dispersions
     ## Permutation: free
@@ -343,137 +282,115 @@ net caught records.
     ## 
     ## Response: Distances
     ##           Df   Sum Sq   Mean Sq      F N.Perm Pr(>F)  
-    ## Groups     2 0.036553 0.0182766 3.4629    999  0.049 *
-    ## Residuals 51 0.269166 0.0052778                       
+    ## Groups     5 0.092738 0.0185477 3.2641    999  0.018 *
+    ## Residuals 52 0.295478 0.0056823                       
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-    ## Run 0 stress 0.14218 
-    ## Run 1 stress 0.1441717 
-    ## Run 2 stress 0.1465901 
-    ## Run 3 stress 0.1425627 
-    ## ... Procrustes: rmse 0.066246  max resid 0.2112341 
-    ## Run 4 stress 0.1425629 
-    ## ... Procrustes: rmse 0.06624254  max resid 0.2110582 
-    ## Run 5 stress 0.1421807 
-    ## ... Procrustes: rmse 0.0003197582  max resid 0.00155504 
-    ## ... Similar to previous best
-    ## Run 6 stress 0.1421799 
-    ## ... New best solution
-    ## ... Procrustes: rmse 0.0002325377  max resid 0.0009753437 
-    ## ... Similar to previous best
-    ## Run 7 stress 0.1444582 
-    ## Run 8 stress 0.1421801 
-    ## ... Procrustes: rmse 0.0003936077  max resid 0.001859247 
-    ## ... Similar to previous best
-    ## Run 9 stress 0.142585 
-    ## ... Procrustes: rmse 0.06595712  max resid 0.2156525 
-    ## Run 10 stress 0.1425105 
-    ## ... Procrustes: rmse 0.01963016  max resid 0.0856492 
-    ## Run 11 stress 0.142563 
-    ## ... Procrustes: rmse 0.06614714  max resid 0.2128941 
-    ## Run 12 stress 0.1421392 
-    ## ... New best solution
-    ## ... Procrustes: rmse 0.00707175  max resid 0.04055688 
-    ## Run 13 stress 0.1425105 
-    ## ... Procrustes: rmse 0.0165995  max resid 0.08089608 
-    ## Run 14 stress 0.1443164 
-    ## Run 15 stress 0.142352 
-    ## ... Procrustes: rmse 0.008513743  max resid 0.05117452 
-    ## Run 16 stress 0.14218 
-    ## ... Procrustes: rmse 0.007219432  max resid 0.04136733 
-    ## Run 17 stress 0.1421807 
-    ## ... Procrustes: rmse 0.007503178  max resid 0.04305177 
-    ## Run 18 stress 0.1421811 
-    ## ... Procrustes: rmse 0.007616049  max resid 0.04374068 
-    ## Run 19 stress 0.1425629 
-    ## ... Procrustes: rmse 0.06471791  max resid 0.2095771 
-    ## Run 20 stress 0.1421805 
-    ## ... Procrustes: rmse 0.007438665  max resid 0.04281042 
-    ## *** Best solution was not repeated -- monoMDS stopping criteria:
-    ##      1: no. of iterations >= maxit
-    ##     19: stress ratio > sratmax
-    ## [1] 0.1421392
-
-![](BeeSearch1_files/figure-gfm/nmds_all_sites-1.png)<!-- -->
-
-## NMDS by Site
-
-![](BeeSearch1_files/figure-gfm/nmds_all_sites_year-1.png)<!-- -->
+    ## 
+    ## Permutation test for homogeneity of multivariate dispersions
+    ## Permutation: free
+    ## Number of permutations: 999
+    ## 
+    ## Response: Distances
+    ##           Df   Sum Sq   Mean Sq      F N.Perm Pr(>F)
+    ## Groups     2 0.007355 0.0036775 0.6595    999  0.504
+    ## Residuals 55 0.306670 0.0055758
 
 ### Site classification by species composition (Random Forest)
 
     ## Random Forest 
     ## 
-    ##  54 samples
-    ## 144 predictors
+    ##  58 samples
+    ## 135 predictors
     ##   3 classes: 'BPF', 'POS', 'SCL' 
     ## 
     ## No pre-processing
     ## Resampling: Bootstrapped (25 reps) 
-    ## Summary of sample sizes: 54, 54, 54, 54, 54, 54, ... 
+    ## Summary of sample sizes: 58, 58, 58, 58, 58, 58, ... 
     ## Resampling results across tuning parameters:
     ## 
     ##   mtry  Accuracy   Kappa    
-    ##     2   0.7162212  0.4413013
-    ##    73   0.7994397  0.6228369
-    ##   144   0.7599393  0.5582317
+    ##     2   0.7073914  0.4416647
+    ##    68   0.7999880  0.6528418
+    ##   135   0.7763999  0.6164565
     ## 
     ## Accuracy was used to select the optimal model using the largest value.
-    ## The final value used for the model was mtry = 73.
+    ## The final value used for the model was mtry = 68.
     ## 
     ## Call:
-    ##  randomForest(x = select(rf_matrix, -Year, -Station, -StationYear,      -Site), y = rf_matrix$Site, mtry = 73, importance = T, nPerm = 999) 
+    ##  randomForest(x = select(rf_matrix, -Year, -Station, -StationYear,      -Site), y = rf_matrix$Site, mtry = 68, importance = T, nPerm = 999,      proximity = T) 
     ##                Type of random forest: classification
     ##                      Number of trees: 500
-    ## No. of variables tried at each split: 73
+    ## No. of variables tried at each split: 68
     ## 
-    ##         OOB estimate of  error rate: 18.52%
+    ##         OOB estimate of  error rate: 15.52%
     ## Confusion matrix:
     ##     BPF POS SCL class.error
     ## BPF  13   1   0  0.07142857
-    ## POS   0  31   0  0.00000000
-    ## SCL   2   7   0  1.00000000
+    ## POS   0  28   3  0.09677419
+    ## SCL   0   5   8  0.38461538
+
+|                          |   BPF |    POS |    SCL | MeanDecreaseAccuracy | MeanDecreaseGini |
+|:-------------------------|------:|-------:|-------:|---------------------:|-----------------:|
+| Agapostemon texanus      | 9.722 |  8.500 | -4.435 |                9.405 |            2.488 |
+| Osmia albolateralis      | 8.091 |  8.860 |  4.100 |               10.598 |            2.480 |
+| Halictus tripartitus     | 7.284 |  9.998 |  3.180 |               10.849 |            2.227 |
+| Bombus flavifrons        | 5.828 |  2.341 | 10.277 |                9.747 |            1.974 |
+| Bombus fervidus          | 8.541 |  3.098 |  0.667 |                7.150 |            1.640 |
+| Apis mellifera           | 8.718 |  3.643 | -0.085 |                8.193 |            1.537 |
+| Bombus melanopygus       | 8.245 |  1.277 |  4.368 |                7.342 |            1.482 |
+| Megachile melanophaea    | 2.481 |  5.662 |  1.316 |                5.970 |            1.025 |
+| Halictus confusus        | 7.541 |  0.824 |  2.871 |                6.584 |            1.016 |
+| Bombus vosnesenskii      | 3.771 |  0.275 |  2.595 |                3.114 |            0.897 |
+| Melissodes rivalis       | 0.779 |  5.277 |  1.638 |                4.884 |            0.867 |
+| Melissodes microsticta   | 1.913 |  1.978 | -0.259 |                2.115 |            0.756 |
+| Ceratina acantha         | 5.823 |  1.166 |  0.687 |                4.557 |            0.716 |
+| Lasioglossum incompletum | 5.194 | -0.816 |  0.709 |                3.878 |            0.713 |
 
 ![](BeeSearch1_files/figure-gfm/random_forest_sites-1.png)<!-- -->
 
-|                          |    BPF |    POS |    SCL | MeanDecreaseAccuracy | MeanDecreaseGini |
-|:-------------------------|-------:|-------:|-------:|---------------------:|-----------------:|
-| Agapostemon texanus      | 11.014 |  9.309 | -1.762 |               11.219 |            2.943 |
-| Halictus tripartitus     |  7.448 | 10.464 |  1.818 |               11.058 |            2.521 |
-| Osmia albolateralis      |  7.684 |  7.447 |  1.896 |                8.830 |            1.970 |
-| Bombus fervidus          |  9.181 |  4.041 |  3.098 |                8.548 |            1.836 |
-| Apis mellifera           |  7.789 |  5.013 |  0.863 |                8.151 |            1.387 |
-| Bombus melanopygus       |  6.869 |  3.577 |  3.142 |                6.800 |            1.185 |
-| Bombus flavifrons        |  2.884 |  1.185 |  5.454 |                5.156 |            1.111 |
-| Halictus confusus        |  5.884 |  2.035 |  0.226 |                5.715 |            0.791 |
-| Lasioglossum incompletum |  5.165 |  1.485 | -0.400 |                4.579 |            0.781 |
-| Megachile melanophaea    |  5.617 |  4.072 |  1.306 |                5.766 |            0.775 |
-| Bombus vosnesenskii      |  3.045 |  1.447 |  1.214 |                3.072 |            0.688 |
-| Andrena hemileuca        |  2.606 |  0.015 |  3.304 |                2.803 |            0.643 |
-| Melissodes microsticta   |  0.513 |  0.266 | -0.404 |                0.546 |            0.575 |
-| Ceratina acantha         |  3.609 |  1.951 | -2.707 |                3.380 |            0.548 |
-| Melissodes rivalis       |  3.101 |  3.943 |  0.687 |                4.773 |            0.519 |
-
-\*\* Random Forest classification of site by species composition.\*\*
-The model was tuned without pre-processing. Bootstrapped resampling used
-25 replicates. Overall model accuracy was 76.4%. The model clearly
-delineated the BPF sites with 0.00 class error. Similarly, POS sites
-were near perfect with 0.029 class error. However, the SCL sites were
-never classified correctly (1.00 class error), with most (8/9)
-identified as POS. This lends further support to the NMDS figure above,
-species composition is very similar across SCL and POS, but BPF sites
-have different community composition compared to the other two sites.
+**Random Forest classification of site by species composition.** The
+model was tuned without pre-processing. Bootstrapped resampling used 25
+replicates. Overall model accuracy was 82%. The model clearly delineated
+the BPF sites with 0.0 class error. Similarly, POS sites were near
+perfect with 0.032 class error. However, the SCL sites were less
+accurately classified (0.462 class error), with (6/13) identified as
+POS. This lends further support to the NMDS figure below, species
+composition is very similar across SCL and POS, but BPF sites have
+different community composition compared to the other two sites.
 
 The table above shows the species most representative of the community
 differences used to make the above classifications. These species are
 the top 10th percentile of ranked variable importance (mean decrease in
-Gini score). Take this with a grain of salt, the model didn’t do a great
-job, overall Out of Bag error rate = 19.3%. This is almost unacceptable,
-especially because Random Forest more often overfits the data.
+Gini score).
 
-- By year ![](BeeSearch1_files/figure-gfm/nmds_all_year-1.png)<!-- -->
+### NMDS by Site figure (include this)
 
-# POS 2017 Changes over seasons
+![](BeeSearch1_files/figure-gfm/nmds_all_sites_year-1.png)<!-- -->
+**Variation in community composition across sites.** Bee species are
+plotted on the first two axes of a three-dimensional non-metric
+multidimensional scaling ordination of the 58 combinations of station
+(subsite) and year, across the three sites. Small points are the
+individual station/year combinations. Large points are the centroids of
+the three sites. Ellipses are 95% confidence intervals around the site
+centroids. Bees species shown are the most representative (top 10th
+percentile of a random forest analysis) of the compositional differences
+among sites. Text size of the labels is proportional to variable
+importance score (mean decrease in Gini score).
+
+## Across years (I don’t think we should include this)
+
+![](BeeSearch1_files/figure-gfm/nmds_all_year-1.png)<!-- --> **Community
+composition across years.** Most years have strong overlap of
+composition but the *year* term is highly significant (PERMANOVA: F =
+1.74, *P* = 0.001). However, the only site in 2014 is SCL and the 2018
+and 2019 years are heavily influenced by the BPF data. Essentially, the
+information in *years* is not sufficiently distinct from the information
+in *sites* and including *year* in the model is not informative. This is
+also the likely cause of the violation of homogeneity of multivariate
+dispersions for the *year* term but not the *site* term.
+
+# POS 2017 Changes over seasons (This is not interesting)
 
     ## Permutation test for adonis under reduced model
     ## Terms added sequentially (first to last)
@@ -482,9 +399,9 @@ especially because Random Forest more often overfits the data.
     ## 
     ## adonis2(formula = nmds2017dist ~ meta2017$ToY, method = "bray")
     ##              Df SumOfSqs      R2      F Pr(>F)  
-    ## meta2017$ToY  2   0.7965 0.12704 1.5281  0.027 *
-    ## Residual     21   5.4731 0.87296                
-    ## Total        23   6.2696 1.00000                
+    ## meta2017$ToY  2   0.7696 0.12265 1.4679  0.044 *
+    ## Residual     21   5.5049 0.87735                
+    ## Total        23   6.2745 1.00000                
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
@@ -493,15 +410,16 @@ especially because Random Forest more often overfits the data.
     ## Number of permutations: 999
     ## 
     ## Response: Distances
-    ##           Df   Sum Sq   Mean Sq    F N.Perm Pr(>F)  
-    ## Groups     2 0.014532 0.0072659 3.86    999  0.028 *
-    ## Residuals 21 0.039529 0.0018823                     
+    ##           Df   Sum Sq   Mean Sq      F N.Perm Pr(>F)  
+    ## Groups     2 0.016570 0.0082849 2.9037    999  0.079 .
+    ## Residuals 21 0.059919 0.0028533                       
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
 Within the Port of Seattle sites in 2017 and only 2017, species
 composition changes significantly throughout the season with distinct
-groups of species in early, mid, and late season sampling.
+groups of species in early, mid, and late season sampling. **However,
+this model violates homogeneity of multivariate dispersions.**
 
 ![](BeeSearch1_files/figure-gfm/nmds2017_plot-1.png)<!-- -->
 **Non-metric multidimensional scaling of bee species in Port of Seattle
@@ -513,10 +431,6 @@ total bee species composition and the labels are specific bee species
 and their position in NMDS space. Large points are the centroids (means)
 of the points in NMDS space. Ellipses are 95% confidence intervals
 around the centroids.
-
-# Can we do analysis with and without major species (H. tripartitus; A. texanus; M. microsticta/us)
-
-What analysis?
 
 # What is the turnover of species within sub-sites within years?
 
@@ -538,7 +452,7 @@ What analysis?
 |:-----|--------:|--------:|-----------:|----------------:|------------:|
 | POS  |    3.57 |    0.95 |      22.14 |            0.95 |       26.49 |
 | BPF  |    3.51 |    0.96 |      22.35 |            0.96 |       19.71 |
-| SCL  |    3.48 |    0.95 |      20.40 |            0.95 |       23.05 |
+| SCL  |    3.48 |    0.95 |      20.40 |            0.95 |       22.73 |
 
 Diversity is similar across all 3 sites.
 
@@ -579,7 +493,7 @@ Diversity is similar across all 3 sites.
      [16] ade4_1.7-22          pROC_1.18.5          phylobase_0.8.12    
      [19] cluster_2.1.4        png_0.1-8            shiny_1.8.1.1       
      [22] compiler_4.2.3       httr_1.4.7           adegraphics_1.0-21  
-     [25] Matrix_1.5-3         fastmap_1.2.0        cli_3.6.1           
+     [25] Matrix_1.5-3         fastmap_1.2.0        cli_3.6.2           
      [28] later_1.3.2          s2_1.1.6             htmltools_0.5.8.1   
      [31] prettyunits_1.2.0    tools_4.2.3          igraph_2.0.3        
      [34] gtable_0.3.5         glue_1.7.0           reshape2_1.4.4      
