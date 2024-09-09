@@ -1,0 +1,43 @@
+Dataset,Header,Definition
+EB_site_metadata,Site_ID,The name of the farm site sample was collected from. Names have been anonymized to protect the identity of producers involved in the study.
+EB_site_metadata,Year,The year urbanization data was taken
+EB_site_metadata,Developed,The percent of developed pixels within 1 km of each farm per year using the USDA Cropland Data Layer. Pixels within these raster files classify single habitat types within 30 by 30 m grid cells.
+EB_site_metadata,Organic_status,"The organic status of the farm site. The farm is either certified organic (Certified), or they are not certified but use organic practices (OP)."
+EB_site_metadata,Years_since_transition,The number of years since the farm has tranisitioned from conventional to organic practices.
+EB_site_metadata,Area,The area of the farm site in meters
+EB_site_metadata,Perimeter,The total length of the farm site edge in meters
+EB_bee_diversity_data,Site_ID,The name of the farm site sample was collected from. Names have been anonymized to protect the identity of producers involved in the study.
+EB_bee_diversity_data,Latitude,Latitude of the farm site. Points have been jittered to protect the identify of the farm.
+EB_bee_diversity_data,Longtiude,Longitude of the farm site. Points have been jittered to protect the identify of the farm.
+EB_bee_diversity_data,ID,Unique bee ID
+EB_bee_diversity_data,Date,Date bee sample was collected
+EB_bee_diversity_data,Sampling_method,Sampling method used to collect bees
+EB_bee_diversity_data,Collector,Last name of person who collected bee sample
+EB_bee_diversity_data,Family,Family of bee sample collected
+EB_bee_diversity_data,Genus,Genus of bee sample collected
+EB_bee_diversity_data,Species,Species of bee sample collected
+EB_morphospecies_data,Genus,Genus of bee sample collected
+EB_morphospecies_data,Morphospecies,Morphospecies of bee sample collected
+EB_morphospecies_data,Description,Desription of specific morphology
+EB_plant_diversity_data,Site_ID,The name of the farm site sample was collected from. Names have been anonymized to protect the identity of producers involved in the study.
+EB_plant_diversity_data,Latitude,Latitude of the farm site. Points have been jittered to protect the identify of the farm.
+EB_plant_diversity_data,Longtiude,Longitude of the farm site. Points have been jittered to protect the identify of the farm.
+EB_plant_diversity_data,Date,Date plant observation was made
+EB_plant_diversity_data,Bout,"When the plant was observed in the season (Early, Mid, Late)"
+EB_plant_diversity_data,Specific_epithet,Species of plant observed
+EB_plant_diversity_data,Sub_species,Sub-species of plant observed
+EB_plant_diversity_data,Variety,Variety of plant observed
+EB_plant_diversity_data,Abundance,Abundance of plant observed at that time point
+EB_plant_diversity_data,Common_name,Common name of plant observed
+EB_pollen_network_data,Site_ID,The name of the farm site sample was collected from. Names have been anonymized to protect the identity of producers involved in the study.
+EB_pollen_network_data,Latitude,Latitude of the farm site. Points have been jittered to protect the identify of the farm.
+EB_pollen_network_data,Longtiude,Longitude of the farm site. Points have been jittered to protect the identify of the farm.
+EB_pollen_network_data,ASV,Amplicon sequence variant 
+EB_pollen_network_data,Abundance,Relative abundance (proportion of sequences) of amplicon sequence variant
+EB_pollen_network_data,Pollinator,"Bee type pollen was collected from: HB (honey bee), BB (bumble bee), OB (other bee)"
+EB_pollen_network_data,Genus,Genus of plant the pollen came from
+EB_pollen_network_data,Species,"Species of plant the pollen came from. OUT can be used in the future to fill out ""NA"" values. "
+EB_visitation_data,Site_ID,The name of the farm site where observations were made. Names have been anonymized to protect the identity of producers involved in the study.
+EB_visitation_data,Latitude,Latitude of the farm site. Points have been jittered to protect the identify of the farm.
+EB_visitation_data,Longtiude,Longitude of the farm site. Points have been jittered to protect the identify of the farm.
+EB_visitation_data,Species,Species of plant found on the farm with number of bee visitations pooled yearly

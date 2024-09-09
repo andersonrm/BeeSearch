@@ -447,6 +447,24 @@ chao_station_year <- dat.ex.msp %>%
               values_fill = list(count = 0)) %>% 
   column_to_rownames("Short.label.name")
 
+# Station by year (raw values)
+station_year_raw <- dat.ex.msp %>% 
+  filter(Collection.Method == "T") %>% 
+  group_by(StationYear, Short.label.name) %>% 
+  tally(name = "count") %>% 
+  select(-count) %>% 
+  group_by(StationYear) %>% 
+  tally(name = "count") %>% 
+  separate_wider_delim(StationYear, delim = "_",
+                       names = c("Station", "Year")) %>% 
+  mutate(Site = substr(Station, 1, 3),
+         Year = as.numeric(Year))
+
+# station year (raw means)
+station_year_raw_means <- station_year_raw %>% 
+  group_by(Site, Year) %>%
+  summarise(mean.raw = mean(count))
+
 
 chao_station_year <- data.frame(
   chao1 = sapply(seq_along(chao_station_year), function(i){
@@ -498,15 +516,29 @@ kable(chao_station_year, format = "markdown", digits = 2)
 chao_station_year %>% 
   mutate(Year = as.numeric(Year),
          Site = substr(Station, 1,3)) %>% 
-  ggplot(aes(x = Year, y = chao1, color = Site)) +
-  geom_jitter(shape = 21, width = 0.05) +
-  geom_smooth(aes(fill = Site),
-              method = "lm", alpha = 0.15) +
+  group_by(Site, Year) %>% 
+  summarise(mean.chao = mean(chao1)) %>% 
+  ggplot(aes(x = Year, y = mean.chao,
+             color = Site, group = Site)) +
+  geom_point(size = 3) +
+  geom_line() +
   theme_cowplot() +
-  labs(y = "Chao1\n(minimum species richness)")
+  labs(y = "Specie richness") +
+  geom_point(data = station_year_raw,
+             aes(x = Year, y = count,
+                 color = Site),
+             shape = 2) +
+  geom_line(data = station_year_raw_means,
+            aes(x = Year, y = mean.raw, color = Site),
+            linetype = 'dashed') +
+  ylim(min = 1, max = 85)
+
+
+
 
 ```
-**Minimum species richness (Chao1) across time.** Points are stations (sub sites), lines are fit by linear regression, and the shaded regions are 95% confidence intervals. The data exclude some morphospecies (see methods), and all net caught records.
+
+**Species richness across sites and sampling years** Points are mean Chao1 estimated species richness, triangles are raw species counts at each substation within each site. Chao richness estimates are lifted by an additive parameter that accounts for rare species likely missed in the sampling. The data exclude some morphospecies (see methods), and all net caught records.
 
 
 

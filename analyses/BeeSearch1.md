@@ -1,7 +1,7 @@
 BeeSearch initial
 ================
 Dr. Riley M. Anderson
-August 02, 2024
+September 09, 2024
 
   
 
@@ -259,10 +259,13 @@ sampling effort. Richness across sites converge in the mid-summer.
 |  35.50 | SCL5    | 2016 |
 
 ![](BeeSearch1_files/figure-gfm/chao_station_year-1.png)<!-- -->
-**Minimum species richness (Chao1) across time.** Points are stations
-(sub sites), lines are fit by linear regression, and the shaded regions
-are 95% confidence intervals. The data exclude some morphospecies (see
-methods), and all net caught records.
+
+**Species richness across sites and sampling years** Points are mean
+Chao1 estimated species richness, triangles are raw species counts at
+each substation within each site. Chao richness estimates are lifted by
+an additive parameter that accounts for rare species likely missed in
+the sampling. The data exclude some morphospecies (see methods), and all
+net caught records.
 
 # Does community composition change across seasons, sites, or years?
 
@@ -271,7 +274,7 @@ methods), and all net caught records.
 ![](BeeSearch1_files/figure-gfm/ndms_fig_seasons-1.png)<!-- -->
 **Community composition across time of season.** Strong overlap of
 composition across the early, mid, and late season sampling (PERMANOVA:
-F = 0.71, 0.79). Data include all compatible stations across all years.
+F = 0.71, 0.78). Data include all compatible stations across all years.
 
 ## Across sites
 
@@ -282,7 +285,7 @@ F = 0.71, 0.79). Data include all compatible stations across all years.
     ## 
     ## Response: Distances
     ##           Df   Sum Sq   Mean Sq      F N.Perm Pr(>F)  
-    ## Groups     5 0.092738 0.0185477 3.2641    999  0.018 *
+    ## Groups     5 0.092738 0.0185477 3.2641    999  0.014 *
     ## Residuals 52 0.295478 0.0056823                       
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
@@ -293,7 +296,7 @@ F = 0.71, 0.79). Data include all compatible stations across all years.
     ## 
     ## Response: Distances
     ##           Df   Sum Sq   Mean Sq      F N.Perm Pr(>F)
-    ## Groups     2 0.007355 0.0036775 0.6595    999  0.504
+    ## Groups     2 0.007355 0.0036775 0.6595    999  0.513
     ## Residuals 55 0.306670 0.0055758
 
 ### Site classification by species composition (Random Forest)
@@ -310,9 +313,9 @@ F = 0.71, 0.79). Data include all compatible stations across all years.
     ## Resampling results across tuning parameters:
     ## 
     ##   mtry  Accuracy   Kappa    
-    ##     2   0.7073914  0.4416647
-    ##    68   0.7999880  0.6528418
-    ##   135   0.7763999  0.6164565
+    ##     2   0.7153856  0.4645572
+    ##    68   0.8082971  0.6789883
+    ##   135   0.7673885  0.6101582
     ## 
     ## Accuracy was used to select the optimal model using the largest value.
     ## The final value used for the model was mtry = 68.
@@ -323,29 +326,29 @@ F = 0.71, 0.79). Data include all compatible stations across all years.
     ##                      Number of trees: 500
     ## No. of variables tried at each split: 68
     ## 
-    ##         OOB estimate of  error rate: 15.52%
+    ##         OOB estimate of  error rate: 13.79%
     ## Confusion matrix:
     ##     BPF POS SCL class.error
-    ## BPF  13   1   0  0.07142857
+    ## BPF  14   0   0  0.00000000
     ## POS   0  28   3  0.09677419
     ## SCL   0   5   8  0.38461538
 
-|                          |   BPF |    POS |    SCL | MeanDecreaseAccuracy | MeanDecreaseGini |
-|:-------------------------|------:|-------:|-------:|---------------------:|-----------------:|
-| Agapostemon texanus      | 9.722 |  8.500 | -4.435 |                9.405 |            2.488 |
-| Osmia albolateralis      | 8.091 |  8.860 |  4.100 |               10.598 |            2.480 |
-| Halictus tripartitus     | 7.284 |  9.998 |  3.180 |               10.849 |            2.227 |
-| Bombus flavifrons        | 5.828 |  2.341 | 10.277 |                9.747 |            1.974 |
-| Bombus fervidus          | 8.541 |  3.098 |  0.667 |                7.150 |            1.640 |
-| Apis mellifera           | 8.718 |  3.643 | -0.085 |                8.193 |            1.537 |
-| Bombus melanopygus       | 8.245 |  1.277 |  4.368 |                7.342 |            1.482 |
-| Megachile melanophaea    | 2.481 |  5.662 |  1.316 |                5.970 |            1.025 |
-| Halictus confusus        | 7.541 |  0.824 |  2.871 |                6.584 |            1.016 |
-| Bombus vosnesenskii      | 3.771 |  0.275 |  2.595 |                3.114 |            0.897 |
-| Melissodes rivalis       | 0.779 |  5.277 |  1.638 |                4.884 |            0.867 |
-| Melissodes microsticta   | 1.913 |  1.978 | -0.259 |                2.115 |            0.756 |
-| Ceratina acantha         | 5.823 |  1.166 |  0.687 |                4.557 |            0.716 |
-| Lasioglossum incompletum | 5.194 | -0.816 |  0.709 |                3.878 |            0.713 |
+|                          |    BPF |    POS |    SCL | MeanDecreaseAccuracy | MeanDecreaseGini |
+|:-------------------------|-------:|-------:|-------:|---------------------:|-----------------:|
+| Agapostemon texanus      | 10.682 |  8.646 | -1.338 |               10.961 |            2.865 |
+| Halictus tripartitus     |  6.896 | 10.967 |  3.557 |               11.246 |            2.751 |
+| Osmia albolateralis      |  7.740 |  9.192 |  4.984 |               10.013 |            2.278 |
+| Bombus flavifrons        |  5.574 |  3.338 |  9.325 |                9.399 |            1.842 |
+| Bombus fervidus          |  8.314 |  4.829 |  1.003 |                7.561 |            1.649 |
+| Apis mellifera           |  8.412 |  5.322 | -1.380 |                8.223 |            1.541 |
+| Bombus melanopygus       |  8.166 |  4.324 |  3.874 |                8.406 |            1.263 |
+| Bombus vosnesenskii      |  4.511 |  0.599 |  2.967 |                4.536 |            0.855 |
+| Lasioglossum incompletum |  4.888 |  2.782 | -2.891 |                3.918 |            0.825 |
+| Megachile melanophaea    |  4.944 |  3.702 |  2.875 |                5.637 |            0.823 |
+| Halictus confusus        |  5.722 | -1.408 |  4.235 |                5.053 |            0.820 |
+| Melissodes rivalis       |  2.460 |  3.785 |  1.088 |                4.447 |            0.786 |
+| Lasioglossum nevadense   | -0.289 | -0.293 |  3.771 |                2.082 |            0.779 |
+| Melissodes microsticta   |  0.738 |  2.044 |  1.577 |                2.332 |            0.678 |
 
 ![](BeeSearch1_files/figure-gfm/random_forest_sites-1.png)<!-- -->
 
@@ -354,7 +357,7 @@ model was tuned without pre-processing. Bootstrapped resampling used 25
 replicates. Overall model accuracy was 82%. The model clearly delineated
 the BPF sites with 0.0 class error. Similarly, POS sites were near
 perfect with 0.032 class error. However, the SCL sites were less
-accurately classified (0.462 class error), with (6/13) identified as
+accurately classified (0.538 class error), with (6/13) identified as
 POS. This lends further support to the NMDS figure below, species
 composition is very similar across SCL and POS, but BPF sites have
 different community composition compared to the other two sites.
@@ -383,7 +386,7 @@ importance score (mean decrease in Gini score).
 ![](BeeSearch1_files/figure-gfm/nmds_all_year-1.png)<!-- --> **Community
 composition across years.** Most years have strong overlap of
 composition but the *year* term is highly significant (PERMANOVA: F =
-1.74, *P* = 0.001). However, the only site in 2014 is SCL and the 2018
+1.74, *P* = 0.004). However, the only site in 2014 is SCL and the 2018
 and 2019 years are heavily influenced by the BPF data. Essentially, the
 information in *years* is not sufficiently distinct from the information
 in *sites* and including *year* in the model is not informative. This is
@@ -398,10 +401,10 @@ dispersions for the *year* term but not the *site* term.
     ## Number of permutations: 999
     ## 
     ## adonis2(formula = nmds2017dist ~ meta2017$ToY, method = "bray")
-    ##              Df SumOfSqs      R2      F Pr(>F)  
-    ## meta2017$ToY  2   0.7696 0.12265 1.4679  0.044 *
-    ## Residual     21   5.5049 0.87735                
-    ## Total        23   6.2745 1.00000                
+    ##              Df SumOfSqs     R2      F Pr(>F)  
+    ## meta2017$ToY  2   0.8083 0.1278 1.5385  0.036 *
+    ## Residual     21   5.5163 0.8722                
+    ## Total        23   6.3246 1.0000                
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
@@ -410,9 +413,9 @@ dispersions for the *year* term but not the *site* term.
     ## Number of permutations: 999
     ## 
     ## Response: Distances
-    ##           Df   Sum Sq   Mean Sq      F N.Perm Pr(>F)  
-    ## Groups     2 0.016570 0.0082849 2.9037    999  0.079 .
-    ## Residuals 21 0.059919 0.0028533                       
+    ##           Df   Sum Sq   Mean Sq    F N.Perm Pr(>F)  
+    ## Groups     2 0.017193 0.0085964 4.09    999  0.041 *
+    ## Residuals 21 0.044138 0.0021018                     
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
