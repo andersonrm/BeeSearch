@@ -385,6 +385,120 @@ sex_ratio_function(dat2, c("Sex",
 **Sex ratios of bees collected by either net or trap across the sampling season.** Points above the dashed line represent male bias, whereas point below represent female bias. Early season (late March - mid May), mid season (mid May to mid July), and late season (mid July - late September) time windows in the sampling effort are shown. Large solid points are sex ratios calculated at the season level. Small open points are sex ratios calculated at the sub-site level within each season. Small points are spread horizontally for visual clarity.
 
 
+# Species accumulation curves
+```{r SAC_prep, echo = F}
+### ALL SITES
+sac_all <- dat.ex.msp %>% 
+  filter(Collection.Method == "T") %>% 
+  mutate(StationYear = factor(StationYear)) %>% 
+  group_by(StationYear, Short.label.name) %>% 
+  tally(name = "count") %>% 
+  pivot_wider(names_from = Short.label.name,
+              values_from = count,
+              values_fill = list(count = 0)) %>% 
+  column_to_rownames("StationYear")
+
+sac_all_list <- specaccum(sac_all, method = "random", permutations = 100,
+          conditioned = T, gamma = "jack1")
+
+### POS
+sac_pos <- dat.ex.msp %>% 
+  filter(Collection.Method == "T",
+         Site == "POS") %>% 
+  mutate(StationYear = factor(StationYear)) %>% 
+  group_by(StationYear, Short.label.name) %>% 
+  tally(name = "count") %>% 
+  pivot_wider(names_from = Short.label.name,
+              values_from = count,
+              values_fill = list(count = 0)) %>% 
+  column_to_rownames("StationYear")
+
+sac_pos_list <- specaccum(sac_pos, method = "random", permutations = 100,
+                          conditioned = T, gamma = "jack1")
+
+#### SCL
+sac_scl <- dat.ex.msp %>% 
+  filter(Collection.Method == "T",
+         Site == "SCL") %>% 
+  mutate(StationYear = factor(StationYear)) %>% 
+  group_by(StationYear, Short.label.name) %>% 
+  tally(name = "count") %>% 
+  pivot_wider(names_from = Short.label.name,
+              values_from = count,
+              values_fill = list(count = 0)) %>% 
+  column_to_rownames("StationYear")
+
+sac_scl_list <- specaccum(sac_scl, method = "random", permutations = 100,
+                          conditioned = T, gamma = "jack1")
+
+### BPF
+sac_bpf <- dat.ex.msp %>% 
+  filter(Collection.Method == "T",
+         Site == "BPF") %>% 
+  mutate(StationYear = factor(StationYear)) %>% 
+  group_by(StationYear, Short.label.name) %>% 
+  tally(name = "count") %>% 
+  pivot_wider(names_from = Short.label.name,
+              values_from = count,
+              values_fill = list(count = 0)) %>% 
+  column_to_rownames("StationYear")
+
+sac_bpf_list <- specaccum(sac_bpf, method = "random", permutations = 100,
+                          conditioned = T, gamma = "jack1")
+
+# Results
+sac_all_result <- data.frame(site = "All Sites",
+                             nsamples = seq(1,58, 1),
+                             richness = sac_all_list[4],
+                             sd = sac_all_list[5]) %>% 
+  mutate(lower = richness - 1.96*sd,
+         upper = richness + 1.96*sd)
+
+sac_pos_result <- data.frame(site = "POS",
+                             nsamples = seq(1,31, 1),
+                             richness = sac_pos_list[4],
+                             sd = sac_pos_list[5]) %>% 
+  mutate(lower = richness - 1.96*sd,
+         upper = richness + 1.96*sd)
+
+sac_scl_result <- data.frame(site = "SCL",
+                             nsamples = seq(1,13, 1),
+                             richness = sac_scl_list[4],
+                             sd = sac_scl_list[5]) %>% 
+  mutate(lower = richness - 1.96*sd,
+         upper = richness + 1.96*sd)
+
+sac_bpf_result <- data.frame(site = "BPF",
+                             nsamples = seq(1,14, 1),
+                             richness = sac_bpf_list[4],
+                             sd = sac_bpf_list[5]) %>% 
+  mutate(lower = richness - 1.96*sd,
+         upper = richness + 1.96*sd)
+
+
+sac_results <- bind_rows(sac_all_result, sac_pos_result,
+          sac_scl_result, sac_bpf_result)
+```
+
+```{r SAC_figure, echo = F}
+
+sac_results %>% 
+  ggplot(aes(x = nsamples, y = richness, fill = site)) +
+  geom_line(aes(color = site),linewidth = 1.1, show.legend = F) +
+  geom_ribbon(aes(ymin = lower, ymax = upper, fill = site),
+              alpha = 0.4) +
+  scale_color_manual(values = c("#000000", "#E69F00", "#56B4E9", "#009E73")) +
+  scale_fill_manual(values = c("#999999", "#E69F00", "#56B4E9", "#009E73")) +
+  theme_cowplot() +
+  labs(x = "No. sampling sites",
+       y = "Richness",
+       fill = "Site") +
+  theme(legend.position = c(0.78,0.4))
+
+```
+
+
+
 # Chao indices
 ```{r chao_indices, echo = F, cache = F}
 
@@ -531,7 +645,9 @@ chao_station_year %>%
   geom_line(data = station_year_raw_means,
             aes(x = Year, y = mean.raw, color = Site),
             linetype = 'dashed') +
-  ylim(min = 1, max = 85)
+  ylim(min = 1, max = 85) +
+  scale_color_manual(values = c("#E69F00", "#56B4E9", "#009E73")) +
+  theme(legend.position = c(0.8, 0.85))
 
 
 
@@ -758,7 +874,9 @@ site_scores %>%
     limits = c(.4, 3),
     breaks = c(0.75, 2, 3),
     range = c(1, 6)) +
-  guides(color = guide_legend(override.aes = list(size = 4, shape = 16)))
+  guides(color = guide_legend(override.aes = list(size = 4, shape = 16))) +
+  scale_color_manual(values = c("#E69F00", "#56B4E9", "#009E73"))+
+  scale_fill_manual(values = c("#E69F00", "#56B4E9", "#009E73"))
 
 
 ```
