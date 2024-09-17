@@ -182,7 +182,21 @@ dat.ex.msp <- dat2 %>%
 
 
 ######################################################
+## Descriptive metrics
 
+total_bees <- dat.ex.msp %>% 
+  group_by(Site) %>% 
+  select(Short.label.name) %>% 
+  tally(name = "total")
+
+honey_bees <- dat.ex.msp %>% 
+  filter(Short.label.name == "Apis mellifera") %>% 
+  group_by(Site) %>% 
+  select(Short.label.name) %>% 
+  tally(name = "A_mellifera")
+
+honey_bees <- left_join(honey_bees, total_bees, by = "Site") %>% 
+  mutate(Percent = 100 * (A_mellifera/total))
 
 
 
@@ -249,6 +263,42 @@ meta.seasons <- dat2 %>%
   mutate(StationTimeYear = paste(Station, ToY, Year, sep = "_")) %>% 
   column_to_rownames("StationTimeYear")
 
+
+```
+
+# Descriptive measures of genera
+```{r genera_figs, echo = F}
+
+genus.counts <- dat.ex.msp %>% 
+  select(Genus, Short.label.name) %>% 
+  group_by(Genus) %>% 
+  distinct() %>% 
+  tally(name = "Species")
+
+genus.props <- dat.ex.msp %>% 
+  group_by(Genus) %>% 
+  tally(name = "Prop") %>% 
+  mutate(prop.abund = Prop/7503)
+
+genus <- left_join(genus.counts, genus.props, by = "Genus")
+
+genus.plot <- genus %>% 
+  ggplot(aes(x = fct_reorder(Genus, Species, .desc = F),
+             y = Species, fill = Genus)) +
+  geom_bar(stat = "identity", show.legend = F) +
+  coord_flip() +
+  theme_cowplot(font_size = 16) +
+  labs(x = "Genus", y = "No. unique species")
+
+genus %>% 
+  ggplot(aes(x = fct_reorder(Genus, Species, .desc = F),
+             y = prop.abund * -1, fill = Genus)) +
+  geom_bar(stat = "identity", show.legend = F) +
+  coord_flip() +
+  theme_cowplot(font_size = 16) +
+  labs(x = "Genus",
+       y = "Proportional\nabundance") +
+  scale_y_continuous(labels = function(y) abs(y))
 
 ```
 
@@ -386,7 +436,10 @@ sex_ratio_function(dat2, c("Sex",
 
 
 # Species accumulation curves
-```{r SAC_prep, echo = F}
+
+* Trap caught only (no net records)
+
+```{r SAC_prep_trap_only, echo = F}
 ### ALL SITES
 sac_all <- dat.ex.msp %>% 
   filter(Collection.Method == "T") %>% 
@@ -480,7 +533,7 @@ sac_results <- bind_rows(sac_all_result, sac_pos_result,
           sac_scl_result, sac_bpf_result)
 ```
 
-```{r SAC_figure, echo = F}
+```{r SAC_figure_trap_only, echo = F}
 
 sac_results %>% 
   ggplot(aes(x = nsamples, y = richness, fill = site)) +
@@ -498,9 +551,142 @@ sac_results %>%
 ```
 
 
+* Trap and net caught records
+
+```{r SAC_prep_trap_and_net, echo = F}
+### ALL SITES
+sac_all_nt <- dat.ex.msp %>% 
+  mutate(StationYear = factor(StationYear)) %>% 
+  group_by(StationYear, Short.label.name) %>% 
+  tally(name = "count") %>% 
+  pivot_wider(names_from = Short.label.name,
+              values_from = count,
+              values_fill = list(count = 0)) %>% 
+  column_to_rownames("StationYear")
+
+sac_all_list_nt <- specaccum(sac_all_nt, method = "random", permutations = 100,
+          conditioned = T, gamma = "jack1")
+
+### POS
+sac_pos_nt <- dat.ex.msp %>% 
+  filter(Site == "POS") %>% 
+  mutate(StationYear = factor(StationYear)) %>% 
+  group_by(StationYear, Short.label.name) %>% 
+  tally(name = "count") %>% 
+  pivot_wider(names_from = Short.label.name,
+              values_from = count,
+              values_fill = list(count = 0)) %>% 
+  column_to_rownames("StationYear")
+
+sac_pos_list_nt <- specaccum(sac_pos_nt, method = "random", permutations = 100,
+                          conditioned = T, gamma = "jack1")
+
+#### SCL
+sac_scl_nt <- dat.ex.msp %>% 
+  filter(Site == "SCL") %>% 
+  mutate(StationYear = factor(StationYear)) %>% 
+  group_by(StationYear, Short.label.name) %>% 
+  tally(name = "count") %>% 
+  pivot_wider(names_from = Short.label.name,
+              values_from = count,
+              values_fill = list(count = 0)) %>% 
+  column_to_rownames("StationYear")
+
+sac_scl_list_nt <- specaccum(sac_scl_nt, method = "random", permutations = 100,
+                          conditioned = T, gamma = "jack1")
+
+### BPF
+sac_bpf_nt <- dat.ex.msp %>% 
+  filter(Site == "BPF") %>% 
+  mutate(StationYear = factor(StationYear)) %>% 
+  group_by(StationYear, Short.label.name) %>% 
+  tally(name = "count") %>% 
+  pivot_wider(names_from = Short.label.name,
+              values_from = count,
+              values_fill = list(count = 0)) %>% 
+  column_to_rownames("StationYear")
+
+sac_bpf_list_nt <- specaccum(sac_bpf_nt, method = "random", permutations = 100,
+                          conditioned = T, gamma = "jack1")
+
+# Results
+sac_all_result_nt <- data.frame(site = "All Sites",
+                             nsamples = seq(1,69, 1),
+                             richness = sac_all_list_nt[4],
+                             sd = sac_all_list_nt[5]) %>% 
+  mutate(lower = richness - 1.96*sd,
+         upper = richness + 1.96*sd)
+
+sac_pos_result_nt <- data.frame(site = "POS",
+                             nsamples = seq(1,40, 1),
+                             richness = sac_pos_list_nt[4],
+                             sd = sac_pos_list_nt[5]) %>% 
+  mutate(lower = richness - 1.96*sd,
+         upper = richness + 1.96*sd)
+
+sac_scl_result_nt <- data.frame(site = "SCL",
+                             nsamples = seq(1,13, 1),
+                             richness = sac_scl_list_nt[4],
+                             sd = sac_scl_list_nt[5]) %>% 
+  mutate(lower = richness - 1.96*sd,
+         upper = richness + 1.96*sd)
+
+sac_bpf_result_nt <- data.frame(site = "BPF",
+                             nsamples = seq(1,16, 1),
+                             richness = sac_bpf_list_nt[4],
+                             sd = sac_bpf_list_nt[5]) %>% 
+  mutate(lower = richness - 1.96*sd,
+         upper = richness + 1.96*sd)
+
+
+sac_results_nt <- bind_rows(sac_all_result_nt, sac_pos_result_nt,
+          sac_scl_result_nt, sac_bpf_result_nt)
+```
+
+```{r SAC_figure_trap_and_net, echo = F}
+
+sac_results_nt %>% 
+  ggplot(aes(x = nsamples, y = richness, fill = site)) +
+  geom_line(aes(color = site),linewidth = 1.1, show.legend = F) +
+  geom_ribbon(aes(ymin = lower, ymax = upper, fill = site),
+              alpha = 0.4) +
+  scale_color_manual(values = c("#000000", "#E69F00", "#56B4E9", "#009E73")) +
+  scale_fill_manual(values = c("#999999", "#E69F00", "#56B4E9", "#009E73")) +
+  theme_cowplot(font_size = 20) +
+  labs(x = "No. sampling sites",
+       y = "Richness",
+       fill = "Site") +
+  theme(legend.position = c(0.78,0.4))
+
+```
+
+
+
 
 # Chao indices
 ```{r chao_indices, echo = F, cache = F}
+
+# OVERALL AGGREGATE
+chao_all <- dat.ex.msp %>% 
+  filter(Collection.Method == "T") %>% 
+  group_by(Short.label.name) %>% 
+  tally(name = "count") %>% 
+  column_to_rownames("Short.label.name")
+
+chao_all <- data.frame(
+  chao1 = sapply(seq_along(chao_all), function(i){
+    chao1(chao_all[[i]])}))
+
+# OVERALL AGGREGATE with net records
+chao_all_net <- dat.ex.msp %>% 
+  group_by(Short.label.name) %>% 
+  tally(name = "count") %>% 
+  column_to_rownames("Short.label.name")
+
+chao_all_net <- data.frame(
+  chao1 = sapply(seq_along(chao_all_net), function(i){
+    chao1(chao_all_net[[i]])}))
+
 
 # Sites by season
 chao_site_season <- dat.ex.msp %>% 
@@ -870,7 +1056,7 @@ site_scores %>%
                                size = MeanDecreaseGini),
                            max.overlaps = 20) +
   scale_size_continuous(
-    name = "Mean decrease Gini",
+    name = "      Mean\ndecrease Gini",
     limits = c(.4, 3),
     breaks = c(0.75, 2, 3),
     range = c(1, 6)) +

@@ -1,12 +1,13 @@
 BeeSearch initial
 ================
 Dr. Riley M. Anderson
-September 10, 2024
+September 17, 2024
 
   
 
 - [Overview](#overview)
   - [Summary of Results](#summary-of-results)
+- [Descriptive measures of genera](#descriptive-measures-of-genera)
 - [How many species do we have at each location? How much variability is
   there in
   richness?](#how-many-species-do-we-have-at-each-location-how-much-variability-is-there-in-richness)
@@ -43,6 +44,10 @@ What is this analysis about?
 ### Summary of Results
 
 - 
+
+# Descriptive measures of genera
+
+![](BeeSearch1_files/figure-gfm/genera_figs-1.png)<!-- -->
 
 # How many species do we have at each location? How much variability is there in richness?
 
@@ -124,7 +129,13 @@ Small points are spread horizontally for visual clarity.
 
 # Species accumulation curves
 
-![](BeeSearch1_files/figure-gfm/SAC_figure-1.png)<!-- -->
+- Trap caught only (no net records)
+
+![](BeeSearch1_files/figure-gfm/SAC_figure_trap_only-1.png)<!-- -->
+
+- Trap and net caught records
+
+![](BeeSearch1_files/figure-gfm/SAC_figure_trap_and_net-1.png)<!-- -->
 
 # Chao indices
 
@@ -279,7 +290,7 @@ net caught records.
 ![](BeeSearch1_files/figure-gfm/ndms_fig_seasons-1.png)<!-- -->
 **Community composition across time of season.** Strong overlap of
 composition across the early, mid, and late season sampling (PERMANOVA:
-F = 0.71, 0.8). Data include all compatible stations across all years.
+F = 0.71, 0.81). Data include all compatible stations across all years.
 
 ## Across sites
 
@@ -290,7 +301,7 @@ F = 0.71, 0.8). Data include all compatible stations across all years.
     ## 
     ## Response: Distances
     ##           Df   Sum Sq   Mean Sq      F N.Perm Pr(>F)  
-    ## Groups     5 0.092738 0.0185477 3.2641    999  0.014 *
+    ## Groups     5 0.092738 0.0185477 3.2641    999  0.015 *
     ## Residuals 52 0.295478 0.0056823                       
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
@@ -301,7 +312,7 @@ F = 0.71, 0.8). Data include all compatible stations across all years.
     ## 
     ## Response: Distances
     ##           Df   Sum Sq   Mean Sq      F N.Perm Pr(>F)
-    ## Groups     2 0.007355 0.0036775 0.6595    999  0.511
+    ## Groups     2 0.007355 0.0036775 0.6595    999  0.531
     ## Residuals 55 0.306670 0.0055758
 
 ### Site classification by species composition (Random Forest)
@@ -318,9 +329,9 @@ F = 0.71, 0.8). Data include all compatible stations across all years.
     ## Resampling results across tuning parameters:
     ## 
     ##   mtry  Accuracy   Kappa    
-    ##     2   0.7080346  0.4521823
-    ##    68   0.7944142  0.6475608
-    ##   135   0.7528614  0.5808422
+    ##     2   0.6797842  0.3836841
+    ##    68   0.8307795  0.7078217
+    ##   135   0.7886709  0.6387701
     ## 
     ## Accuracy was used to select the optimal model using the largest value.
     ## The final value used for the model was mtry = 68.
@@ -331,29 +342,29 @@ F = 0.71, 0.8). Data include all compatible stations across all years.
     ##                      Number of trees: 500
     ## No. of variables tried at each split: 68
     ## 
-    ##         OOB estimate of  error rate: 17.24%
+    ##         OOB estimate of  error rate: 13.79%
     ## Confusion matrix:
     ##     BPF POS SCL class.error
     ## BPF  14   0   0  0.00000000
-    ## POS   0  28   3  0.09677419
-    ## SCL   0   7   6  0.53846154
+    ## POS   0  29   2  0.06451613
+    ## SCL   0   6   7  0.46153846
 
-|                          |    BPF |    POS |    SCL | MeanDecreaseAccuracy | MeanDecreaseGini |
-|:-------------------------|-------:|-------:|-------:|---------------------:|-----------------:|
-| Halictus tripartitus     |  8.362 |  9.695 |  0.988 |               10.294 |            2.452 |
-| Agapostemon texanus      | 10.509 |  9.212 | -1.232 |               10.833 |            2.446 |
-| Osmia albolateralis      |  7.043 |  8.378 |  3.458 |                9.589 |            2.384 |
-| Bombus flavifrons        |  7.183 |  2.384 |  9.025 |                8.806 |            2.022 |
-| Bombus fervidus          |  9.693 |  4.204 |  0.519 |                8.250 |            1.940 |
-| Apis mellifera           |  8.265 |  3.486 | -0.401 |                7.720 |            1.369 |
-| Bombus melanopygus       |  7.651 |  5.063 |  4.805 |                8.210 |            1.350 |
-| Halictus confusus        |  7.552 | -1.029 |  4.186 |                6.801 |            1.191 |
-| Megachile melanophaea    |  4.461 |  3.472 |  1.687 |                4.956 |            0.892 |
-| Melissodes rivalis       |  0.636 |  3.683 |  0.971 |                3.265 |            0.879 |
-| Bombus vosnesenskii      |  3.613 |  1.362 |  2.388 |                4.202 |            0.766 |
-| Ceratina acantha         |  4.597 | -0.001 |  0.348 |                3.542 |            0.742 |
-| Melissodes microsticta   |  1.804 |  1.125 | -1.510 |                0.681 |            0.739 |
-| Lasioglossum incompletum |  5.689 |  0.859 | -1.321 |                3.933 |            0.693 |
+|                          |   BPF |    POS |    SCL | MeanDecreaseAccuracy | MeanDecreaseGini |
+|:-------------------------|------:|-------:|-------:|---------------------:|-----------------:|
+| Halictus tripartitus     | 7.926 | 10.494 |  3.425 |               11.219 |            2.754 |
+| Agapostemon texanus      | 9.457 |  7.139 | -2.746 |                8.955 |            2.475 |
+| Osmia albolateralis      | 6.177 |  8.630 |  5.249 |                9.699 |            2.269 |
+| Bombus fervidus          | 8.852 |  3.358 |  0.033 |                7.705 |            1.581 |
+| Bombus flavifrons        | 4.296 |  4.409 |  8.753 |                8.645 |            1.518 |
+| Bombus melanopygus       | 8.424 |  3.948 |  2.974 |                8.208 |            1.407 |
+| Halictus confusus        | 8.138 |  0.849 |  3.963 |                7.997 |            1.387 |
+| Apis mellifera           | 7.681 |  2.254 |  0.403 |                7.104 |            1.300 |
+| Megachile melanophaea    | 5.587 |  4.529 |  2.474 |                6.003 |            0.948 |
+| Bombus vosnesenskii      | 3.272 | -0.024 |  4.160 |                3.633 |            0.848 |
+| Lasioglossum nevadense   | 0.379 |  0.798 |  4.955 |                3.842 |            0.791 |
+| Melissodes rivalis       | 1.326 |  3.545 |  0.711 |                3.378 |            0.787 |
+| Lasioglossum knereri     | 0.161 |  4.050 |  2.981 |                3.715 |            0.718 |
+| Lasioglossum incompletum | 5.311 |  0.292 |  0.715 |                4.305 |            0.711 |
 
 ![](BeeSearch1_files/figure-gfm/random_forest_sites-1.png)<!-- -->
 
@@ -391,7 +402,7 @@ importance score (mean decrease in Gini score).
 ![](BeeSearch1_files/figure-gfm/nmds_all_year-1.png)<!-- --> **Community
 composition across years.** Most years have strong overlap of
 composition but the *year* term is highly significant (PERMANOVA: F =
-1.74, *P* = 0.001). However, the only site in 2014 is SCL and the 2018
+1.74, *P* = 0.004). However, the only site in 2014 is SCL and the 2018
 and 2019 years are heavily influenced by the BPF data. Essentially, the
 information in *years* is not sufficiently distinct from the information
 in *sites* and including *year* in the model is not informative. This is
@@ -406,10 +417,10 @@ dispersions for the *year* term but not the *site* term.
     ## Number of permutations: 999
     ## 
     ## adonis2(formula = nmds2017dist ~ meta2017$ToY, method = "bray")
-    ##              Df SumOfSqs      R2     F Pr(>F)  
-    ## meta2017$ToY  2   0.7636 0.12119 1.448  0.047 *
-    ## Residual     21   5.5371 0.87881               
-    ## Total        23   6.3007 1.00000               
+    ##              Df SumOfSqs      R2      F Pr(>F)  
+    ## meta2017$ToY  2   0.7344 0.11686 1.3894   0.06 .
+    ## Residual     21   5.5500 0.88314                
+    ## Total        23   6.2845 1.00000                
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
@@ -419,8 +430,8 @@ dispersions for the *year* term but not the *site* term.
     ## 
     ## Response: Distances
     ##           Df   Sum Sq   Mean Sq      F N.Perm Pr(>F)  
-    ## Groups     2 0.016515 0.0082573 3.3301    999  0.054 .
-    ## Residuals 21 0.052071 0.0024796                       
+    ## Groups     2 0.017437 0.0087185 4.0034    999  0.033 *
+    ## Residuals 21 0.045733 0.0021778                       
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
