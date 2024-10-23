@@ -94,6 +94,7 @@ source("functions/TES.R")
 
 # general cleaning and conversion:
 dat1 <- dat1 %>% 
+  uncount(Count) %>% 
   mutate(across(c(Station : Sex, Site), as.factor), # convert to factors
          Date = ymd(Label.Date), # Convert to date
          Year = year(Date), # Create year column
@@ -209,7 +210,7 @@ get_matrix_sites_within_years <- function(input_year, data){
   matrix.site.years <- data %>% 
   filter(Year == input_year) %>% 
   group_by(Station, Short.label.name) %>% 
-  summarise(n = sum(Count)) %>% 
+  tally(name = "n") %>% 
   pivot_wider(names_from = Short.label.name,
               values_from = n,
               values_fill = list(n = 0))  %>% 
@@ -224,7 +225,7 @@ mat2017 <- dat2 %>%
   filter(Year == "2017" & Site == "POS" &
            Collection.Method == "T") %>% 
   group_by(Station, Short.label.name, ToY) %>%
-  summarise(n = sum(Count)) %>% 
+  tally(name = "n") %>% 
   pivot_wider(names_from = Short.label.name,
               values_from = n) %>% 
   replace(is.na(.), 0) %>% 
@@ -246,7 +247,7 @@ mat.seasons <- dat2 %>%
   filter(Collection.Method == "T" &
            Site == "POS") %>% 
   group_by(Station, Short.label.name, ToY, Year) %>%
-  summarise(n = sum(Count)) %>% 
+  tally(name = "n") %>% 
   ungroup() %>% 
   pivot_wider(names_from = Short.label.name,
               values_from = n) %>% 
@@ -267,7 +268,9 @@ meta.seasons <- dat2 %>%
 ```
 
 # Descriptive measures of genera
-```{r genera_figs, echo = F}
+
+## All sites together
+```{r genera_figs_all_sites, echo = F}
 
 genus.counts <- dat.ex.msp %>% 
   select(Genus, Short.label.name) %>% 
@@ -278,29 +281,289 @@ genus.counts <- dat.ex.msp %>%
 genus.props <- dat.ex.msp %>% 
   group_by(Genus) %>% 
   tally(name = "Prop") %>% 
-  mutate(prop.abund = Prop/7503)
+  mutate(prop.abund = Prop/nrow(dat.ex.msp))
 
 genus <- left_join(genus.counts, genus.props, by = "Genus")
 
-genus.plot <- genus %>% 
-  ggplot(aes(x = fct_reorder(Genus, Species, .desc = F),
-             y = Species, fill = Genus)) +
-  geom_bar(stat = "identity", show.legend = F) +
-  coord_flip() +
-  theme_cowplot(font_size = 16) +
-  labs(x = "Genus", y = "No. unique species")
-
 genus %>% 
   ggplot(aes(x = fct_reorder(Genus, Species, .desc = F),
-             y = prop.abund * -1, fill = Genus)) +
-  geom_bar(stat = "identity", show.legend = F) +
+             y = Species, fill = Genus)) +
+  geom_col(show.legend = F) +
+  geom_col(aes(y = -prop.abund * 100, fill = Genus),
+           show.legend = F) +
+  geom_hline(yintercept = 0) +
   coord_flip() +
   theme_cowplot(font_size = 16) +
   labs(x = "Genus",
-       y = "Proportional\nabundance") +
+       y = "") +
+  annotate(geom = "text",
+           x = 5,
+           y = -30, 
+           label = "Proportional\nabundance (%)",
+           color = "black",
+           size = 5) +
+  annotate(geom = "text",
+           x = 5,
+           y = 18, 
+           label = "No. unique\nspecies",
+           color = "black",
+           size = 5) +
+  scale_y_continuous(labels = function(y) abs(y))
+#################################################
+genus_plot_all <- genus %>% 
+  ggplot(aes(x = fct_reorder(Genus, Species, .desc = F),
+             y = Species, fill = Genus)) +
+  geom_col(show.legend = F) +
+  geom_col(aes(y = -prop.abund * 100, fill = Genus),
+           show.legend = F) +
+  geom_hline(yintercept = 0) +
+  coord_flip() +
+  theme_cowplot(font_size = 16) +
+  labs(x = "",
+       y = "") +
+  annotate(geom = "text",
+           x = 5,
+           y = -30, 
+           label = "Proportional\nabundance (%)",
+           color = "black",
+           size = 5) +
+  annotate(geom = "text",
+           x = 5,
+           y = 18, 
+           label = "Unique\nspecies",
+           color = "black",
+           size = 5) +
   scale_y_continuous(labels = function(y) abs(y))
 
 ```
+
+## POS
+```{r genera_figs_pos, echo = F}
+
+genus.counts.pos <- dat.ex.msp %>% 
+  filter(Site == "POS") %>% 
+  select(Genus, Short.label.name) %>% 
+  group_by(Genus) %>% 
+  distinct() %>% 
+  tally(name = "Species")
+
+genus.props.pos <- dat.ex.msp %>% 
+  filter(Site == "POS") %>% 
+  group_by(Genus) %>% 
+  tally(name = "Prop") %>% 
+  mutate(prop.abund = Prop/nrow(filter(dat.ex.msp, Site == "POS")))
+
+genus.pos <- left_join(genus.counts.pos, genus.props.pos, by = "Genus")
+
+genus.pos %>% 
+  ggplot(aes(x = fct_reorder(Genus, Species, .desc = F),
+             y = Species, fill = Genus)) +
+  geom_col(show.legend = F) +
+  geom_col(aes(y = -prop.abund * 100, fill = Genus),
+           show.legend = F) +
+  geom_hline(yintercept = 0) +
+  coord_flip() +
+  theme_cowplot(font_size = 16) +
+  labs(x = "Genus",
+       y = "") +
+  annotate(geom = "text",
+           x = 5,
+           y = -30, 
+           label = "Proportional\nabundance (%)",
+           color = "black",
+           size = 5) +
+  annotate(geom = "text",
+           x = 5,
+           y = 13, 
+           label = "No. unique\nspecies",
+           color = "black",
+           size = 5) +
+  scale_y_continuous(labels = function(y) abs(y))
+#################################################
+genus_plot_pos <- genus.pos %>% 
+  ggplot(aes(x = fct_reorder(Genus, Species, .desc = F),
+             y = Species, fill = Genus)) +
+  geom_col(show.legend = F) +
+  geom_col(aes(y = -prop.abund * 100, fill = Genus),
+           show.legend = F) +
+  geom_hline(yintercept = 0) +
+  scale_x_discrete(position = "top") +
+  coord_flip() +
+  theme_cowplot(font_size = 16) +
+  labs(x = "",
+       y = "") +
+  annotate(geom = "text",
+           x = 5,
+           y = -30, 
+           label = "Proportional\nabundance (%)",
+           color = "black",
+           size = 5) +
+  annotate(geom = "text",
+           x = 5,
+           y = 13, 
+           label = "Unique\nspecies",
+           color = "black",
+           size = 5) +
+  scale_y_continuous(labels = function(y) abs(y))
+
+```
+
+## SCL
+```{r genera_figs_scl, echo = F}
+
+genus.counts.scl <- dat.ex.msp %>% 
+  filter(Site == "SCL") %>% 
+  select(Genus, Short.label.name) %>% 
+  group_by(Genus) %>% 
+  distinct() %>% 
+  tally(name = "Species")
+
+genus.props.scl <- dat.ex.msp %>% 
+  filter(Site == "SCL") %>% 
+  group_by(Genus) %>% 
+  tally(name = "Prop") %>% 
+  mutate(prop.abund = Prop/nrow(filter(dat.ex.msp, Site == "SCL")))
+
+genus.scl <- left_join(genus.counts.scl, genus.props.scl, by = "Genus")
+
+genus.scl %>% 
+  ggplot(aes(x = fct_reorder(Genus, Species, .desc = F),
+             y = Species, fill = Genus)) +
+  geom_col(show.legend = F) +
+  geom_col(aes(y = -prop.abund * 100, fill = Genus),
+           show.legend = F) +
+  geom_hline(yintercept = 0) +
+  coord_flip() +
+  theme_cowplot(font_size = 16) +
+  labs(x = "Genus",
+       y = "") +
+  annotate(geom = "text",
+           x = 5,
+           y = -15, 
+           label = "Proportional\nabundance (%)",
+           color = "black",
+           size = 5) +
+  annotate(geom = "text",
+           x = 5,
+           y = 10, 
+           label = "No. unique\nspecies",
+           color = "black",
+           size = 5) +
+  scale_y_continuous(labels = function(y) abs(y))
+###################################################
+genus_plot_scl <- genus.scl %>% 
+  ggplot(aes(x = fct_reorder(Genus, Species, .desc = F),
+             y = Species, fill = Genus)) +
+  geom_col(show.legend = F) +
+  geom_col(aes(y = -prop.abund * 100, fill = Genus),
+           show.legend = F) +
+  geom_hline(yintercept = 0) +
+  coord_flip() +
+  theme_cowplot(font_size = 16) +
+  labs(x = "",
+       y = "") +
+  annotate(geom = "text",
+           x = 5,
+           y = -15, 
+           label = "Proportional\nabundance (%)",
+           color = "black",
+           size = 5) +
+  annotate(geom = "text",
+           x = 5,
+           y = 10, 
+           label = "Unique\nspecies",
+           color = "black",
+           size = 5) +
+  scale_y_continuous(labels = function(y) abs(y))
+
+```
+
+## BPF
+```{r genera_figs_bpf, echo = F}
+
+genus.counts.bpf <- dat.ex.msp %>% 
+  filter(Site == "BPF") %>% 
+  select(Genus, Short.label.name) %>% 
+  group_by(Genus) %>% 
+  distinct() %>% 
+  tally(name = "Species")
+
+genus.props.bpf <- dat.ex.msp %>% 
+  filter(Site == "BPF") %>% 
+  group_by(Genus) %>% 
+  tally(name = "Prop") %>% 
+  mutate(prop.abund = Prop/nrow(filter(dat.ex.msp, Site == "BPF")))
+
+genus.bpf <- left_join(genus.counts.bpf, genus.props.bpf, by = "Genus")
+
+
+
+genus.bpf %>% 
+  ggplot(aes(x = fct_reorder(Genus, Species, .desc = F),
+             y = Species, fill = Genus)) +
+  geom_col(show.legend = F) +
+  geom_col(aes(y = -prop.abund * 100, fill = Genus),
+           show.legend = F) +
+  geom_hline(yintercept = 0) +
+  scale_x_discrete(position = "top") +
+  coord_flip() +
+  theme_cowplot(font_size = 16) +
+  labs(x = "",
+       y = "") +
+  annotate(geom = "text",
+           x = 5,
+           y = -20, 
+           label = "Proportional\nabundance (%)",
+           color = "black",
+           size = 5) +
+  annotate(geom = "text",
+           x = 5,
+           y = 12, 
+           label = "No. unique\nspecies",
+           color = "black",
+           size = 5) +
+  scale_y_continuous(labels = function(y) abs(y))
+
+
+#########################################################
+genus_plot_bpf <- genus.bpf %>% 
+  ggplot(aes(x = fct_reorder(Genus, Species, .desc = F),
+             y = Species, fill = Genus)) +
+  geom_col(show.legend = F) +
+  geom_col(aes(y = -prop.abund * 100, fill = Genus),
+           show.legend = F) +
+  geom_hline(yintercept = 0) +
+  scale_x_discrete(position = "top") +
+  coord_flip() +
+  theme_cowplot(font_size = 16) +
+  labs(x = "",
+       y = "") +
+  annotate(geom = "text",
+           x = 4.5,
+           y = -20, 
+           label = "Proportional\nabundance (%)",
+           color = "black",
+           size = 5) +
+  annotate(geom = "text",
+           x = 4.4,
+           y = 12, 
+           label = "Unique\nspecies",
+           color = "black",
+           size = 5) +
+  scale_y_continuous(labels = function(y) abs(y))
+
+```
+
+## All genus plots together in one figure:
+```{r genus_plot_one_fig, echo = F}
+
+plot_grid(genus_plot_all, genus_plot_pos,
+          genus_plot_scl, genus_plot_bpf, 
+          labels = c("A", "B", "C", "D"),
+          label_size = 14)
+
+```
+
 
 # How many species do we have at each location? How much variability is there in richness?
 
@@ -938,6 +1201,8 @@ site_meta <- dat2 %>%
 # Stats
 site.year.mod <- adonis2(site_matrix ~ Site * Year,
         data = site_meta, method = "bray")
+
+site.year.mod
 
 permutest(betadisper(vegdist(site_matrix, method = "bray"),
                      site_meta$Year))
