@@ -68,6 +68,7 @@ library(fossil)
 library(geosphere)
 library(randomForest)
 library(caret)
+library(ggridges)
 
 
 # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -80,11 +81,18 @@ dat1 <- read.csv("data/CABS1.csv")
 comp.sites <- read.csv("data/comparable.sites.csv")
 
 site.locs <- read.csv("data/site.locations.csv")
+
+temps <- read.csv("data/temperatures.csv")
 ####################################
 # Funtions
 ####################################
 
-source("functions/TES.R")
+Mode <- function(x) {
+  ux <- unique(x)
+  ux[which.max(tabulate(match(x, ux)))]
+}
+
+
 
 
 ```
@@ -285,6 +293,24 @@ genus.props <- dat.ex.msp %>%
 
 genus <- left_join(genus.counts, genus.props, by = "Genus")
 
+###################
+# color palette
+c24 <- c(
+  "maroon", "#E31A1C", "green4", "#6A3D9A",
+  "#FF7F00", "gold1", "mediumpurple1","skyblue2", "#FB9A99",
+  "palegreen2", "#CAB2D6", "#FDBF6F", "gray70", "khaki2",
+  "dodgerblue2", "orchid1", "deeppink1", "blue1", "steelblue4",
+  "darkturquoise", "green1", "yellow4", "yellow3", "darkorange4"
+)
+
+
+genus_levels <- levels(genus$Genus)
+
+color_mapping <- setNames(c24, genus_levels)
+
+
+
+##########
 genus %>% 
   ggplot(aes(x = fct_reorder(Genus, Species, .desc = F),
              y = Species, fill = Genus)) +
@@ -308,7 +334,9 @@ genus %>%
            label = "No. unique\nspecies",
            color = "black",
            size = 5) +
-  scale_y_continuous(labels = function(y) abs(y))
+  scale_y_continuous(labels = function(y) abs(y)) +
+  scale_fill_manual(values = color_mapping)
+
 #################################################
 genus_plot_all <- genus %>% 
   ggplot(aes(x = fct_reorder(Genus, Species, .desc = F),
@@ -333,7 +361,8 @@ genus_plot_all <- genus %>%
            label = "Unique\nspecies",
            color = "black",
            size = 5) +
-  scale_y_continuous(labels = function(y) abs(y))
+  scale_y_continuous(labels = function(y) abs(y)) +
+  scale_fill_manual(values = color_mapping)
 
 ```
 
@@ -378,7 +407,8 @@ genus.pos %>%
            label = "No. unique\nspecies",
            color = "black",
            size = 5) +
-  scale_y_continuous(labels = function(y) abs(y))
+  scale_y_continuous(labels = function(y) abs(y)) +
+  scale_fill_manual(values = color_mapping)
 #################################################
 genus_plot_pos <- genus.pos %>% 
   ggplot(aes(x = fct_reorder(Genus, Species, .desc = F),
@@ -404,7 +434,8 @@ genus_plot_pos <- genus.pos %>%
            label = "Unique\nspecies",
            color = "black",
            size = 5) +
-  scale_y_continuous(labels = function(y) abs(y))
+  scale_y_continuous(labels = function(y) abs(y)) +
+  scale_fill_manual(values = color_mapping)
 
 ```
 
@@ -449,7 +480,8 @@ genus.scl %>%
            label = "No. unique\nspecies",
            color = "black",
            size = 5) +
-  scale_y_continuous(labels = function(y) abs(y))
+  scale_y_continuous(labels = function(y) abs(y)) +
+  scale_fill_manual(values = color_mapping)
 ###################################################
 genus_plot_scl <- genus.scl %>% 
   ggplot(aes(x = fct_reorder(Genus, Species, .desc = F),
@@ -474,7 +506,8 @@ genus_plot_scl <- genus.scl %>%
            label = "Unique\nspecies",
            color = "black",
            size = 5) +
-  scale_y_continuous(labels = function(y) abs(y))
+  scale_y_continuous(labels = function(y) abs(y)) +
+  scale_fill_manual(values = color_mapping)
 
 ```
 
@@ -522,7 +555,8 @@ genus.bpf %>%
            label = "No. unique\nspecies",
            color = "black",
            size = 5) +
-  scale_y_continuous(labels = function(y) abs(y))
+  scale_y_continuous(labels = function(y) abs(y)) +
+  scale_fill_manual(values = color_mapping)
 
 
 #########################################################
@@ -550,7 +584,8 @@ genus_plot_bpf <- genus.bpf %>%
            label = "Unique\nspecies",
            color = "black",
            size = 5) +
-  scale_y_continuous(labels = function(y) abs(y))
+  scale_y_continuous(labels = function(y) abs(y)) +
+  scale_fill_manual(values = color_mapping)
 
 ```
 
@@ -561,6 +596,141 @@ plot_grid(genus_plot_all, genus_plot_pos,
           genus_plot_scl, genus_plot_bpf, 
           labels = c("A", "B", "C", "D"),
           label_size = 14)
+
+```
+
+# Genus by time of year
+```{r genus_ridgeplot, echo = F}
+
+
+dat_ridges <- dat.ex.msp %>% 
+  filter(Genus != "Diadasia" & Genus != "Anthophora") %>% 
+  droplevels() %>% 
+  mutate(week = week(Date))
+
+genus_orders <- dat_ridges %>% 
+  select(Genus, JD) %>% 
+  group_by(Genus) %>% 
+  summarise(peak = Mode(JD)) %>% 
+  arrange(desc(peak)) %>% 
+  data.frame()
+
+level_order <- genus_orders$Genus
+
+
+dat_ridges %>% 
+  ggplot(aes(x = week,
+             y = factor(Genus, level = level_order),
+             fill = Genus)) +
+  geom_density_ridges(scale = 3,
+                               rel_min_height = 0.01) +
+  theme_ridges(grid = F) +
+  scale_fill_manual(values = color_mapping) +
+  theme(legend.position = "none") +
+  scale_x_continuous(breaks = c(10, 20, 30, 40),
+                     labels = c("3 March", "15 May",
+                                "24 July", "3 October")) +
+  labs(x = "", y = "") +
+  geom_vline(xintercept = 12.6,
+             color = "grey50", linetype = "dashed") +
+  geom_vline(xintercept = 25.3,
+             color = "grey50", linetype = "dashed") +
+  geom_vline(xintercept = 38.4,
+             color = "grey50", linetype = "dashed") +
+  annotate(geom = "text", x = 7, y = 27, label = " ") +
+  annotate(geom = "text", x = 7, y = 25, label = "Winter") +
+  annotate(geom = "text", x = 20, y = 25, label = "Spring") +
+  annotate(geom = "text", x = 32, y = 25, label = "Summer") +
+  annotate(geom = "text", x = 43, y = 25, label = "Fall") 
+
+
+```
+
+
+# Species by time of year
+```{r species_ridgeplot, echo = F}
+
+more_than_10 <- dat.ex.msp %>% group_by(Short.label.name) %>% 
+  tally() %>% 
+  filter(n > 9)
+
+dat_ridges_species <- dat.ex.msp %>%
+  mutate(week = week(Date)) %>% 
+  semi_join(more_than_10, by = "Short.label.name")
+
+
+
+species_orders <- dat_ridges_species %>% 
+  select(Short.label.name, JD) %>% 
+  group_by(Short.label.name) %>% 
+  summarise(peak = Mode(JD)) %>% 
+  arrange(desc(peak)) %>% 
+  data.frame()
+
+level_order_species <- species_orders$Short.label.name
+
+
+dat_ridges_species %>% 
+  ggplot(aes(x = week,
+             y = factor(Short.label.name,
+                        level = level_order_species),
+             fill = Short.label.name)) +
+  geom_density_ridges(scale = 3, rel_min_height = 0.01) +
+  theme_ridges(grid = F) +
+  theme(legend.position = "none") +
+  scale_x_continuous(breaks = c(10, 20, 30, 40),
+                     labels = c("3 March", "15 May",
+                                "24 July", "3 October")) +
+  labs(x = "", y = "") +
+  geom_vline(xintercept = 12.6,
+             color = "grey50", linetype = "dashed") +
+  geom_vline(xintercept = 25.3,
+             color = "grey50", linetype = "dashed") +
+  geom_vline(xintercept = 38.4,
+             color = "grey50", linetype = "dashed") +
+  annotate(geom = "text", x = 7, y = 68, label = " ") +
+  annotate(geom = "text", x = 8, y = 63, label = "Winter") +
+  annotate(geom = "text", x = 20, y = 63, label = "Spring") +
+  annotate(geom = "text", x = 32, y = 63, label = "Summer") +
+  annotate(geom = "text", x = 42, y = 63, label = "Fall")
+
+
+```
+
+# Genera with multiple species by time of year
+```{r genera_multi_species_ridgeplot, echo = F}
+
+dat_ridges_species %>% 
+  filter(Genus == "Agapostemon" | Genus == "Andrena" |
+         Genus == "Bombus" | Genus == "Ceratina" |
+           Genus == "Halictus" | Genus == "Hylaeus" |
+           Genus == "Lasioglossum" | Genus == "Megachile" |
+           Genus == "Melissodes" | Genus == "Osmia" |
+           Genus == "Sphecodes") %>% 
+  ggplot(aes(x = week,
+             y = factor(Short.label.name,
+                        level = level_order_species),
+             fill = Short.label.name)) +
+  geom_density_ridges(scale = 3, rel_min_height = 0.01) +
+  theme_ridges(grid = F) +
+  theme(legend.position = "none") +
+  scale_x_continuous(breaks = c(10, 20, 30, 40),
+                     labels = c("3 March", "15 May",
+                                "24 July", "3 October")) +
+  labs(x = "", y = "") +
+  geom_vline(xintercept = 12.6,
+             color = "grey50", linetype = "dashed") +
+  geom_vline(xintercept = 25.3,
+             color = "grey50", linetype = "dashed") +
+  geom_vline(xintercept = 38.4,
+             color = "grey50", linetype = "dashed") +
+  annotate(geom = "text", x = 7, y = 10, label = " ") +
+  annotate(geom = "text", x = 8, y = 6, label = "Winter") +
+  annotate(geom = "text", x = 20, y = 6, label = "Spring") +
+  annotate(geom = "text", x = 32, y = 6, label = "Summer") +
+  annotate(geom = "text", x = 42, y = 6, label = "Fall") +
+  facet_wrap(~Genus, scale = "free", ncol = 3)
+
 
 ```
 

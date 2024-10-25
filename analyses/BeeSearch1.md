@@ -1,7 +1,7 @@
 BeeSearch initial
 ================
 Dr. Riley M. Anderson
-October 23, 2024
+October 25, 2024
 
   
 
@@ -14,6 +14,10 @@ October 23, 2024
   - [BPF](#bpf)
   - [All genus plots together in one
     figure:](#all-genus-plots-together-in-one-figure)
+- [Genus by time of year](#genus-by-time-of-year)
+- [Species by time of year](#species-by-time-of-year)
+- [Genera with multiple species by time of
+  year](#genera-with-multiple-species-by-time-of-year)
 - [How many species do we have at each location? How much variability is
   there in
   richness?](#how-many-species-do-we-have-at-each-location-how-much-variability-is-there-in-richness)
@@ -72,6 +76,18 @@ What is this analysis about?
 ## All genus plots together in one figure:
 
 ![](BeeSearch1_files/figure-gfm/genus_plot_one_fig-1.png)<!-- -->
+
+# Genus by time of year
+
+![](BeeSearch1_files/figure-gfm/genus_ridgeplot-1.png)<!-- -->
+
+# Species by time of year
+
+![](BeeSearch1_files/figure-gfm/species_ridgeplot-1.png)<!-- -->
+
+# Genera with multiple species by time of year
+
+![](BeeSearch1_files/figure-gfm/genera_multi_species_ridgeplot-1.png)<!-- -->
 
 # How many species do we have at each location? How much variability is there in richness?
 
@@ -314,7 +330,7 @@ net caught records.
 ![](BeeSearch1_files/figure-gfm/ndms_fig_seasons-1.png)<!-- -->
 **Community composition across time of season.** Strong overlap of
 composition across the early, mid, and late season sampling (PERMANOVA:
-F = 0.71, 0.78). Data include all compatible stations across all years.
+F = 0.71, 0.8). Data include all compatible stations across all years.
 
 ## Across sites
 
@@ -325,9 +341,9 @@ F = 0.71, 0.78). Data include all compatible stations across all years.
     ## 
     ## adonis2(formula = site_matrix ~ Site * Year, data = site_meta, method = "bray")
     ##           Df SumOfSqs      R2      F Pr(>F)    
-    ## Site       2   0.8299 0.06331 2.2719  0.017 *  
+    ## Site       2   0.8299 0.06331 2.2719  0.013 *  
     ## Year       5   2.9453 0.22470 3.2253  0.001 ***
-    ## Site:Year  2   0.5657 0.04316 1.5486  0.090 .  
+    ## Site:Year  2   0.5657 0.04316 1.5486  0.092 .  
     ## Residual  48   8.7667 0.66883                  
     ## Total     57  13.1076 1.00000                  
     ## ---
@@ -350,7 +366,7 @@ F = 0.71, 0.78). Data include all compatible stations across all years.
     ## 
     ## Response: Distances
     ##           Df  Sum Sq   Mean Sq      F N.Perm Pr(>F)
-    ## Groups     2 0.01095 0.0054731 0.4431    999  0.644
+    ## Groups     2 0.01095 0.0054731 0.4431    999  0.647
     ## Residuals 55 0.67935 0.0123518
 
 ### Site classification by species composition (Random Forest)
@@ -367,9 +383,9 @@ F = 0.71, 0.78). Data include all compatible stations across all years.
     ## Resampling results across tuning parameters:
     ## 
     ##   mtry  Accuracy   Kappa    
-    ##     2   0.6855338  0.4200838
-    ##    68   0.8389425  0.7234027
-    ##   135   0.8137281  0.6798269
+    ##     2   0.7361485  0.4947978
+    ##    68   0.8549307  0.7455251
+    ##   135   0.8129852  0.6782722
     ## 
     ## Accuracy was used to select the optimal model using the largest value.
     ## The final value used for the model was mtry = 68.
@@ -389,20 +405,20 @@ F = 0.71, 0.78). Data include all compatible stations across all years.
 
 |                          |    BPF |    POS |    SCL | MeanDecreaseAccuracy | MeanDecreaseGini |
 |:-------------------------|-------:|-------:|-------:|---------------------:|-----------------:|
-| Halictus tripartitus     |  9.073 | 11.686 |  5.758 |               12.712 |            3.302 |
-| Agapostemon texanus      | 10.752 | 10.142 | -0.141 |               11.757 |            3.093 |
-| Bombus flavifrons        |  5.341 |  4.481 | 10.253 |               10.353 |            2.259 |
-| Apis mellifera           | 10.026 |  3.771 |  2.037 |                9.237 |            2.167 |
-| Osmia albolateralis      |  6.473 |  8.068 |  5.543 |                9.093 |            1.973 |
-| Bombus fervidus          |  8.938 |  5.235 |  1.165 |                8.186 |            1.853 |
-| Halictus confusus        |  7.358 |  0.754 |  3.533 |                7.309 |            1.021 |
-| Bombus melanopygus       |  6.389 |  2.401 |  2.959 |                6.558 |            0.967 |
-| Bombus vosnesenskii      |  2.632 |  2.983 |  0.304 |                3.334 |            0.869 |
-| Lasioglossum incompletum |  6.297 | -0.611 | -0.212 |                3.686 |            0.758 |
-| Megachile melanophaea    |  4.689 |  4.081 |  2.794 |                5.512 |            0.747 |
-| Bombus mixtus            | -1.904 |  0.650 |  2.390 |                0.749 |            0.719 |
-| Melissodes rivalis       |  1.130 |  3.773 | -0.131 |                3.270 |            0.694 |
-| Lasioglossum nevadense   |  0.905 |  0.010 |  3.552 |                3.142 |            0.661 |
+| Halictus tripartitus     |  7.438 | 10.981 |  4.746 |               11.922 |            3.064 |
+| Agapostemon texanus      | 10.542 |  9.875 | -0.238 |               10.970 |            2.973 |
+| Bombus flavifrons        |  5.807 |  3.277 |  9.846 |                9.770 |            2.092 |
+| Apis mellifera           |  9.637 |  5.771 |  4.844 |                9.699 |            2.021 |
+| Osmia albolateralis      |  5.788 |  7.344 |  4.567 |                8.566 |            2.011 |
+| Bombus fervidus          |  8.918 |  5.311 |  0.558 |                8.414 |            1.825 |
+| Bombus melanopygus       |  7.588 |  2.751 |  3.354 |                7.444 |            1.192 |
+| Melissodes rivalis       |  1.410 |  2.521 | -1.338 |                2.556 |            0.877 |
+| Megachile melanophaea    |  3.913 |  4.211 |  2.409 |                5.375 |            0.868 |
+| Bombus vosnesenskii      |  3.729 |  3.692 | -0.610 |                3.882 |            0.832 |
+| Halictus confusus        |  6.360 |  1.236 |  3.850 |                6.363 |            0.832 |
+| Lasioglossum incompletum |  5.181 |  0.627 | -1.700 |                2.827 |            0.675 |
+| Lasioglossum nevadense   |  1.372 |  1.065 |  3.519 |                3.212 |            0.661 |
+| Melissodes microsticta   |  1.313 |  0.519 |  0.073 |                1.060 |            0.657 |
 
 ![](BeeSearch1_files/figure-gfm/random_forest_sites-1.png)<!-- -->
 
@@ -411,7 +427,7 @@ model was tuned without pre-processing. Bootstrapped resampling used 25
 replicates. Overall model accuracy was 82%. The model clearly delineated
 the BPF sites with 0.0 class error. Similarly, POS sites were near
 perfect with 0.032 class error. However, the SCL sites were less
-accurately classified (0.615 class error), with (7/13) identified as
+accurately classified (0.385 class error), with (5/13) identified as
 POS. This lends further support to the NMDS figure below, species
 composition is very similar across SCL and POS, but BPF sites have
 different community composition compared to the other two sites.
@@ -456,9 +472,9 @@ dispersions for the *year* term but not the *site* term.
     ## 
     ## adonis2(formula = nmds2017dist ~ meta2017$ToY, method = "bray")
     ##              Df SumOfSqs      R2      F Pr(>F)  
-    ## meta2017$ToY  2   0.7687 0.12358 1.4806  0.032 *
-    ## Residual     21   5.4516 0.87642                
-    ## Total        23   6.2203 1.00000                
+    ## meta2017$ToY  2   0.7260 0.11645 1.3839  0.057 .
+    ## Residual     21   5.5083 0.88355                
+    ## Total        23   6.2343 1.00000                
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
@@ -468,8 +484,8 @@ dispersions for the *year* term but not the *site* term.
     ## 
     ## Response: Distances
     ##           Df   Sum Sq   Mean Sq     F N.Perm Pr(>F)  
-    ## Groups     2 0.018737 0.0093685 3.738    999  0.037 *
-    ## Residuals 21 0.052632 0.0025063                      
+    ## Groups     2 0.013242 0.0066209 2.896    999  0.083 .
+    ## Residuals 21 0.048010 0.0022862                      
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
@@ -532,51 +548,52 @@ Diversity is similar across all 3 sites.
     [1] stats     graphics  grDevices utils     datasets  methods   base     
 
     other attached packages:
-     [1] caret_6.0-94         randomForest_4.7-1.1 geosphere_1.5-18    
-     [4] fossil_0.4.0         shapefiles_0.7.2     foreign_0.8-84      
-     [7] maps_3.4.2           sp_2.1-4             knitr_1.47          
-    [10] adespatial_0.3-23    vegan_2.6-6.1        lattice_0.20-45     
-    [13] permute_0.9-7        cowplot_1.1.3        lubridate_1.9.3     
-    [16] forcats_1.0.0        stringr_1.5.1        dplyr_1.1.4         
-    [19] purrr_1.0.2          readr_2.1.5          tidyr_1.3.1         
-    [22] tibble_3.2.1         ggplot2_3.5.1        tidyverse_2.0.0     
+     [1] ggridges_0.5.6       caret_6.0-94         randomForest_4.7-1.1
+     [4] geosphere_1.5-18     fossil_0.4.0         shapefiles_0.7.2    
+     [7] foreign_0.8-84       maps_3.4.2           sp_2.1-4            
+    [10] knitr_1.47           adespatial_0.3-23    vegan_2.6-6.1       
+    [13] lattice_0.20-45      permute_0.9-7        cowplot_1.1.3       
+    [16] lubridate_1.9.3      forcats_1.0.0        stringr_1.5.1       
+    [19] dplyr_1.1.4          purrr_1.0.2          readr_2.1.5         
+    [22] tidyr_1.3.1          tibble_3.2.1         ggplot2_3.5.1       
+    [25] tidyverse_2.0.0     
 
     loaded via a namespace (and not attached):
-      [1] colorspace_2.1-0     seqinr_4.2-36        deldir_2.0-4        
-      [4] class_7.3-21         rprojroot_2.0.4      rstudioapi_0.16.0   
-      [7] proxy_0.4-27         farver_2.1.2         listenv_0.9.1       
-     [10] ggrepel_0.9.5        prodlim_2023.08.28   fansi_1.0.6         
-     [13] xml2_1.3.6           codetools_0.2-19     splines_4.2.3       
-     [16] ade4_1.7-22          pROC_1.18.5          phylobase_0.8.12    
-     [19] cluster_2.1.4        png_0.1-8            shiny_1.8.1.1       
-     [22] compiler_4.2.3       httr_1.4.7           adegraphics_1.0-21  
-     [25] Matrix_1.5-3         fastmap_1.2.0        cli_3.6.2           
-     [28] later_1.3.2          s2_1.1.6             htmltools_0.5.8.1   
-     [31] prettyunits_1.2.0    tools_4.2.3          igraph_2.0.3        
-     [34] gtable_0.3.5         glue_1.7.0           reshape2_1.4.4      
-     [37] wk_0.9.1             Rcpp_1.0.12          vctrs_0.6.5         
-     [40] spdep_1.3-5          ape_5.8              nlme_3.1-162        
-     [43] iterators_1.0.14     timeDate_4032.109    gower_1.0.1         
-     [46] xfun_0.44            globals_0.16.3       adephylo_1.1-16     
-     [49] timechange_0.3.0     mime_0.12            lifecycle_1.0.4     
-     [52] XML_3.99-0.16.1      future_1.33.2        MASS_7.3-58.2       
-     [55] scales_1.3.0         ipred_0.9-14         hms_1.1.3           
-     [58] promises_1.3.0       parallel_4.2.3       RColorBrewer_1.1-3  
-     [61] yaml_2.3.8           rpart_4.1.23         latticeExtra_0.6-30 
-     [64] stringi_1.8.4        highr_0.11           foreach_1.5.2       
-     [67] e1071_1.7-14         hardhat_1.4.0        boot_1.3-28.1       
-     [70] lava_1.8.0           spData_2.3.1         rlang_1.1.4         
-     [73] pkgconfig_2.0.3      rncl_0.8.7           evaluate_0.24.0     
-     [76] sf_1.0-16            labeling_0.4.3       recipes_1.0.10      
-     [79] tidyselect_1.2.1     parallelly_1.37.1    plyr_1.8.9          
-     [82] magrittr_2.0.3       R6_2.5.1             generics_0.1.3      
-     [85] DBI_1.2.3            pillar_1.9.0         withr_3.0.0         
-     [88] mgcv_1.8-42          units_0.8-5          nnet_7.3-18         
-     [91] survival_3.5-3       future.apply_1.11.2  crayon_1.5.2        
-     [94] uuid_1.2-0           interp_1.1-6         KernSmooth_2.23-20  
-     [97] utf8_1.2.4           tzdb_0.4.0           rmarkdown_2.27      
-    [100] jpeg_0.1-10          progress_1.2.3       RNeXML_2.4.11       
-    [103] adegenet_2.1.10      grid_4.2.3           data.table_1.15.4   
-    [106] ModelMetrics_1.2.2.2 digest_0.6.35        classInt_0.4-10     
-    [109] xtable_1.8-4         httpuv_1.6.15        stats4_4.2.3        
-    [112] munsell_0.5.1       
+      [1] uuid_1.2-0           plyr_1.8.9           igraph_2.0.3        
+      [4] splines_4.2.3        listenv_0.9.1        rncl_0.8.7          
+      [7] digest_0.6.35        foreach_1.5.2        htmltools_0.5.8.1   
+     [10] fansi_1.0.6          magrittr_2.0.3       cluster_2.1.4       
+     [13] tzdb_0.4.0           recipes_1.0.10       globals_0.16.3      
+     [16] gower_1.0.1          hardhat_1.4.0        timechange_0.3.0    
+     [19] prettyunits_1.2.0    jpeg_0.1-10          colorspace_2.1-0    
+     [22] ggrepel_0.9.5        xfun_0.44            crayon_1.5.2        
+     [25] phylobase_0.8.12     survival_3.5-3       iterators_1.0.14    
+     [28] ape_5.8              glue_1.7.0           gtable_0.3.5        
+     [31] ipred_0.9-14         seqinr_4.2-36        future.apply_1.11.2 
+     [34] adegraphics_1.0-21   scales_1.3.0         DBI_1.2.3           
+     [37] Rcpp_1.0.12          xtable_1.8-4         progress_1.2.3      
+     [40] spData_2.3.1         units_0.8-5          spdep_1.3-5         
+     [43] proxy_0.4-27         stats4_4.2.3         lava_1.8.0          
+     [46] prodlim_2023.08.28   httr_1.4.7           RColorBrewer_1.1-3  
+     [49] wk_0.9.1             pkgconfig_2.0.3      XML_3.99-0.16.1     
+     [52] farver_2.1.2         nnet_7.3-18          deldir_2.0-4        
+     [55] utf8_1.2.4           tidyselect_1.2.1     labeling_0.4.3      
+     [58] rlang_1.1.4          reshape2_1.4.4       later_1.3.2         
+     [61] munsell_0.5.1        adephylo_1.1-16      tools_4.2.3         
+     [64] cli_3.6.2            generics_0.1.3       ade4_1.7-22         
+     [67] evaluate_0.24.0      fastmap_1.2.0        yaml_2.3.8          
+     [70] ModelMetrics_1.2.2.2 s2_1.1.6             future_1.33.2       
+     [73] nlme_3.1-162         mime_0.12            adegenet_2.1.10     
+     [76] xml2_1.3.6           compiler_4.2.3       rstudioapi_0.16.0   
+     [79] png_0.1-8            e1071_1.7-14         RNeXML_2.4.11       
+     [82] stringi_1.8.4        highr_0.11           Matrix_1.5-3        
+     [85] classInt_0.4-10      vctrs_0.6.5          pillar_1.9.0        
+     [88] lifecycle_1.0.4      data.table_1.15.4    httpuv_1.6.15       
+     [91] R6_2.5.1             latticeExtra_0.6-30  promises_1.3.0      
+     [94] KernSmooth_2.23-20   parallelly_1.37.1    codetools_0.2-19    
+     [97] boot_1.3-28.1        MASS_7.3-58.2        rprojroot_2.0.4     
+    [100] withr_3.0.0          mgcv_1.8-42          parallel_4.2.3      
+    [103] hms_1.1.3            grid_4.2.3           rpart_4.1.23        
+    [106] timeDate_4032.109    class_7.3-21         rmarkdown_2.27      
+    [109] sf_1.0-16            pROC_1.18.5          shiny_1.8.1.1       
+    [112] interp_1.1-6        
