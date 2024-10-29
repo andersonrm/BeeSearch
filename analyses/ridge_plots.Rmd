@@ -1,0 +1,629 @@
+---
+title: "BeeSearch ridge plots"
+author: "Dr. Riley M. Anderson"
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+graphics: yes
+output:
+  github_document:
+    toc: yes
+    toc_depth: 5
+    pandoc_args: --webtex
+  html_document:
+    keep_md: yes
+    theme: readable
+    mathjax: default
+  html_notebook:
+    code_folding: hide
+    theme: readable
+    mathjax: default
+  pdf_document:
+    toc: yes
+header-includes:
+  \usepackage{float}
+  \floatplacement{figure}{H}
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include = F}
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@ Knitr Options
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+# Set root directory to the project directory
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+
+
+# Set default knitr options: 
+# Suppress warnings and messages, cache chunks, 
+#  set default figure size to 6x8 at 300 dpi, and save a png and pdf
+knitr::opts_chunk$set(warning = F, message = F, collapse = T, cache = F,
+    fig.height = 6, fig.width = 8, dpi = 300, # 6x8" @ 300dpi:1800x2400=4.3MP
+    dev = c('png', 'pdf'), dev.args = list(pdf = list(onefile = F)))
+
+```
+
+
+
+## Overview
+
+This analysis compares the abundance of genera and species throughout the season. All analyses use the full data set. That is, counts of each species at each time point are the cumulative sum of all sites and all years.
+
+### Summary of Results
+18 genera had >= 20 records and these genera are shown for the genus level plot. Additional plots for parasite-host combinations are shown without any record cut-off. Sample size is included in each plot.
+
+```{r Main_Code, include = F, cache = F}
+
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@ Setup - This code is run, but output is hidden
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+# Load Packages
+library(tidyverse) # Needed for data wrangling: dplyr, tidyr, ggplot2
+library(cowplot) # Needed for publication-quality ggplots
+library(knitr)
+library(ggridges)
+
+
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@ Data Preparation
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+# Import datasets
+dat1 <- read.csv("data/CABS1.csv")
+
+comp.sites <- read.csv("data/comparable.sites.csv")
+
+site.locs <- read.csv("data/site.locations.csv")
+
+
+####################################
+# Funtions
+####################################
+
+Mode <- function(x) {
+  ux <- unique(x)
+  ux[which.max(tabulate(match(x, ux)))]
+}
+
+
+```
+
+
+```{r Data_Wrangling, echo = F, comment = ""}
+
+# general cleaning and conversion:
+dat1 <- dat1 %>% 
+  uncount(Count) %>% 
+  mutate(across(c(Station : Sex, Site), as.factor), # convert to factors
+         Date = ymd(Label.Date), # Convert to date
+         Year = year(Date), # Create year column
+         Month = month(Date), # create month column
+         # JD --- Day of year (julian day)
+         JD = yday(Date),
+         # ToY --- Time of Year
+         ToY = case_when(JD < 135 ~ "early",
+                         JD > 205 ~ "late",
+                         TRUE ~ "mid"),
+         # Create a station/year column for grouping
+         StationYear = paste(Station, Year, sep = "_")) %>% 
+  filter(Station != "",
+         Site != "") %>% # remove empty station & site records
+  # convert M/F to male/female to avoid "F = FALSE" misinterpretation
+  mutate(Sex = case_when(
+      Sex == "M" ~ "male",
+      Sex == "F" ~ "female",
+      TRUE ~ NA_character_ # Handle any unexpected values
+    )) %>% 
+  # correct misidentification record
+  mutate(Short.label.name = case_when(
+    Short.label.name == "Megachile apicalis" ~ "Megachile rotundata",
+    TRUE ~ as.character(Short.label.name)
+  )) %>% 
+  # correct misindentification sex classification
+  mutate(Sex = case_when(
+    Unique.Specimen.Number == 678 |
+      Unique.Specimen.Number == 679 ~ "Male",
+    TRUE ~ as.character(Sex)
+  ))
+
+
+# Create data with all the incompatible sites (unequal sampling effort)
+incomp.sites <- dat1 %>% 
+  select(StationYear) %>% 
+  filter(StationYear == "POS1_2018" |
+           StationYear == "POS10_2019" |
+           StationYear == "POS11_2018" |
+           StationYear == "POS13_2017" |
+           StationYear == "POS14_2017" |
+           StationYear == "POS15_2017" |
+           StationYear == "POS16_2017" |
+           StationYear == "POS17_2017" |
+           StationYear == "POS18_2017" |
+           StationYear == "POS19_2017" |
+           StationYear == "POS20_2017" |
+           StationYear == "POS20_2019" |
+           StationYear == "POS21_2017" |
+           StationYear == "POS22_2019" |
+           StationYear == "POS23_2019" |
+           StationYear == "POS1_2014" |
+           StationYear == "POS2_2014" |
+           StationYear == "POS3_2014") %>% 
+  distinct() %>% 
+  mutate(StationYear = factor(StationYear))
+
+
+# filter out the sites with incompatible sampling effort
+dat2 <- anti_join(dat1, incomp.sites, by = "StationYear") %>% 
+  # unequal sampling in 2020
+  filter(Year != 2020) %>% 
+  mutate(Year = factor(Year)) %>% 
+  droplevels()
+
+# keep the single record of morphospecies "Hylaeus sp. 2023_1"
+keep.Hylaeus <- dat2 %>% 
+  filter(str_detect(Short.label.name, "Hylaeus sp. 2023"))
+
+# remove any records where species is undetermined:
+dat2 <- dat2 %>% 
+  filter(!str_detect(Short.label.name, "(?<!m)sp\\.")) %>% 
+  bind_rows(keep.Hylaeus)
+# ^^^ this data will be used when analyses do not depend on number of species
+
+
+# Filter out certain morphospecies that could inflate richness
+dat.ex.msp <- dat2 %>% 
+  filter(!(Sex == "male" & str_detect(Short.label.name,
+                                    "Sphecodes msp\\.")),
+         !(Sex == "female" & str_detect(Short.label.name,
+                                       "Osmia msp\\.")),
+         !(Sex == "female" & str_detect(Short.label.name,
+                                        "Nomada msp\\.")))
+# ^^^ this data will be used for analyses involving species counts
+
+##############################################
+
+genus.counts <- dat.ex.msp %>% 
+  select(Genus, Short.label.name) %>% 
+  group_by(Genus) %>% 
+  distinct() %>% 
+  tally(name = "Species")
+
+genus.props <- dat.ex.msp %>% 
+  group_by(Genus) %>% 
+  tally(name = "Prop") %>% 
+  mutate(prop.abund = Prop/nrow(dat.ex.msp))
+
+genus <- left_join(genus.counts, genus.props, by = "Genus")
+
+###################
+# color palette
+c24 <- c(
+  "maroon", "#E31A1C", "green4", "#6A3D9A",
+  "#FF7F00", "gold1", "mediumpurple1","skyblue2", "#FB9A99",
+  "palegreen2", "#CAB2D6", "#FDBF6F", "gray70", "khaki2",
+  "dodgerblue2", "orchid1", "deeppink1", "blue1", "steelblue4",
+  "darkturquoise", "green1", "yellow4", "yellow3", "darkorange4"
+)
+
+
+genus_levels <- levels(genus$Genus)
+
+color_mapping <- setNames(c24, genus_levels)
+```
+
+
+# Genus by time of year
+```{r genus_ridgeplot, echo = F}
+
+genus_records <- dat.ex.msp %>% 
+  group_by(Genus) %>% 
+  tally() %>% filter(n > 19) %>% 
+  mutate(stars = case_when(n < 50 & n > 20 ~ "*",
+                           n < 100 & n >= 50 ~ "**",
+                           n < 1000 & n >= 100 ~ "***",
+                           n >= 1000 ~ "****"))
+
+dat_ridges <- dat.ex.msp %>% 
+  semi_join(genus_records, by = "Genus") %>% 
+  mutate(week = week(Date))
+
+
+genus_orders <- dat_ridges %>% 
+  select(Genus, JD) %>% 
+  group_by(Genus) %>% 
+  summarise(peak = Mode(JD)) %>% 
+  arrange(desc(peak)) %>% 
+  data.frame()
+
+level_order <- genus_orders$Genus
+
+
+dat_ridges %>% 
+  ggplot(aes(x = week,
+             y = factor(Genus, level = level_order),
+             fill = Genus)) +
+  geom_density_ridges(scale = 3,
+                               rel_min_height = 0.01) +
+  theme_ridges(grid = F) +
+  scale_fill_manual(values = color_mapping) +
+  theme(legend.position = "none") +
+  scale_x_continuous(breaks = c(10, 20, 30, 40),
+                     labels = c("3 March", "15 May",
+                                "24 July", "3 October")) +
+  labs(x = "", y = "") +
+  geom_vline(xintercept = 12.6,
+             color = "grey50", linetype = "dashed") +
+  geom_vline(xintercept = 25.3,
+             color = "grey50", linetype = "dashed") +
+  geom_vline(xintercept = 38.4,
+             color = "grey50", linetype = "dashed") +
+  annotate(geom = "text", x = 7, y = 27, label = " ") +
+  annotate(geom = "text", x = 9, y = 25, label = "Winter") +
+  annotate(geom = "text", x = 18, y = 25, label = "Spring") +
+  annotate(geom = "text", x = 32, y = 25, label = "Summer") +
+  annotate(geom = "text", x = 41, y = 25, label = "Fall") +
+  geom_text(data = genus_records, aes(x = 43, y = Genus,
+                                      label = n),
+            size = 3)
+
+
+```
+
+### Host-parasite ridges
+```{r genus_parasite_host, echo = F}
+
+parasite_records <- dat.ex.msp %>% 
+  group_by(Genus) %>% 
+  tally() %>% 
+  filter(Genus == "Nomada" | Genus == "Andrena" |
+           Genus == "Agapostemon" | Genus == "Stelis" |
+           Genus == "Osmia" | Genus == "Megachile" |
+           Genus == "Sphecodes" | Genus == "Halictus" |
+           Genus == "Lasioglossum" | Genus == "Epeolus" |
+           Genus == "Colletes" | Genus == "Triepeolus" |
+           Genus == "Melissodes" | Genus == "Coelioxys")
+
+dat_ridges_parasite <- dat.ex.msp %>% 
+  semi_join(parasite_records, by = "Genus") %>% 
+  mutate(week = week(Date))
+
+
+parasite_orders <- dat_ridges_parasite %>% 
+  select(Genus, JD) %>% 
+  group_by(Genus) %>% 
+  summarise(peak = Mode(JD)) %>% 
+  arrange(desc(peak)) %>% 
+  data.frame()
+
+level_order_parasite <- parasite_orders$Genus
+
+
+dat_ridges_parasite %>% 
+  ggplot(aes(x = week,
+             y = factor(Genus, level = level_order_parasite),
+             fill = Genus)) +
+  geom_density_ridges(scale = 3, rel_min_height = 0.01) +
+  theme_ridges(grid = F) +
+  scale_fill_manual(values = color_mapping) +
+  theme(legend.position = "none") +
+  scale_x_continuous(breaks = c(10, 20, 30, 40),
+                     labels = c("3 March", "15 May",
+                                "24 July", "3 October")) +
+  labs(x = "", y = "") +
+  geom_vline(xintercept = 12.6,
+             color = "grey50", linetype = "dashed") +
+  geom_vline(xintercept = 25.3,
+             color = "grey50", linetype = "dashed") +
+  geom_vline(xintercept = 38.4,
+             color = "grey50", linetype = "dashed") +
+  annotate(geom = "text", x = 7, y = 18, label = " ") +
+  annotate(geom = "text", x = 9, y = 17, label = "Winter") +
+  annotate(geom = "text", x = 18, y = 17, label = "Spring") +
+  annotate(geom = "text", x = 32, y = 17, label = "Summer") +
+  annotate(geom = "text", x = 42, y = 17, label = "Fall") +
+  geom_text(data = parasite_records, aes(x = 45, y = Genus,
+                                      label = n),
+            size = 3)
+
+```
+
+### Nomada
+```{r Nomada_ridges, echo = F}
+
+nomada <- dat_ridges_parasite %>% 
+  filter(Genus == "Nomada" | Genus == "Andrena" |
+           Genus == "Agapostemon") %>% 
+  ggplot(aes(x = week,
+             y = factor(Genus, level = c("Agapostemon",
+                                         "Andrena",
+                                         "Nomada")),
+             fill = Genus)) +
+  geom_density_ridges(scale = 3,
+                               rel_min_height = 0.01) +
+  theme_ridges(grid = F) +
+  scale_fill_manual(values = color_mapping) +
+  theme(legend.position = "none") +
+  scale_x_continuous(breaks = c(10, 20, 30, 40),
+                     labels = c("3 March", "15 May",
+                                "24 July", "3 October")) +
+  labs(x = "", y = "") +
+  geom_vline(xintercept = 12.6,
+             color = "grey50", linetype = "dashed") +
+  geom_vline(xintercept = 25.3,
+             color = "grey50", linetype = "dashed") +
+  geom_vline(xintercept = 38.4,
+             color = "grey50", linetype = "dashed") +
+  annotate(geom = "text", x = 7, y = 8, label = " ") +
+  annotate(geom = "text", x = 9, y = 7, label = "Winter") +
+  annotate(geom = "text", x = 18, y = 7, label = "Spring") +
+  annotate(geom = "text", x = 32, y = 7, label = "Summer") +
+  annotate(geom = "text", x = 41, y = 7, label = "Fall") +
+  geom_text(data = filter(parasite_records,
+                          Genus == "Nomada" | Genus == "Andrena" |
+                          Genus == "Agapostemon"),
+            aes(x = 43, y = Genus, label = n), size = 3)
+
+```
+
+### Stelis
+```{r Stelis_ridges, echo = F}
+
+stelis <- dat_ridges_parasite %>% 
+  filter(Genus == "Stelis" | Genus == "Osmia" |
+           Genus == "Megachile") %>% 
+  ggplot(aes(x = week,
+             y = factor(Genus, level = c("Megachile",
+                                         "Osmia",
+                                         "Stelis")),
+             fill = Genus)) +
+  geom_density_ridges(scale = 3,
+                               rel_min_height = 0.01) +
+  theme_ridges(grid = F) +
+  scale_fill_manual(values = color_mapping) +
+  theme(legend.position = "none") +
+  scale_x_continuous(breaks = c(10, 20, 30, 40),
+                     labels = c("3 March", "15 May",
+                                "24 July", "3 October")) +
+  labs(x = "", y = "") +
+  geom_vline(xintercept = 12.6,
+             color = "grey50", linetype = "dashed") +
+  geom_vline(xintercept = 25.3,
+             color = "grey50", linetype = "dashed") +
+  geom_vline(xintercept = 38.4,
+             color = "grey50", linetype = "dashed") +
+  annotate(geom = "text", x = 7, y = 8, label = " ") +
+  annotate(geom = "text", x = 9, y = 7, label = "Winter") +
+  annotate(geom = "text", x = 18, y = 7, label = "Spring") +
+  annotate(geom = "text", x = 32, y = 7, label = "Summer") +
+  annotate(geom = "text", x = 41, y = 7, label = "Fall") +
+  geom_text(data = filter(parasite_records,
+                          Genus == "Stelis" | Genus == "Osmia" |
+                          Genus == "Megachile"),
+            aes(x = 43, y = Genus, label = n), size = 3)
+
+```
+
+### Sphecodes
+```{r Sphecodes_ridges, echo = F}
+
+sphecodes <- dat_ridges_parasite %>% 
+  filter(Genus == "Sphecodes" | Genus == "Halictus" |
+           Genus == "Lasioglossum" | Genus == "Agapostemon") %>% 
+  ggplot(aes(x = week,
+             y = factor(Genus, level = c("Lasioglossum",
+                                         "Agapostemon",
+                                         "Halictus",
+                                         "Sphecodes")),
+             fill = Genus)) +
+  geom_density_ridges(scale = 3,
+                               rel_min_height = 0.01) +
+  theme_ridges(grid = F) +
+  scale_fill_manual(values = color_mapping) +
+  theme(legend.position = "none") +
+  scale_x_continuous(breaks = c(10, 20, 30, 40),
+                     labels = c("3 March", "15 May",
+                                "24 July", "3 October")) +
+  labs(x = "", y = "") +
+  geom_vline(xintercept = 12.6,
+             color = "grey50", linetype = "dashed") +
+  geom_vline(xintercept = 25.3,
+             color = "grey50", linetype = "dashed") +
+  geom_vline(xintercept = 38.4,
+             color = "grey50", linetype = "dashed") +
+  annotate(geom = "text", x = 7, y = 8, label = " ") +
+  annotate(geom = "text", x = 9, y = 7, label = "Winter") +
+  annotate(geom = "text", x = 18, y = 7, label = "Spring") +
+  annotate(geom = "text", x = 32, y = 7, label = "Summer") +
+  annotate(geom = "text", x = 41, y = 7, label = "Fall") +
+  geom_text(data = filter(parasite_records,
+                          Genus == "Sphecodes" | Genus == "Halictus" |
+           Genus == "Lasioglossum" | Genus == "Agapostemon"),
+            aes(x = 43, y = Genus, label = n), size = 3)
+
+```
+
+### Epeolus
+```{r Epeolus_ridges, echo = F}
+
+epeolus <- dat_ridges_parasite %>% 
+  filter(Genus == "Epeolus" | Genus == "Colletes") %>% 
+  ggplot(aes(x = week,
+             y = factor(Genus, level = c("Colletes",
+                                         "Epeolus")),
+             fill = Genus)) +
+  geom_density_ridges(scale = 3,
+                               rel_min_height = 0.01) +
+  theme_ridges(grid = F) +
+  scale_fill_manual(values = color_mapping) +
+  theme(legend.position = "none") +
+  scale_x_continuous(breaks = c(10, 20, 30, 40),
+                     labels = c("3 March", "15 May",
+                                "24 July", "3 October")) +
+  labs(x = "", y = "") +
+  geom_vline(xintercept = 12.6,
+             color = "grey50", linetype = "dashed") +
+  geom_vline(xintercept = 25.3,
+             color = "grey50", linetype = "dashed") +
+  geom_vline(xintercept = 38.4,
+             color = "grey50", linetype = "dashed") +
+  annotate(geom = "text", x = 7, y = 8, label = " ") +
+  annotate(geom = "text", x = 9, y = 7, label = "Winter") +
+  annotate(geom = "text", x = 18, y = 7, label = "Spring") +
+  annotate(geom = "text", x = 32, y = 7, label = "Summer") +
+  annotate(geom = "text", x = 41, y = 7, label = "Fall") +
+  geom_text(data = filter(parasite_records,
+                          Genus == "Epeolus" | Genus == "Colletes"),
+            aes(x = 43, y = Genus, label = n), size = 3)
+
+```
+
+### Triepeolus
+```{r Triepeolus_ridges, echo = F}
+
+triepeolus <- dat_ridges_parasite %>% 
+  filter(Genus == "Triepeolus" | Genus == "Melissodes") %>% 
+  ggplot(aes(x = week,
+             y = factor(Genus, level = c("Melissodes",
+                                         "Triepeolus")),
+             fill = Genus)) +
+  geom_density_ridges(scale = 3,
+                               rel_min_height = 0.01) +
+  theme_ridges(grid = F) +
+  scale_fill_manual(values = color_mapping) +
+  theme(legend.position = "none") +
+  scale_x_continuous(breaks = c(10, 20, 30, 40),
+                     labels = c("3 March", "15 May",
+                                "24 July", "3 October")) +
+  labs(x = "", y = "") +
+  geom_vline(xintercept = 12.6,
+             color = "grey50", linetype = "dashed") +
+  geom_vline(xintercept = 25.3,
+             color = "grey50", linetype = "dashed") +
+  geom_vline(xintercept = 38.4,
+             color = "grey50", linetype = "dashed") +
+  annotate(geom = "text", x = 7, y = 8, label = " ") +
+  annotate(geom = "text", x = 7, y = 7, label = "Winter") +
+  annotate(geom = "text", x = 18, y = 7, label = "Spring") +
+  annotate(geom = "text", x = 32, y = 7, label = "Summer") +
+  annotate(geom = "text", x = 45, y = 7, label = "Fall") +
+  geom_text(data = filter(parasite_records,
+                          Genus == "Triepeolus" |
+                          Genus == "Melissodes"),
+            aes(x = 65, y = Genus, label = n), size = 3)
+
+```
+
+### Coelioxys
+```{r Coelioxys_ridges, echo = F}
+
+coelioxys <- dat_ridges_parasite %>% 
+  filter(Genus == "Coelioxys" | Genus == "Megachile") %>% 
+  ggplot(aes(x = week,
+             y = factor(Genus, level = c("Megachile",
+                                         "Coelioxys")),
+             fill = Genus)) +
+  geom_density_ridges(scale = 3,
+                               rel_min_height = 0.01) +
+  theme_ridges(grid = F) +
+  scale_fill_manual(values = color_mapping) +
+  theme(legend.position = "none") +
+  scale_x_continuous(breaks = c(10, 20, 30, 40),
+                     labels = c("3 March", "15 May",
+                                "24 July", "3 October")) +
+  labs(x = "", y = "") +
+  geom_vline(xintercept = 12.6,
+             color = "grey50", linetype = "dashed") +
+  geom_vline(xintercept = 25.3,
+             color = "grey50", linetype = "dashed") +
+  geom_vline(xintercept = 38.4,
+             color = "grey50", linetype = "dashed") +
+  annotate(geom = "text", x = 7, y = 8, label = " ") +
+  annotate(geom = "text", x = 7, y = 7, label = "Winter") +
+  annotate(geom = "text", x = 18, y = 7, label = "Spring") +
+  annotate(geom = "text", x = 32, y = 7, label = "Summer") +
+  annotate(geom = "text", x = 43, y = 7, label = "Fall") +
+  geom_text(data = filter(parasite_records,
+                          Genus == "Coelioxys" |
+                          Genus == "Megachile"),
+            aes(x = 45, y = Genus, label = n), size = 3)
+
+```
+
+### Parasite-host composite
+```{r parasite_host_composite, echo = F, fig.width = 9, fig.height = 10}
+
+plot_grid(nomada, stelis, sphecodes,
+          epeolus, triepeolus, coelioxys,
+          labels = c("A", "B", "C", "D", "E", "F"),
+          nrow = 3)
+
+
+```
+
+
+
+# Species by time of year
+```{r species_ridgeplot, echo = F, fig.height = 10}
+
+more_than_20 <- dat.ex.msp %>% group_by(Short.label.name) %>% 
+  tally() %>% 
+  filter(n > 20)
+
+dat_ridges_species <- dat.ex.msp %>%
+  mutate(week = week(Date)) %>% 
+  semi_join(more_than_20, by = "Short.label.name")
+
+
+
+species_orders <- dat_ridges_species %>% 
+  select(Short.label.name, JD) %>% 
+  group_by(Short.label.name) %>% 
+  summarise(peak = Mode(JD)) %>% 
+  arrange(desc(peak)) %>% 
+  data.frame()
+
+level_order_species <- species_orders$Short.label.name
+
+
+dat_ridges_species %>% 
+  ggplot(aes(x = week,
+             y = factor(Short.label.name,
+                        level = level_order_species),
+             fill = Short.label.name)) +
+  geom_density_ridges(scale = 3, rel_min_height = 0.01) +
+  theme_ridges(grid = F) +
+  theme(legend.position = "none") +
+  scale_x_continuous(breaks = c(10, 20, 30, 40),
+                     labels = c("3 March", "15 May",
+                                "24 July", "3 October")) +
+  labs(x = "", y = "") +
+  geom_vline(xintercept = 12.6,
+             color = "grey50", linetype = "dashed") +
+  geom_vline(xintercept = 25.3,
+             color = "grey50", linetype = "dashed") +
+  geom_vline(xintercept = 38.4,
+             color = "grey50", linetype = "dashed") +
+  annotate(geom = "text", x = 7, y = 50, label = " ") +
+  annotate(geom = "text", x = 8, y = 48, label = "Winter") +
+  annotate(geom = "text", x = 20, y = 48, label = "Spring") +
+  annotate(geom = "text", x = 32, y = 48, label = "Summer") +
+  annotate(geom = "text", x = 42, y = 48, label = "Fall") +
+  geom_text(data = more_than_20, aes(x = 43, y = Short.label.name,
+                                     label = n), size = 3)
+
+
+```
+
+
+## Session Information
+
+```{r Session_Info, echo = F, comment = ""}
+
+# Add session information to help with reproduceability
+sessionInfo()
+
+
+```
+
+
