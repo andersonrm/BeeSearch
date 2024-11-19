@@ -230,21 +230,24 @@ dat_ridges <- dat.ex.msp %>%
 
 
 genus_orders <- dat_ridges %>% 
-  select(Genus, JD) %>% 
+  select(Genus, week) %>% 
   group_by(Genus) %>% 
-  summarise(peak = Mode(JD)) %>% 
+  summarise(peak = Mode(week)) %>% 
   arrange(desc(peak)) %>% 
   data.frame()
 
 level_order <- genus_orders$Genus
 
 
+
 dat_ridges %>% 
   ggplot(aes(x = week,
              y = factor(Genus, level = level_order),
              fill = Genus)) +
-  geom_density_ridges(scale = 3,
-                               rel_min_height = 0.01) +
+  geom_density_ridges(aes(height = stat(density)),
+                      scale = 5,
+                      rel_min_height = 0.01,
+                      stat = "density") +
   theme_ridges(grid = F) +
   scale_fill_manual(values = color_mapping) +
   theme(legend.position = "none") +
@@ -268,8 +271,7 @@ dat_ridges %>%
   annotate(geom = "text", x = 41, y = 20, label = "Fall",
            size = 5) +
   geom_text(data = genus_records, aes(x = 43, y = Genus,
-                                      label = n),
-            size = 3)
+                                      label = n), size = 3)
 
 
 ```
@@ -307,7 +309,9 @@ dat_ridges_parasite %>%
   ggplot(aes(x = week,
              y = factor(Genus, level = level_order_parasite),
              fill = Genus)) +
-  geom_density_ridges(scale = 3, rel_min_height = 0.01) +
+  geom_density_ridges(aes(height = stat(density)),
+                      scale = 6, rel_min_height = 0.01,
+                      stat = "density") +
   theme_ridges(grid = F) +
   scale_fill_manual(values = color_mapping) +
   theme(legend.position = "none") +
@@ -332,7 +336,7 @@ dat_ridges_parasite %>%
 
 ```
 
-### Nomada
+
 ```{r Nomada_ridges, echo = F}
 
 nomada <- dat_ridges_parasite %>% 
@@ -343,8 +347,10 @@ nomada <- dat_ridges_parasite %>%
                                          "Andrena",
                                          "Nomada")),
              fill = Genus)) +
-  geom_density_ridges(scale = 3,
-                               rel_min_height = 0.01) +
+  geom_density_ridges(aes(height = stat(density)),
+                      scale = 3, 
+                      rel_min_height = 0.01,
+                      stat = "density") +
   theme_ridges(grid = F) +
   scale_fill_manual(values = color_mapping) +
   theme(legend.position = "none") +
@@ -370,7 +376,7 @@ nomada <- dat_ridges_parasite %>%
 
 ```
 
-### Stelis
+
 ```{r Stelis_ridges, echo = F}
 
 stelis <- dat_ridges_parasite %>% 
@@ -381,8 +387,10 @@ stelis <- dat_ridges_parasite %>%
                                          "Osmia",
                                          "Stelis")),
              fill = Genus)) +
-  geom_density_ridges(scale = 3,
-                               rel_min_height = 0.01) +
+  geom_density_ridges(aes(height = stat(density)),
+                      scale = 4, 
+                      rel_min_height = 0.01,
+                      stat = "density") +
   theme_ridges(grid = F) +
   scale_fill_manual(values = color_mapping) +
   theme(legend.position = "none") +
@@ -396,19 +404,20 @@ stelis <- dat_ridges_parasite %>%
              color = "grey50", linetype = "dashed") +
   geom_vline(xintercept = 38.4,
              color = "grey50", linetype = "dashed") +
-  annotate(geom = "text", x = 7, y = 8, label = " ") +
-  annotate(geom = "text", x = 9, y = 7, label = "Winter") +
+  annotate(geom = "text", x = 9, y = 8, label = " ") +
+  annotate(geom = "text", x = 10.5, y = 7, label = "Winter") +
   annotate(geom = "text", x = 18, y = 7, label = "Spring") +
   annotate(geom = "text", x = 32, y = 7, label = "Summer") +
   annotate(geom = "text", x = 41, y = 7, label = "Fall") +
   geom_text(data = filter(parasite_records,
                           Genus == "Stelis" | Genus == "Osmia" |
                           Genus == "Megachile"),
-            aes(x = 43, y = Genus, label = n), size = 3)
+            aes(x = 11, y = Genus, label = n), size = 3) +
+  scale_y_discrete(position = "right")
 
 ```
 
-### Sphecodes
+
 ```{r Sphecodes_ridges, echo = F}
 
 sphecodes <- dat_ridges_parasite %>% 
@@ -420,8 +429,10 @@ sphecodes <- dat_ridges_parasite %>%
                                          "Halictus",
                                          "Sphecodes")),
              fill = Genus)) +
-  geom_density_ridges(scale = 3,
-                               rel_min_height = 0.01) +
+  geom_density_ridges(aes(height = stat(density)),
+                      scale = 3, 
+                      rel_min_height = 0.01,
+                      stat = "density") +
   theme_ridges(grid = F) +
   scale_fill_manual(values = color_mapping) +
   theme(legend.position = "none") +
@@ -447,7 +458,7 @@ sphecodes <- dat_ridges_parasite %>%
 
 ```
 
-### Epeolus
+
 ```{r Epeolus_ridges, echo = F}
 
 epeolus <- dat_ridges_parasite %>% 
@@ -456,8 +467,10 @@ epeolus <- dat_ridges_parasite %>%
              y = factor(Genus, level = c("Colletes",
                                          "Epeolus")),
              fill = Genus)) +
-  geom_density_ridges(scale = 3,
-                               rel_min_height = 0.01) +
+  geom_density_ridges(aes(height = stat(density)),
+                      scale = 3, 
+                      rel_min_height = 0.01,
+                      stat = "density") +
   theme_ridges(grid = F) +
   scale_fill_manual(values = color_mapping) +
   theme(legend.position = "none") +
@@ -471,18 +484,19 @@ epeolus <- dat_ridges_parasite %>%
              color = "grey50", linetype = "dashed") +
   geom_vline(xintercept = 38.4,
              color = "grey50", linetype = "dashed") +
-  annotate(geom = "text", x = 7, y = 8, label = " ") +
-  annotate(geom = "text", x = 9, y = 7, label = "Winter") +
+  annotate(geom = "text", x = 9, y = 8, label = " ") +
+  annotate(geom = "text", x = 10.5, y = 7, label = "Winter") +
   annotate(geom = "text", x = 18, y = 7, label = "Spring") +
   annotate(geom = "text", x = 32, y = 7, label = "Summer") +
   annotate(geom = "text", x = 41, y = 7, label = "Fall") +
   geom_text(data = filter(parasite_records,
                           Genus == "Epeolus" | Genus == "Colletes"),
-            aes(x = 43, y = Genus, label = n), size = 3)
+            aes(x = 11, y = Genus, label = n), size = 3) +
+  scale_y_discrete(position = "right")
 
 ```
 
-### Triepeolus
+
 ```{r Triepeolus_ridges, echo = F}
 
 triepeolus <- dat_ridges_parasite %>% 
@@ -491,8 +505,10 @@ triepeolus <- dat_ridges_parasite %>%
              y = factor(Genus, level = c("Melissodes",
                                          "Triepeolus")),
              fill = Genus)) +
-  geom_density_ridges(scale = 3,
-                               rel_min_height = 0.01) +
+  geom_density_ridges(aes(height = stat(density)),
+                      scale = 3, 
+                      rel_min_height = 0.01,
+                      stat = "density") +
   theme_ridges(grid = F) +
   scale_fill_manual(values = color_mapping) +
   theme(legend.position = "none") +
@@ -506,19 +522,19 @@ triepeolus <- dat_ridges_parasite %>%
              color = "grey50", linetype = "dashed") +
   geom_vline(xintercept = 38.4,
              color = "grey50", linetype = "dashed") +
-  annotate(geom = "text", x = 7, y = 8, label = " ") +
-  annotate(geom = "text", x = 7, y = 7, label = "Winter") +
-  annotate(geom = "text", x = 18, y = 7, label = "Spring") +
-  annotate(geom = "text", x = 32, y = 7, label = "Summer") +
-  annotate(geom = "text", x = 45, y = 7, label = "Fall") +
+  annotate(geom = "text", x = 7, y = 5, label = " ") +
+  annotate(geom = "text", x = 9.5, y = 4.5, label = "Winter") +
+  annotate(geom = "text", x = 18, y = 4.5, label = "Spring") +
+  annotate(geom = "text", x = 32, y = 4.5, label = "Summer") +
+  annotate(geom = "text", x = 45, y = 4.5, label = "Fall") +
   geom_text(data = filter(parasite_records,
                           Genus == "Triepeolus" |
                           Genus == "Melissodes"),
-            aes(x = 65, y = Genus, label = n), size = 3)
+            aes(x = 50, y = c(1, 1.8), label = n), size = 3)
 
 ```
 
-### Coelioxys
+
 ```{r Coelioxys_ridges, echo = F}
 
 coelioxys <- dat_ridges_parasite %>% 
@@ -527,8 +543,10 @@ coelioxys <- dat_ridges_parasite %>%
              y = factor(Genus, level = c("Megachile",
                                          "Coelioxys")),
              fill = Genus)) +
-  geom_density_ridges(scale = 3,
-                               rel_min_height = 0.01) +
+  geom_density_ridges(aes(height = stat(density)),
+                      scale = 3, 
+                      rel_min_height = 0.01,
+                      stat = "density") +
   theme_ridges(grid = F) +
   scale_fill_manual(values = color_mapping) +
   theme(legend.position = "none") +
@@ -542,25 +560,27 @@ coelioxys <- dat_ridges_parasite %>%
              color = "grey50", linetype = "dashed") +
   geom_vline(xintercept = 38.4,
              color = "grey50", linetype = "dashed") +
-  annotate(geom = "text", x = 7, y = 8, label = " ") +
-  annotate(geom = "text", x = 7, y = 7, label = "Winter") +
+  annotate(geom = "text", x = 9, y = 8, label = " ") +
+  annotate(geom = "text", x = 10.5, y = 7, label = "Winter") +
   annotate(geom = "text", x = 18, y = 7, label = "Spring") +
   annotate(geom = "text", x = 32, y = 7, label = "Summer") +
   annotate(geom = "text", x = 43, y = 7, label = "Fall") +
   geom_text(data = filter(parasite_records,
                           Genus == "Coelioxys" |
                           Genus == "Megachile"),
-            aes(x = 45, y = Genus, label = n), size = 3)
+            aes(x = 11, y = Genus, label = n), size = 3) +
+  scale_y_discrete(position = "right")
 
 ```
 
 ### Parasite-host composite
-```{r parasite_host_composite, echo = F, fig.width = 9, fig.height = 10}
+```{r parasite_host_composite, echo = F, fig.width = 12, fig.height = 10}
 
 plot_grid(nomada, stelis, sphecodes,
           epeolus, triepeolus, coelioxys,
           labels = c("A", "B", "C", "D", "E", "F"),
-          nrow = 3)
+          nrow = 3, rel_widths = c(0.9, 1),
+          greedy = FALSE)
 
 
 ```

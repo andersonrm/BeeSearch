@@ -153,10 +153,7 @@ incomp.sites <- dat1 %>%
            StationYear == "POS20_2019" |
            StationYear == "POS21_2017" |
            StationYear == "POS22_2019" |
-           StationYear == "POS23_2019" |
-           StationYear == "POS1_2014" |
-           StationYear == "POS2_2014" |
-           StationYear == "POS3_2014") %>% 
+           StationYear == "POS23_2019") %>% 
   distinct() %>% 
   mutate(StationYear = factor(StationYear))
 
@@ -164,7 +161,7 @@ incomp.sites <- dat1 %>%
 # filter out the sites with incompatible sampling effort
 dat2 <- anti_join(dat1, incomp.sites, by = "StationYear") %>% 
   # unequal sampling in 2020
-  filter(Year != 2020) %>% 
+  # filter(Year != 2020) %>% 
   mutate(Year = factor(Year)) %>% 
   droplevels()
 
@@ -193,13 +190,20 @@ dat.ex.msp <- dat2 %>%
 ######################################################
 ## Descriptive metrics
 
-total_bees <- dat.ex.msp %>% 
+total_bees <- dat1 %>% 
   group_by(Site) %>% 
   select(Short.label.name) %>% 
   tally(name = "total")
 
-honey_bees <- dat.ex.msp %>% 
+honey_bees <- dat1 %>% 
   filter(Short.label.name == "Apis mellifera") %>% 
+  group_by(Site) %>% 
+  select(Short.label.name) %>% 
+  tally(name = "A_mellifera")
+
+honey_bees_net <- dat1 %>% 
+  filter(Short.label.name == "Apis mellifera",
+         Collection.Method == "N") %>% 
   group_by(Site) %>% 
   select(Short.label.name) %>% 
   tally(name = "A_mellifera")
@@ -274,6 +278,58 @@ meta.seasons <- dat2 %>%
 
 
 ```
+
+# Descriptive measures of the dataset
+```{r number_records, echo = F}
+records <- nrow(dat1)
+
+unique_species <- dat1 %>%  group_by(Short.label.name) %>% 
+  tally(name = "species") %>% nrow()
+
+families <- dat1 %>% group_by(Family) %>% 
+  tally(name = "families") %>% nrow()# data does not contain Family
+
+genera <- dat1 %>%  group_by(Genus) %>%
+  tally(name = "genera") %>% nrow()
+
+kable(data.frame(n = c( "specimens", "species", "families", "genera"),
+           records = c(records, unique_species, families, genera)),
+      format = "markdown")
+```
+
+
+## Raw species counts by year and site
+```{r raw_species_counts_year_site, echo = F}
+dat1 %>% 
+  group_by(Site, Year, Species) %>% tally() %>% 
+  group_by(Site, Year) %>% tally(name = "Species") %>% 
+  ggplot(aes(x = factor(Year), y = Species,
+             color = Site, group = Site)) +
+  geom_point(size = 3) +
+  geom_line(linewidth = 1.5) +
+  theme_cowplot() +
+  scale_color_manual(values = c("#E69F00", "#56B4E9", "#009E73")) +
+  labs(x = "Year") 
+```
+
+## Trimmed species counts by year and site
+
+* some morphospecies were excluded
+```{r trimmed_species_counts_year_site, echo = F}
+dat.ex.msp %>% 
+  group_by(Site, Year, Species) %>% tally() %>% 
+  group_by(Site, Year) %>% tally(name = "Species") %>% 
+  ggplot(aes(x = factor(Year), y = Species,
+             color = Site, group = Site)) +
+  geom_point(size = 3) +
+  geom_line(linewidth = 1.5) +
+  theme_cowplot() +
+  scale_color_manual(values = c("#E69F00", "#56B4E9", "#009E73")) +
+  labs(x = "Year")
+
+
+```
+
 
 # Descriptive measures of genera
 
@@ -616,9 +672,9 @@ dat_ridges <- dat.ex.msp %>%
 
 
 genus_orders <- dat_ridges %>% 
-  select(Genus, JD) %>% 
+  select(Genus, week) %>% 
   group_by(Genus) %>% 
-  summarise(peak = Mode(JD)) %>% 
+  summarise(peak = Mode(week)) %>% 
   arrange(desc(peak)) %>% 
   data.frame()
 
@@ -1236,14 +1292,14 @@ sac_bpf_list <- specaccum(sac_bpf, method = "random", permutations = 100,
 
 # Results
 sac_all_result <- data.frame(site = "All Sites",
-                             nsamples = seq(1,58, 1),
+                             nsamples = seq(1,69, 1),
                              richness = sac_all_list[4],
                              sd = sac_all_list[5]) %>% 
   mutate(lower = richness - 1.96*sd,
          upper = richness + 1.96*sd)
 
 sac_pos_result <- data.frame(site = "POS",
-                             nsamples = seq(1,31, 1),
+                             nsamples = seq(1,42, 1),
                              richness = sac_pos_list[4],
                              sd = sac_pos_list[5]) %>% 
   mutate(lower = richness - 1.96*sd,
@@ -1346,14 +1402,14 @@ sac_bpf_list_nt <- specaccum(sac_bpf_nt, method = "random", permutations = 100,
 
 # Results
 sac_all_result_nt <- data.frame(site = "All Sites",
-                             nsamples = seq(1,69, 1),
+                             nsamples = seq(1,80, 1),
                              richness = sac_all_list_nt[4],
                              sd = sac_all_list_nt[5]) %>% 
   mutate(lower = richness - 1.96*sd,
          upper = richness + 1.96*sd)
 
 sac_pos_result_nt <- data.frame(site = "POS",
-                             nsamples = seq(1,40, 1),
+                             nsamples = seq(1,51, 1),
                              richness = sac_pos_list_nt[4],
                              sd = sac_pos_list_nt[5]) %>% 
   mutate(lower = richness - 1.96*sd,
@@ -1385,13 +1441,17 @@ sac_results_nt %>%
   geom_line(aes(color = site),linewidth = 1.1, show.legend = F) +
   geom_ribbon(aes(ymin = lower, ymax = upper, fill = site),
               alpha = 0.4) +
-  scale_color_manual(values = c("#000000", "#E69F00", "#56B4E9", "#009E73")) +
-  scale_fill_manual(values = c("#999999", "#E69F00", "#56B4E9", "#009E73")) +
-  theme_cowplot(font_size = 20) +
+  scale_color_manual(values = c("#000000", "#E69F00",
+                                "#56B4E9", "#009E73")) +
+  scale_fill_manual(values = c("#999999", "#E69F00",
+                               "#56B4E9", "#009E73")) +
+  theme_cowplot() +
   labs(x = "No. sampling sites",
        y = "Richness",
        fill = "Site") +
-  theme(legend.position = c(0.78,0.4))
+  theme(legend.position = c(0.78,0.4)) +
+  scale_y_continuous(breaks = waiver(),
+                     n.breaks = 7)
 
 ```
 

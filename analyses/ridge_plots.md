@@ -1,7 +1,7 @@
 BeeSearch ridge plots
 ================
 Dr. Riley M. Anderson
-October 29, 2024
+November 19, 2024
 
   
 
@@ -9,12 +9,6 @@ October 29, 2024
   - [Summary of Results](#summary-of-results)
 - [Genus by time of year](#genus-by-time-of-year)
   - [Host-parasite ridges](#host-parasite-ridges)
-  - [Nomada](#nomada)
-  - [Stelis](#stelis)
-  - [Sphecodes](#sphecodes)
-  - [Epeolus](#epeolus)
-  - [Triepeolus](#triepeolus)
-  - [Coelioxys](#coelioxys)
   - [Parasite-host composite](#parasite-host-composite)
 - [Species by time of year](#species-by-time-of-year)
   - [Session Information](#session-information)
@@ -39,18 +33,6 @@ without any record cut-off. Sample size is included in each plot.
 ### Host-parasite ridges
 
 ![](ridge_plots_files/figure-gfm/genus_parasite_host-1.png)<!-- -->
-
-### Nomada
-
-### Stelis
-
-### Sphecodes
-
-### Epeolus
-
-### Triepeolus
-
-### Coelioxys
 
 ### Parasite-host composite
 

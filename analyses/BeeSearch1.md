@@ -1,12 +1,18 @@
 BeeSearch initial
 ================
 Dr. Riley M. Anderson
-October 25, 2024
+November 08, 2024
 
   
 
 - [Overview](#overview)
   - [Summary of Results](#summary-of-results)
+- [Descriptive measures of the
+  dataset](#descriptive-measures-of-the-dataset)
+  - [Raw species counts by year and
+    site](#raw-species-counts-by-year-and-site)
+  - [Trimmed species counts by year and
+    site](#trimmed-species-counts-by-year-and-site)
 - [Descriptive measures of genera](#descriptive-measures-of-genera)
   - [All sites together](#all-sites-together)
   - [POS](#pos)
@@ -15,6 +21,14 @@ October 25, 2024
   - [All genus plots together in one
     figure:](#all-genus-plots-together-in-one-figure)
 - [Genus by time of year](#genus-by-time-of-year)
+  - [Host-parasite ridges](#host-parasite-ridges)
+  - [Nomada](#nomada)
+  - [Stelis](#stelis)
+  - [Sphecodes](#sphecodes)
+  - [Epeolus](#epeolus)
+  - [Triepeolus](#triepeolus)
+  - [Coelioxys](#coelioxys)
+  - [Parasite-host composite](#parasite-host-composite)
 - [Species by time of year](#species-by-time-of-year)
 - [Genera with multiple species by time of
   year](#genera-with-multiple-species-by-time-of-year)
@@ -55,6 +69,24 @@ What is this analysis about?
 
 - 
 
+# Descriptive measures of the dataset
+
+| n         | records |
+|:----------|--------:|
+| specimens |   25441 |
+| species   |     167 |
+| families  |       2 |
+| genera    |      24 |
+
+## Raw species counts by year and site
+
+![](BeeSearch1_files/figure-gfm/raw_species_counts_year_site-1.png)<!-- -->
+
+## Trimmed species counts by year and site
+
+- some morphospecies were excluded
+  ![](BeeSearch1_files/figure-gfm/trimmed_species_counts_year_site-1.png)<!-- -->
+
 # Descriptive measures of genera
 
 ## All sites together
@@ -81,6 +113,26 @@ What is this analysis about?
 
 ![](BeeSearch1_files/figure-gfm/genus_ridgeplot-1.png)<!-- -->
 
+### Host-parasite ridges
+
+![](BeeSearch1_files/figure-gfm/genus_parasite_host-1.png)<!-- -->
+
+### Nomada
+
+### Stelis
+
+### Sphecodes
+
+### Epeolus
+
+### Triepeolus
+
+### Coelioxys
+
+### Parasite-host composite
+
+![](BeeSearch1_files/figure-gfm/parasite_host_composite-1.png)<!-- -->
+
 # Species by time of year
 
 ![](BeeSearch1_files/figure-gfm/species_ridgeplot-1.png)<!-- -->
@@ -106,8 +158,8 @@ net.
 
 | Collection.Method | Male | female | male | sex_ratio |
 |:------------------|-----:|-------:|-----:|----------:|
-| T                 |    2 |  19330 | 1542 |      0.08 |
-| N                 |    0 |   1659 |  406 |      0.24 |
+| T                 |    2 |  21026 | 1724 |      0.08 |
+| N                 |    0 |   1660 |  406 |      0.24 |
 
 - By site:
 
@@ -115,10 +167,10 @@ net.
 |:------------------|:-----|-----:|-------:|-----:|----------:|
 | T                 | SCL  |    2 |   1465 |  314 |      0.21 |
 | N                 | BPF  |    0 |     69 |   94 |      1.36 |
-| N                 | POS  |    0 |   1538 |  255 |      0.17 |
+| N                 | POS  |    0 |   1539 |  255 |      0.17 |
 | N                 | SCL  |    0 |     52 |   57 |      1.10 |
 | T                 | BPF  |    0 |   1332 |  349 |      0.26 |
-| T                 | POS  |    0 |  16533 |  879 |      0.05 |
+| T                 | POS  |    0 |  18229 | 1061 |      0.06 |
 
 ![](BeeSearch1_files/figure-gfm/sex_ratios_by_site-1.png)<!-- --> **Sex
 ratios of bees by site and collection method.** Points above the dashed
@@ -128,12 +180,12 @@ line represent male bias, whereas point below represent female bias.
 
 | Collection.Method | ToY   | Male | female | male | sex_ratio |
 |:------------------|:------|-----:|-------:|-----:|----------:|
-| T                 | mid   |    2 |   7221 |  721 |      0.10 |
+| T                 | mid   |    2 |   8639 |  867 |      0.10 |
 | N                 | early |    0 |    128 |   81 |      0.63 |
-| N                 | late  |    0 |   1084 |  201 |      0.19 |
+| N                 | late  |    0 |   1085 |  201 |      0.19 |
 | N                 | mid   |    0 |    447 |  124 |      0.28 |
 | T                 | early |    0 |   4473 |  380 |      0.08 |
-| T                 | late  |    0 |   7636 |  441 |      0.06 |
+| T                 | late  |    0 |   7914 |  477 |      0.06 |
 
 - By season and site:
 
@@ -143,7 +195,7 @@ line represent male bias, whereas point below represent female bias.
 | N                 | early | BPF  |    0 |     15 |   59 |      3.93 |
 | N                 | early | POS  |    0 |    113 |   22 |      0.19 |
 | N                 | late  | BPF  |    0 |     36 |   24 |      0.67 |
-| N                 | late  | POS  |    0 |   1048 |  175 |      0.17 |
+| N                 | late  | POS  |    0 |   1049 |  175 |      0.17 |
 | N                 | mid   | BPF  |    0 |     18 |   11 |      0.61 |
 | N                 | mid   | POS  |    0 |    377 |   58 |      0.15 |
 | N                 | mid   | SCL  |    0 |     52 |   55 |      1.06 |
@@ -151,10 +203,10 @@ line represent male bias, whereas point below represent female bias.
 | T                 | early | POS  |    0 |   3815 |  193 |      0.05 |
 | T                 | early | SCL  |    0 |    455 |  140 |      0.31 |
 | T                 | late  | BPF  |    0 |    346 |  138 |      0.40 |
-| T                 | late  | POS  |    0 |   6993 |  254 |      0.04 |
+| T                 | late  | POS  |    0 |   7271 |  290 |      0.04 |
 | T                 | late  | SCL  |    0 |    297 |   49 |      0.16 |
 | T                 | mid   | BPF  |    0 |    783 |  164 |      0.21 |
-| T                 | mid   | POS  |    0 |   5725 |  432 |      0.08 |
+| T                 | mid   | POS  |    0 |   7143 |  578 |      0.08 |
 | N                 | late  | SCL  |    0 |      0 |    2 |       Inf |
 
 ![](BeeSearch1_files/figure-gfm/sex_ratios_by_season_and_site-1.png)<!-- -->
@@ -190,7 +242,7 @@ Chao1 minimum species richness is defined non-parametrically as:
 |  chao1 | Site |
 |-------:|:-----|
 |  92.79 | BPF  |
-| 108.46 | POS  |
+| 125.35 | POS  |
 | 104.35 | SCL  |
 
 - Chao indices by site and season
@@ -201,8 +253,8 @@ Chao1 minimum species richness is defined non-parametrically as:
 |  87.00 | BPF  | late   |
 |  81.00 | BPF  | mid    |
 |  78.29 | POS  | early  |
-| 105.50 | POS  | late   |
-|  89.00 | POS  | mid    |
+|  60.50 | POS  | late   |
+| 119.06 | POS  | mid    |
 |  97.79 | SCL  | early  |
 |  56.12 | SCL  | late   |
 |  84.33 | SCL  | mid    |
@@ -216,40 +268,43 @@ sampling effort. Richness across sites converge in the mid-summer.
 
 - Chao indices by station
 
-| chao1 | Station |
-|------:|:--------|
-| 38.40 | BPF1    |
-| 62.17 | BPF2    |
-| 32.90 | BPF3    |
-| 79.00 | BPF4    |
-| 49.00 | BPF5    |
-| 43.10 | BPF6    |
-| 41.07 | BPF7    |
-| 44.50 | BPF8    |
-| 78.57 | POS1    |
-| 18.67 | POS10   |
-| 33.10 | POS11   |
-| 53.12 | POS12   |
-| 36.17 | POS13   |
-| 96.00 | POS2    |
-| 50.90 | POS20   |
-| 50.45 | POS21   |
-| 51.12 | POS22   |
-| 61.25 | POS23   |
-| 53.00 | POS24   |
-| 49.40 | POS25   |
-| 73.14 | POS3    |
-| 50.29 | POS4    |
-| 77.00 | POS5    |
-| 41.90 | POS6    |
-| 35.00 | POS7    |
-| 75.40 | POS8    |
-| 51.12 | POS9    |
-| 87.79 | SCL1    |
-| 84.12 | SCL2    |
-| 58.12 | SCL3    |
-| 74.56 | SCL4    |
-| 32.67 | SCL5    |
+|  chao1 | Station |
+|-------:|:--------|
+|  38.40 | BPF1    |
+|  62.17 | BPF2    |
+|  32.90 | BPF3    |
+|  79.00 | BPF4    |
+|  49.00 | BPF5    |
+|  43.10 | BPF6    |
+|  41.07 | BPF7    |
+|  44.50 | BPF8    |
+|  79.00 | POS1    |
+|  18.67 | POS10   |
+|  33.10 | POS11   |
+|  53.12 | POS12   |
+|  50.10 | POS13   |
+| 101.12 | POS2    |
+|  68.17 | POS20   |
+|  50.45 | POS21   |
+|  51.12 | POS22   |
+|  61.25 | POS23   |
+|  68.00 | POS24   |
+|  49.40 | POS25   |
+|  42.25 | POS26   |
+|  41.40 | POS27   |
+|  26.50 | POS28   |
+|  94.50 | POS3    |
+|  71.33 | POS4    |
+|  77.00 | POS5    |
+|  41.90 | POS6    |
+|  35.00 | POS7    |
+|  75.40 | POS8    |
+|  58.08 | POS9    |
+|  87.79 | SCL1    |
+|  84.12 | SCL2    |
+|  58.12 | SCL3    |
+|  74.56 | SCL4    |
+|  32.67 | SCL5    |
 
 - Chao indices by station and year
 
@@ -274,23 +329,33 @@ sampling effort. Richness across sites converge in the mid-summer.
 |  34.25 | POS12   | 2017 |
 |  39.00 | POS12   | 2019 |
 |  36.17 | POS13   | 2018 |
+|  51.12 | POS13   | 2020 |
+|  32.14 | POS1    | 2014 |
 |  40.00 | POS1    | 2015 |
 |  44.00 | POS1    | 2016 |
 |  64.17 | POS1    | 2019 |
 |  50.90 | POS20   | 2018 |
+|  45.67 | POS20   | 2020 |
 |  50.45 | POS21   | 2019 |
 |  51.12 | POS22   | 2018 |
 |  61.25 | POS23   | 2018 |
 |  53.00 | POS24   | 2018 |
+|  24.50 | POS24   | 2020 |
 |  49.40 | POS25   | 2019 |
+|  42.25 | POS26   | 2020 |
+|  41.40 | POS27   | 2020 |
+|  26.50 | POS28   | 2020 |
+|  31.25 | POS2    | 2014 |
 |  46.08 | POS2    | 2015 |
 |  86.17 | POS2    | 2016 |
 |  41.12 | POS2    | 2019 |
+|  44.17 | POS3    | 2014 |
 |  45.67 | POS3    | 2015 |
 |  45.40 | POS3    | 2016 |
 |  52.00 | POS3    | 2018 |
 |  45.25 | POS4    | 2016 |
 |  40.14 | POS4    | 2018 |
+|  50.07 | POS4    | 2020 |
 |  72.25 | POS5    | 2017 |
 |  56.60 | POS5    | 2019 |
 |  41.00 | POS6    | 2017 |
@@ -300,6 +365,7 @@ sampling effort. Richness across sites converge in the mid-summer.
 |  58.50 | POS8    | 2019 |
 |  86.50 | POS9    | 2017 |
 |  43.50 | POS9    | 2018 |
+|  41.00 | POS9    | 2020 |
 |  48.00 | SCL1    | 2014 |
 |  59.90 | SCL1    | 2015 |
 | 116.67 | SCL1    | 2016 |
@@ -330,7 +396,7 @@ net caught records.
 ![](BeeSearch1_files/figure-gfm/ndms_fig_seasons-1.png)<!-- -->
 **Community composition across time of season.** Strong overlap of
 composition across the early, mid, and late season sampling (PERMANOVA:
-F = 0.71, 0.8). Data include all compatible stations across all years.
+F = 0.7, 0.8). Data include all compatible stations across all years.
 
 ## Across sites
 
@@ -341,11 +407,11 @@ F = 0.71, 0.8). Data include all compatible stations across all years.
     ## 
     ## adonis2(formula = site_matrix ~ Site * Year, data = site_meta, method = "bray")
     ##           Df SumOfSqs      R2      F Pr(>F)    
-    ## Site       2   0.8299 0.06331 2.2719  0.013 *  
-    ## Year       5   2.9453 0.22470 3.2253  0.001 ***
-    ## Site:Year  2   0.5657 0.04316 1.5486  0.092 .  
-    ## Residual  48   8.7667 0.66883                  
-    ## Total     57  13.1076 1.00000                  
+    ## Site       2   0.6636 0.04387 1.7176  0.059 .  
+    ## Year       6   2.9761 0.19677 2.5677  0.001 ***
+    ## Site:Year  3   0.4742 0.03135 0.8182  0.700    
+    ## Residual  57  11.0113 0.72801                  
+    ## Total     68  15.1252 1.00000                  
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
@@ -354,41 +420,41 @@ F = 0.71, 0.8). Data include all compatible stations across all years.
     ## Number of permutations: 999
     ## 
     ## Response: Distances
-    ##           Df  Sum Sq  Mean Sq      F N.Perm Pr(>F)   
-    ## Groups     5 0.25002 0.050004 3.4661    999  0.007 **
-    ## Residuals 52 0.75018 0.014427                        
-    ## ---
-    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ##           Df  Sum Sq  Mean Sq      F N.Perm Pr(>F)
+    ## Groups     6 0.09572 0.015954 0.9434    999  0.465
+    ## Residuals 62 1.04854 0.016912
     ## 
     ## Permutation test for homogeneity of multivariate dispersions
     ## Permutation: free
     ## Number of permutations: 999
     ## 
     ## Response: Distances
-    ##           Df  Sum Sq   Mean Sq      F N.Perm Pr(>F)
-    ## Groups     2 0.01095 0.0054731 0.4431    999  0.647
-    ## Residuals 55 0.67935 0.0123518
+    ##           Df  Sum Sq  Mean Sq      F N.Perm Pr(>F)  
+    ## Groups     2 0.07687 0.038433 3.6875    999  0.036 *
+    ## Residuals 66 0.68788 0.010422                       
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
 ### Site classification by species composition (Random Forest)
 
     ## Random Forest 
     ## 
-    ##  58 samples
-    ## 135 predictors
+    ##  69 samples
+    ## 139 predictors
     ##   3 classes: 'BPF', 'POS', 'SCL' 
     ## 
     ## No pre-processing
     ## Resampling: Bootstrapped (25 reps) 
-    ## Summary of sample sizes: 58, 58, 58, 58, 58, 58, ... 
+    ## Summary of sample sizes: 69, 69, 69, 69, 69, 69, ... 
     ## Resampling results across tuning parameters:
     ## 
     ##   mtry  Accuracy   Kappa    
-    ##     2   0.7361485  0.4947978
-    ##    68   0.8549307  0.7455251
-    ##   135   0.8129852  0.6782722
+    ##     2   0.7159519  0.3210833
+    ##    70   0.8430056  0.6866038
+    ##   139   0.8196204  0.6437746
     ## 
     ## Accuracy was used to select the optimal model using the largest value.
-    ## The final value used for the model was mtry = 68.
+    ## The final value used for the model was mtry = 70.
     ## 
     ## Call:
     ##  randomForest(x = select(rf_matrix, -Year, -Station, -StationYear,      -Site), y = rf_matrix$Site, mtry = 68, importance = T, nPerm = 999,      proximity = T) 
@@ -396,29 +462,29 @@ F = 0.71, 0.8). Data include all compatible stations across all years.
     ##                      Number of trees: 500
     ## No. of variables tried at each split: 68
     ## 
-    ##         OOB estimate of  error rate: 8.62%
+    ##         OOB estimate of  error rate: 17.39%
     ## Confusion matrix:
     ##     BPF POS SCL class.error
-    ## BPF  14   0   0   0.0000000
-    ## POS   0  31   0   0.0000000
-    ## SCL   1   4   8   0.3846154
+    ## BPF  14   0   0  0.00000000
+    ## POS   1  39   2  0.07142857
+    ## SCL   1   8   4  0.69230769
 
 |                          |    BPF |    POS |    SCL | MeanDecreaseAccuracy | MeanDecreaseGini |
 |:-------------------------|-------:|-------:|-------:|---------------------:|-----------------:|
-| Halictus tripartitus     |  7.438 | 10.981 |  4.746 |               11.922 |            3.064 |
-| Agapostemon texanus      | 10.542 |  9.875 | -0.238 |               10.970 |            2.973 |
-| Bombus flavifrons        |  5.807 |  3.277 |  9.846 |                9.770 |            2.092 |
-| Apis mellifera           |  9.637 |  5.771 |  4.844 |                9.699 |            2.021 |
-| Osmia albolateralis      |  5.788 |  7.344 |  4.567 |                8.566 |            2.011 |
-| Bombus fervidus          |  8.918 |  5.311 |  0.558 |                8.414 |            1.825 |
-| Bombus melanopygus       |  7.588 |  2.751 |  3.354 |                7.444 |            1.192 |
-| Melissodes rivalis       |  1.410 |  2.521 | -1.338 |                2.556 |            0.877 |
-| Megachile melanophaea    |  3.913 |  4.211 |  2.409 |                5.375 |            0.868 |
-| Bombus vosnesenskii      |  3.729 |  3.692 | -0.610 |                3.882 |            0.832 |
-| Halictus confusus        |  6.360 |  1.236 |  3.850 |                6.363 |            0.832 |
-| Lasioglossum incompletum |  5.181 |  0.627 | -1.700 |                2.827 |            0.675 |
-| Lasioglossum nevadense   |  1.372 |  1.065 |  3.519 |                3.212 |            0.661 |
-| Melissodes microsticta   |  1.313 |  0.519 |  0.073 |                1.060 |            0.657 |
+| Agapostemon texanus      | 11.486 |  9.579 | -1.120 |               11.428 |            3.318 |
+| Halictus tripartitus     |  9.276 | 11.482 |  4.608 |               13.328 |            3.215 |
+| Bombus fervidus          | 10.738 |  7.271 | -0.529 |               10.628 |            2.524 |
+| Bombus flavifrons        |  5.197 |  3.734 |  8.654 |                9.041 |            1.942 |
+| Apis mellifera           |  9.848 |  1.582 |  2.391 |                8.392 |            1.898 |
+| Osmia albolateralis      |  6.179 |  7.109 |  3.398 |                8.237 |            1.643 |
+| Bombus melanopygus       |  6.806 |  2.788 |  3.198 |                6.840 |            1.083 |
+| Bombus mixtus            | -0.142 |  1.087 |  3.466 |                2.783 |            0.959 |
+| Melissodes rivalis       |  2.925 |  6.249 |  1.367 |                6.164 |            0.924 |
+| Halictus confusus        |  7.193 |  2.092 |  2.976 |                7.244 |            0.897 |
+| Lasioglossum incompletum |  4.583 |  1.450 | -0.100 |                3.643 |            0.878 |
+| Agapostemon virescens    |  3.822 |  5.569 |  0.876 |                6.377 |            0.833 |
+| Bombus vosnesenskii      |  2.833 |  2.200 |  0.576 |                3.116 |            0.803 |
+| Lasioglossum nevadense   |  1.004 |  0.496 |  3.511 |                2.992 |            0.672 |
 
 ![](BeeSearch1_files/figure-gfm/random_forest_sites-1.png)<!-- -->
 
@@ -426,8 +492,8 @@ F = 0.71, 0.8). Data include all compatible stations across all years.
 model was tuned without pre-processing. Bootstrapped resampling used 25
 replicates. Overall model accuracy was 82%. The model clearly delineated
 the BPF sites with 0.0 class error. Similarly, POS sites were near
-perfect with 0.032 class error. However, the SCL sites were less
-accurately classified (0.385 class error), with (5/13) identified as
+perfect with 0.024 class error. However, the SCL sites were less
+accurately classified (0.846 class error), with (10/13) identified as
 POS. This lends further support to the NMDS figure below, species
 composition is very similar across SCL and POS, but BPF sites have
 different community composition compared to the other two sites.
@@ -456,7 +522,7 @@ importance score (mean decrease in Gini score).
 ![](BeeSearch1_files/figure-gfm/nmds_all_year-1.png)<!-- --> **Community
 composition across years.** Most years have strong overlap of
 composition but the *year* term is highly significant (PERMANOVA: F =
-3.23, *P* = 0.001). However, the only site in 2014 is SCL and the 2018
+2.57, *P* = 0.001). However, the only site in 2014 is SCL and the 2018
 and 2019 years are heavily influenced by the BPF data. Essentially, the
 information in *years* is not sufficiently distinct from the information
 in *sites* and including *year* in the model is not informative. This is
@@ -472,9 +538,9 @@ dispersions for the *year* term but not the *site* term.
     ## 
     ## adonis2(formula = nmds2017dist ~ meta2017$ToY, method = "bray")
     ##              Df SumOfSqs      R2      F Pr(>F)  
-    ## meta2017$ToY  2   0.7260 0.11645 1.3839  0.057 .
-    ## Residual     21   5.5083 0.88355                
-    ## Total        23   6.2343 1.00000                
+    ## meta2017$ToY  2   0.8053 0.12678 1.5245  0.031 *
+    ## Residual     21   5.5465 0.87322                
+    ## Total        23   6.3518 1.00000                
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
@@ -483,9 +549,9 @@ dispersions for the *year* term but not the *site* term.
     ## Number of permutations: 999
     ## 
     ## Response: Distances
-    ##           Df   Sum Sq   Mean Sq     F N.Perm Pr(>F)  
-    ## Groups     2 0.013242 0.0066209 2.896    999  0.083 .
-    ## Residuals 21 0.048010 0.0022862                      
+    ##           Df   Sum Sq   Mean Sq      F N.Perm Pr(>F)  
+    ## Groups     2 0.014458 0.0072291 3.4619    999  0.061 .
+    ## Residuals 21 0.043852 0.0020882                       
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
 
