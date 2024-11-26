@@ -1,0 +1,327 @@
+---
+title: "BeeSearch Multivariate Analyses"
+author: "Dr. Riley M. Anderson"
+date: '`r format(Sys.Date(), "%B %d, %Y")`'
+graphics: yes
+output:
+  github_document:
+    toc: yes
+    toc_depth: 5
+    pandoc_args: --webtex
+  html_document:
+    keep_md: yes
+    theme: readable
+    mathjax: default
+  html_notebook:
+    code_folding: hide
+    theme: readable
+    mathjax: default
+  pdf_document:
+    toc: yes
+header-includes:
+  \usepackage{float}
+  \floatplacement{figure}{H}
+editor_options:
+  chunk_output_type: console
+---
+
+```{r setup, include = F}
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@ Knitr Options
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+# Set root directory to the project directory
+knitr::opts_knit$set(root.dir = rprojroot::find_rstudio_root_file())
+
+
+# Set default knitr options: 
+# Suppress warnings and messages, cache chunks, 
+#  set default figure size to 6x8 at 300 dpi, and save a png and pdf
+knitr::opts_chunk$set(warning = F, message = F, collapse = T, cache = F,
+    fig.height = 6, fig.width = 8, dpi = 300, # 6x8" @ 300dpi:1800x2400=4.3MP
+    dev = c('png', 'pdf'), dev.args = list(pdf = list(onefile = F)))
+
+```
+
+
+
+## Overview
+
+What is this analysis about?
+
+### Summary of Results
+* 
+
+```{r Main_Code, include = F, cache = F}
+
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@ Setup - This code is run, but output is hidden
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+# Load Packages
+library(tidyverse) # Needed for data wrangling: dplyr, tidyr, ggplot2
+library(cowplot) # Needed for publication-quality ggplots
+library(vegan)
+library(randomForest)
+library(caret)
+library(knitr)
+
+
+
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+# @@@@@ Data Preparation
+# @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+# Import datasets
+dat1 <- read.csv("data/CABS1.csv")
+
+####################################
+
+###################################
+###################
+# color palette
+c24 <- c(
+  "maroon", "#E31A1C", "green4", "#6A3D9A",
+  "#FF7F00", "gold1", "mediumpurple1","skyblue2", "#FB9A99",
+  "palegreen2", "#CAB2D6", "#FDBF6F", "gray70", "khaki2",
+  "dodgerblue2", "orchid1", "deeppink1", "blue1", "steelblue4",
+  "darkturquoise", "green1", "yellow4", "yellow3", "darkorange4"
+)
+
+
+```
+
+
+```{r Data_Wrangling, echo = F, comment = ""}
+
+# general cleaning and conversion:
+dat1 <- dat1 %>% 
+  uncount(Count) %>% 
+  mutate(across(c(Station : Sex, Site), as.factor), # convert to factors
+         Date = ymd(Label.Date), # Convert to date
+         Year = year(Date), # Create year column
+         Month = month(Date), # create month column
+         # JD --- Day of year (julian day)
+         JD = yday(Date),
+         # ToY --- Time of Year
+         ToY = case_when(JD < 135 ~ "early",
+                         JD > 205 ~ "late",
+                         TRUE ~ "mid"),
+         # Create a station/year column for grouping
+         StationYear = paste(Station, Year, sep = "_")) %>% 
+  filter(Station != "",
+         Site != "") %>% # remove empty station & site records
+  # convert M/F to male/female to avoid "F = FALSE" misinterpretation
+  mutate(Sex = case_when(
+      Sex == "M" ~ "male",
+      Sex == "F" ~ "female",
+      TRUE ~ NA_character_ # Handle any unexpected values
+    )) %>% 
+  # correct misidentification record
+  mutate(Short.label.name = case_when(
+    Short.label.name == "Megachile apicalis" ~ "Megachile rotundata",
+    TRUE ~ as.character(Short.label.name)
+  )) %>% 
+  # correct misindentification sex classification
+  mutate(Sex = case_when(
+    Unique.Specimen.Number == 678 |
+      Unique.Specimen.Number == 679 ~ "Male",
+    TRUE ~ as.character(Sex)
+  ))
+
+
+# keep the single record of morphospecies "Hylaeus sp. 2023_1"
+keep.Hylaeus <- dat1 %>% 
+  filter(str_detect(Short.label.name, "Hylaeus sp. 2023"))
+
+# remove any records where species is undetermined:
+dat2 <- dat1 %>% 
+  filter(!str_detect(Short.label.name, "(?<!m)sp\\."),
+         !str_detect(Short.label.name, "(?<!m)msp\\.")) %>% 
+  bind_rows(keep.Hylaeus)
+
+
+```
+
+
+## Across sites
+```{r nmds_all_sites_prep_and_tests, echo = F}
+
+#####################################################
+# matrix assembly
+site_matrix <- dat2 %>% 
+  filter(Collection.Method == "T") %>% 
+  group_by(Short.label.name, StationYear) %>% 
+  tally(n = "count") %>% 
+  pivot_wider(names_from = Short.label.name,
+              values_from = count,
+              values_fill = list(count = 0)) %>% 
+  column_to_rownames("StationYear")
+
+site_meta <- dat2 %>% 
+  filter(Collection.Method == "T") %>% 
+  select(Site, Station, StationYear, Year) %>% 
+  distinct()
+#####################################################
+
+
+
+#############################################################
+# Stats
+site.year.mod <- adonis2(site_matrix ~ Site * Year,
+        data = site_meta, method = "bray")
+
+site.year.mod
+
+permutest(betadisper(vegdist(site_matrix, method = "bray"),
+                     site_meta$Year))
+
+permutest(betadisper(vegdist(site_matrix, method = "bray"),
+                     site_meta$Site))
+
+```
+
+
+```{r nmds_sites_calcs, eval = T, include = F}
+# NMDS scores
+nmds_SSY <- metaMDS(site_matrix, distance = "bray",
+                    k = 3, try = 250, autotransform = F)
+nmds_SSY$stress
+# 
+# stressplot(nmds_SSY)
+
+site_scores <- data.frame(scores(nmds_SSY)$sites) %>%
+  rownames_to_column("StationYear") %>% 
+  left_join(site_meta, by = "StationYear") %>%
+  unite(SiteYear, c("Site", "Year"), sep = "_", remove = F) %>% 
+  mutate(across(c(SiteYear:Year), as.factor)) %>% 
+  filter(Site != "") %>% 
+  droplevels()
+
+spp_scores <- data.frame(scores(nmds_SSY)$species) %>% 
+  rownames_to_column("Species")
+
+centroids_SSY <- site_scores %>% 
+  group_by(SiteYear) %>% 
+  summarise(NMDS1 = mean(NMDS1),
+            NMDS2 = mean(NMDS2))
+
+centroids_site <- site_scores %>% 
+  group_by(Site) %>% 
+  summarise(NMDS1 = mean(NMDS1),
+            NMDS2 = mean(NMDS2))
+
+centroids_year <- site_scores %>% 
+  group_by(Year) %>% 
+  summarise(NMDS1 = mean(NMDS1),
+            NMDS2 = mean(NMDS2))
+```
+
+### Site classification by species composition (Random Forest)
+```{r random_forest_sites, echo = F}
+
+rf_matrix <- site_matrix %>% 
+  rownames_to_column("StationYear") %>% 
+  separate_wider_delim(StationYear, delim = "_",
+                       cols_remove = F,
+                       names = c("Station", "Year")) %>% 
+  separate_wider_position(Station,
+                          widths = c(Site = 3, 3, StationID = 2),
+                          cols_remove = F,
+                          too_few = "debug") %>% 
+  select(-StationID, -Station_width,
+         -Station_remainder, -Station_ok) %>% 
+  mutate(across(c(Site:StationYear), as.factor))
+
+rfmod_site <- randomForest(y = rf_matrix$Site,
+                           x = select(rf_matrix,
+                                      -Year, -Station,
+                                      -StationYear, -Site),
+                           importance = T, nPerm = 999,
+                           proximity = T)
+
+
+train(y = rf_matrix$Site,
+      x = select(rf_matrix,
+                 -Year, -Station,
+                 -StationYear, -Site),
+      method = "rf", na.action = na.omit)
+
+update(rfmod_site, mtry = 55)
+
+
+imp_vals_top <- data.frame(importance(rfmod_site)) %>% 
+  arrange(desc(MeanDecreaseGini)) %>% 
+  filter(MeanDecreaseGini > quantile(MeanDecreaseGini, 0.9))
+
+kable(imp_vals_top, format = "markdown", digits = 3)
+
+
+dat2 %>% filter(Short.label.name == "Agapostemon texanus") %>%
+  group_by(Site, StationYear) %>% tally() %>% 
+  group_by(Site) %>% 
+  summarise(mean = mean(n))
+
+MDSplot(rfmod_site, rf_matrix$Site)
+```
+
+**Random Forest classification of site by species composition.** The model was tuned without pre-processing. Bootstrapped resampling used 25 replicates. The model was built with 500 trees and model tuning maximized accuracy at 55 variables/split. Overall model accuracy was 82%. Out of bag estimate of error rate was 16.7%. This lends further support to the NMDS figure below, species composition is very similar across SCL and POS, but BPF sites have different community composition compared to the other two sites. 
+
+The table above shows the species most representative of the community differences used to make the above classifications. These species are the top 10th percentile of ranked variable importance (mean decrease in Gini score, a measure of the total decrease in node impurities from splitting on the variable, averaged over all trees).
+
+
+### NMDS by Site figure (include this)
+```{r nmds_all_sites_year, echo = F}
+
+imp_spp <- imp_vals_top %>% 
+  rownames_to_column("Species") %>% 
+  select(Species, MeanDecreaseGini)
+
+spp_scores <- right_join(spp_scores, imp_spp, by = "Species")
+
+site_scores %>% 
+  ggplot(aes(x = NMDS1, y = NMDS2)) +
+  geom_point(aes(NMDS1, NMDS2, color = Site),
+             size = 1) +
+  stat_ellipse(aes(color = Site),
+               show.legend = F) +
+  geom_point(data = centroids_site,
+             aes(x = NMDS1, y = NMDS2, fill = Site),
+             size = 4,
+             shape = 21, show.legend = F) +
+  theme_cowplot() +
+  ggrepel::geom_text_repel(data = spp_scores,
+                           aes(x = NMDS1, y = NMDS2,
+                               label = Species,
+                               size = MeanDecreaseGini),
+                           max.overlaps = 20) +
+  scale_size_continuous(
+    name = "      Mean\ndecrease Gini",
+    limits = c(.4, 3),
+    breaks = c(0.75, 2, 3),
+    range = c(1, 6)) +
+  guides(color = guide_legend(override.aes = list(size = 4, shape = 16))) +
+  scale_color_manual(values = c("#E69F00", "#56B4E9", "#009E73"))+
+  scale_fill_manual(values = c("#E69F00", "#56B4E9", "#009E73"))
+
+
+
+
+```
+**Variation in community composition across sites.** Bee species are plotted on the first two axes of a three-dimensional non-metric multidimensional scaling ordination of the 58 combinations of station (subsite) and year, across the three sites. Small points are the individual station/year combinations. Large points are the centroids of the three sites. Ellipses are 95% confidence intervals around the site centroids.  Bees species shown are the most representative (top 10th percentile of a random forest analysis) of the compositional differences among sites. Text size of the labels is proportional to variable importance score (mean decrease in Gini score).
+
+
+
+
+
+## Session Information
+
+```{r Session_Info, echo = F, comment = ""}
+
+# Add session information to help with reproduceability
+sessionInfo()
+
+
+```
+
+
