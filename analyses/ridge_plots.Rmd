@@ -247,7 +247,8 @@ dat_ridges %>%
   geom_density_ridges(aes(height = stat(density)),
                       scale = 5,
                       rel_min_height = 0.01,
-                      stat = "density") +
+                      stat = "density",
+                      bw = "bcv") +
   theme_ridges(grid = F) +
   scale_fill_manual(values = color_mapping) +
   theme(legend.position = "none") +

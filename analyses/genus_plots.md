@@ -1,7 +1,7 @@
 BeeSearch genus plots
 ================
 Dr. Riley M. Anderson
-October 29, 2024
+November 26, 2024
 
   
 
@@ -13,6 +13,13 @@ October 29, 2024
   - [BPF](#bpf)
   - [All genus plots together in one
     figure:](#all-genus-plots-together-in-one-figure)
+  - [All sites together (trap and net
+    records)](#all-sites-together-trap-and-net-records)
+  - [All sites together (net records
+    only)](#all-sites-together-net-records-only)
+  - [Genus Trap and Net, And Net Only](#genus-trap-and-net-and-net-only)
+  - [Genus Trap only and Net only](#genus-trap-only-and-net-only)
+  - [All Genus plots](#all-genus-plots)
   - [Session Information](#session-information)
 
 ## Overview
@@ -41,6 +48,44 @@ proportional abundance of each genus.
 ## All genus plots together in one figure:
 
 ![](genus_plots_files/figure-gfm/genus_plot_one_fig-1.png)<!-- -->
+
+**Proportional abundance and unique species** A) All sites collectively,
+B) POS, C) SCL, and D) BPF. Data are from trap collected records and
+exclude all net caught records. Data are pooled across years.
+
+## All sites together (trap and net records)
+
+![](genus_plots_files/figure-gfm/genera_figs_all_sites_trap_net-1.png)<!-- -->
+
+## All sites together (net records only)
+
+![](genus_plots_files/figure-gfm/genera_figs_all_sites_nets-1.png)<!-- -->
+
+## Genus Trap and Net, And Net Only
+
+![](genus_plots_files/figure-gfm/trapnet_and_net-1.png)<!-- -->
+
+**Proportional abundance and unique species** for A) all net and trap
+caught records and B) net caught records only. Data combine records
+across all sites and years.
+
+## Genus Trap only and Net only
+
+![](genus_plots_files/figure-gfm/trap_and_net-1.png)<!-- -->
+
+**Proportional abundance and unique species** for A) trap caught records
+and B) net caught records. Data combine records across all sites and
+years.
+
+## All Genus plots
+
+![](genus_plots_files/figure-gfm/all_plots-1.png)<!-- -->
+
+**Proportional abundance and unique species for all genera.** A) trap
+caught records pooled across all sites and years, B) trap records from
+POS, C) trap records from SCL, D) trap records from BPF, E) trap and net
+caught records pooled across all sites and years, and F) all net caught
+records pooled across sites and years.
 
 ## Session Information
 
