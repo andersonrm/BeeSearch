@@ -15,6 +15,7 @@ November 27, 2024
   - [Parasite-host composite (3 bad
     combos)](#parasite-host-composite-3-bad-combos)
 - [Species by time of year](#species-by-time-of-year)
+- [Phenology by phylogeny](#phenology-by-phylogeny)
   - [Session Information](#session-information)
 
 ## Overview
@@ -93,6 +94,10 @@ the right are the total number of records for each species. Species
 displayed are those for which sample sizes were
 ![\ge](https://latex.codecogs.com/png.latex?%5Cge "\ge") 20. Vertical
 dashed lines correspond to 21 March, 21 June, and 21 September.
+
+# Phenology by phylogeny
+
+![](ridge_plots_files/figure-gfm/genus_phylogeny_phenology-1.png)<!-- -->
 
 ## Session Information
 

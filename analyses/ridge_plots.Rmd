@@ -140,6 +140,19 @@ genus.props <- dat1 %>%
 
 genus <- left_join(genus.counts, genus.props, by = "Genus")
 
+
+
+genus <- genus %>% 
+  mutate(family = factor(c(
+    "Halictidae", "Andrenidae", "Megachilidae", "Apidae",
+    "Apidae", "Apidae", "Apidae", "Megachilidae", "Colletidae",
+    "Apidae", "Apidae", "Halictidae", "Megachilidae", "Megachilidae",
+    "Colletidae", "Halictidae", "Megachilidae", "Apidae", "Apidae",
+    "Megachilidae", "Andrenidae", "Halictidae", "Megachilidae",
+    "Apidae"
+  )))
+
+
 ###################
 # color palette
 c24 <- c(
@@ -159,6 +172,11 @@ color_mapping <- setNames(c24, genus_levels)
 
 # Genus by time of year
 ```{r genus_ridgeplot, echo = F}
+
+dat1 <- dat1 %>% select(-Family)
+
+families <- genus %>% select(Genus, family)
+dat1 <- left_join(dat1, families, by = "Genus")
 
 genus_records <- dat1 %>% 
   group_by(Genus) %>% 
@@ -217,6 +235,9 @@ dat_ridges %>%
            size = 5) +
   geom_text(data = genus_records, aes(x = 43, y = Genus,
                                       label = n), size = 3)
+
+
+
 
 
 ```
@@ -701,6 +722,48 @@ dat_ridges_species %>%
 ```
 
 **Species-level seasonal distributions.** Density is estimated uniformly across all species with Silverman's method. Sample sizes displayed on the right are the total number of records for each species. Species displayed are those for which sample sizes were $\ge$ 20. Vertical dashed lines correspond to 21 March, 21 June, and 21 September.
+
+# Phenology by phylogeny
+```{r genus_phylogeny_phenology, echo = F}
+genus <- genus %>% 
+  arrange(desc(family))
+
+level_order_fam <- genus$Genus
+
+dat_ridges %>% 
+  ggplot(aes(x = week,
+             y = factor(Genus, level = level_order_fam),
+             fill = family)) +
+  geom_density_ridges(aes(height = stat(density)),
+                      scale = 5,
+                      rel_min_height = 0.01,
+                      stat = "density",
+                      bw = "bcv") +
+  theme_ridges(grid = F) +
+  scale_x_continuous(breaks = c(10, 20, 30, 40),
+                     labels = c("3 March", "15 May",
+                                "24 July", "3 October")) +
+  labs(x = "", y = "", fill = "Family") +
+  geom_vline(xintercept = 12.6,
+             color = "grey50", linetype = "dashed") +
+  geom_vline(xintercept = 25.3,
+             color = "grey50", linetype = "dashed") +
+  geom_vline(xintercept = 38.4,
+             color = "grey50", linetype = "dashed") +
+  annotate(geom = "text", x = 7, y = 26, label = " ") +
+  annotate(geom = "text", x = 9, y = 24, label = "Winter",
+           size = 5) +
+  annotate(geom = "text", x = 18, y = 24, label = "Spring",
+           size = 5) +
+  annotate(geom = "text", x = 32, y = 24, label = "Summer",
+           size = 5) +
+  annotate(geom = "text", x = 41, y = 24, label = "Fall",
+           size = 5) 
+
+
+```
+
+
 
 ## Session Information
 
