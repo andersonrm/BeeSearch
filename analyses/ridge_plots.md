@@ -1,7 +1,7 @@
 BeeSearch ridge plots
 ================
 Dr. Riley M. Anderson
-November 19, 2024
+November 27, 2024
 
   
 
@@ -10,6 +10,10 @@ November 19, 2024
 - [Genus by time of year](#genus-by-time-of-year)
   - [Host-parasite ridges](#host-parasite-ridges)
   - [Parasite-host composite](#parasite-host-composite)
+  - [Parasite-host composite (3 good
+    combos)](#parasite-host-composite-3-good-combos)
+  - [Parasite-host composite (3 bad
+    combos)](#parasite-host-composite-3-bad-combos)
 - [Species by time of year](#species-by-time-of-year)
   - [Session Information](#session-information)
 
@@ -18,29 +22,77 @@ November 19, 2024
 This analysis compares the abundance of genera and species throughout
 the season. All analyses use the full data set. That is, counts of each
 species at each time point are the cumulative sum of all sites and all
-years.
+years. Records also include net caught specimens and all morphospecies.
 
 ### Summary of Results
 
-18 genera had \>= 20 records and these genera are shown for the genus
-level plot. Additional plots for parasite-host combinations are shown
-without any record cut-off. Sample size is included in each plot.
+19 genera had ![\ge](https://latex.codecogs.com/png.latex?%5Cge "\ge")
+20 records and these genera are shown for the genus level plot.
+Additional plots for parasite-host combinations are shown without any
+record cut-off. Sample size is included in each plot.
 
 # Genus by time of year
 
 ![](ridge_plots_files/figure-gfm/genus_ridgeplot-1.png)<!-- -->
 
-### Host-parasite ridges
+**Genus-level seasonal distributions.** Density is estimated at the
+genus level with Scott’s method for genera presumed univoltine, while
+biased cross validation was used for genera presumed multivoltine.
+Sample sizes displayed on the right are the total number of records for
+each genera. Vertical dashed lines correspond to 21 March, 21 June, and
+21 September.
 
-![](ridge_plots_files/figure-gfm/genus_parasite_host-1.png)<!-- -->
+### Host-parasite ridges
 
 ### Parasite-host composite
 
 ![](ridge_plots_files/figure-gfm/parasite_host_composite-1.png)<!-- -->
 
+**Genus-level seasonal distributions** for the parasites: A) Nomada, B)
+Stelis, C) Sphecodes, D) Epeolus, E) Triepeolus, and F) Coelioxys.
+Beneath each parasite genera are the presumed host genera. Density is
+estimated at the genus level with Scott’s method for genera presumed
+univoltine, while biased cross validation was used for genera presumed
+multivoltine. Sample sizes displayed on the right (plots A, C, E) and
+left (plots B, D, F) are the total number of records for each genera.
+Vertical dashed lines correspond to 21 March, 21 June, and 21 September.
+
+### Parasite-host composite (3 good combos)
+
+![](ridge_plots_files/figure-gfm/para_host_composite_3-1.png)<!-- -->
+
+**Genus-level seasonal distributions** for the parasites: A) Nomada, B)
+Sphecodes, and C) Coelioxys. Beneath each parasite genera are the
+presumed host genera. Density is estimated at the genus level with
+Scott’s method for genera presumed univoltine, while biased cross
+validation was used for genera presumed multivoltine. Sample sizes
+displayed on the right are the total number of records for each genera.
+Vertical dashed lines correspond to 21 March, 21 June, and 21 September.
+
+### Parasite-host composite (3 bad combos)
+
+![](ridge_plots_files/figure-gfm/parasite_host_composite_3_bad-1.png)<!-- -->
+
+**Genus-level seasonal distributions** for the parasites: A) Stelis, B)
+Epeolus, and C) Triepeolus. Beneath each parasite genera are the
+presumed host genera. Density is estimated at the genus level with
+Scott’s method for genera presumed univoltine, while biased cross
+validation was used for genera presumed multivoltine. Sample sizes
+displayed on the right are the total number of records for each genera.
+Vertical dashed lines correspond to 21 March, 21 June, and 21 September.
+These parasites have low sample sizes limiting distributional
+estimation.
+
 # Species by time of year
 
 ![](ridge_plots_files/figure-gfm/species_ridgeplot-1.png)<!-- -->
+
+**Species-level seasonal distributions.** Density is estimated uniformly
+across all species with Silverman’s method. Sample sizes displayed on
+the right are the total number of records for each species. Species
+displayed are those for which sample sizes were
+![\ge](https://latex.codecogs.com/png.latex?%5Cge "\ge") 20. Vertical
+dashed lines correspond to 21 March, 21 June, and 21 September.
 
 ## Session Information
 
