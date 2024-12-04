@@ -669,7 +669,10 @@ plot_grid(stelis2, epeolus2, triepeolus,
 # Species by time of year
 ```{r species_ridgeplot, echo = F, fig.height = 10}
 
-more_than_20 <- dat1 %>% group_by(Short.label.name) %>% 
+more_than_20 <- dat1 %>%
+  filter(!str_detect(Short.label.name, "(?<!m)sp\\."),
+         !str_detect(Short.label.name, "(?<!m)msp\\.")) %>% 
+  group_by(Short.label.name) %>% 
   tally() %>% 
   filter(n > 20)
 
@@ -707,11 +710,11 @@ dat_ridges_species %>%
              color = "grey50", linetype = "dashed") +
   geom_vline(xintercept = 38.4,
              color = "grey50", linetype = "dashed") +
-  annotate(geom = "text", x = 7, y = 54, label = " ") +
-  annotate(geom = "text", x = 8, y = 52, label = "Winter") +
-  annotate(geom = "text", x = 20, y = 52, label = "Spring") +
-  annotate(geom = "text", x = 32, y = 52, label = "Summer") +
-  annotate(geom = "text", x = 42, y = 52, label = "Fall") +
+  annotate(geom = "text", x = 7, y = 52, label = " ") +
+  annotate(geom = "text", x = 8, y = 50, label = "Winter") +
+  annotate(geom = "text", x = 20, y = 50, label = "Spring") +
+  annotate(geom = "text", x = 32, y = 50, label = "Summer") +
+  annotate(geom = "text", x = 42, y = 50, label = "Fall") +
   geom_text(data = more_than_20, aes(x = 43, y = Short.label.name,
                                      label = n), size = 3)
 
