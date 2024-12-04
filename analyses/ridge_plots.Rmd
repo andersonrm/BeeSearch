@@ -290,7 +290,7 @@ nomada <- dat_ridges_parasite %>%
                       scale = 3, 
                       rel_min_height = 0.01,
                       stat = "density",
-                      bw = "nrd") +
+                      bw = "bcv") +
   theme_ridges(grid = F) +
   scale_fill_manual(values = color_mapping) +
   theme(legend.position = "none") +
@@ -471,7 +471,7 @@ epeolus <- dat_ridges_parasite %>%
   annotate(geom = "text", x = 41, y = 7, label = "Fall") +
   geom_text(data = filter(parasite_records,
                           Genus == "Epeolus" | Genus == "Colletes"),
-            aes(x = 11, y = Genus, label = n), size = 3) +
+            aes(x = 17, y = Genus, label = n), size = 3) +
   scale_y_discrete(position = "right")
 
 ###############################################3
@@ -519,11 +519,8 @@ triepeolus <- dat_ridges_parasite %>%
              y = factor(Genus, level = c("Melissodes",
                                          "Triepeolus")),
              fill = Genus)) +
-  geom_density_ridges(aes(height = stat(density)),
-                      scale = 3, 
-                      rel_min_height = 0.01,
-                      stat = "density",
-                      bw = "nrd0") +
+  geom_density_ridges(scale = 2, 
+                      rel_min_height = 0.01) +
   theme_ridges(grid = F) +
   scale_fill_manual(values = color_mapping) +
   theme(legend.position = "none") +
@@ -537,15 +534,15 @@ triepeolus <- dat_ridges_parasite %>%
              color = "grey50", linetype = "dashed") +
   geom_vline(xintercept = 38.4,
              color = "grey50", linetype = "dashed") +
-  annotate(geom = "text", x = 7, y = 5, label = " ") +
-  annotate(geom = "text", x = 9.5, y = 4.5, label = "Winter") +
+  annotate(geom = "text", x = 6, y = 5, label = " ") +
+  annotate(geom = "text", x = 7, y = 4.5, label = "Winter") +
   annotate(geom = "text", x = 18, y = 4.5, label = "Spring") +
   annotate(geom = "text", x = 32, y = 4.5, label = "Summer") +
-  annotate(geom = "text", x = 45, y = 4.5, label = "Fall") +
+  annotate(geom = "text", x = 48, y = 4.5, label = "Fall") +
   geom_text(data = filter(parasite_records,
                           Genus == "Triepeolus" |
                           Genus == "Melissodes"),
-            aes(x = 50, y = c(1, 1.8), label = n), size = 3)
+            aes(x = 50, y = c(.7, 1.8), label = n), size = 3)
 
 
 
