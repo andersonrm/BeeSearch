@@ -155,9 +155,10 @@ dat1 <- dat1 %>%
 keep.Hylaeus <- dat1 %>% 
   filter(str_detect(Short.label.name, "Hylaeus sp. 2023"))
 
-# remove any records where species is undetermined:
+# remove any records where species is undetermined & remove all morphospecies
 dat2 <- dat1 %>% 
-  filter(!str_detect(Short.label.name, "(?<!m)sp\\.")) %>% 
+  filter(!str_detect(Short.label.name, "(?<!m)sp\\."),
+         !str_detect(Short.label.name, "(?<!m)msp\\.")) %>% 
   bind_rows(keep.Hylaeus)
 
 keep.Sphecodes <- dat2 %>% filter(Genus == "Sphecodes") %>%
@@ -179,18 +180,7 @@ keep.Nomada <- dat2 %>% filter(Genus == "Nomada") %>%
            n >= 10)
 
 
-dat2 %>% select(Genus, Short.label.name) %>% 
-  filter(str_detect(Short.label.name, "(?<!m)msp\\.")) %>% 
-  group_by(Short.label.name) %>% tally() %>% print(n = 35)
-# Filter out certain morphospecies that could inflate richness
-dat.ex.msp <- dat2 %>% 
-  filter(!(Sex == "male" & str_detect(Short.label.name,
-                                    "Sphecodes msp\\.")),
-         !(Sex == "female" & str_detect(Short.label.name,
-                                       "Osmia msp\\.")),
-         !(Sex == "female" & str_detect(Short.label.name,
-                                        "Nomada msp\\.")))
-# ^^^ this data will be used for analyses involving species counts
+
 
 ```
 
@@ -200,12 +190,12 @@ dat.ex.msp <- dat2 %>%
 ######################################################
 ## Descriptive metrics
 
-total_bees <- dat.ex.msp %>% 
+total_bees <- dat1 %>% 
   group_by(Site) %>% 
   select(Short.label.name) %>% 
   tally(name = "total")
 
-honey_bees <- dat.ex.msp %>% 
+honey_bees <- dat1 %>% 
   filter(Short.label.name == "Apis mellifera") %>% 
   group_by(Site) %>% 
   select(Short.label.name) %>% 
@@ -228,7 +218,7 @@ kable(honey_bees, format = "markdown", digits = 2)
 
 ```{r SAC_prep_trap_only, echo = F}
 ### ALL SITES
-sac_all <- dat.ex.msp %>% 
+sac_all <- dat2 %>% 
   filter(Collection.Method == "T") %>% 
   mutate(StationYear = factor(StationYear)) %>% 
   group_by(StationYear, Short.label.name) %>% 
@@ -238,11 +228,13 @@ sac_all <- dat.ex.msp %>%
               values_fill = list(count = 0)) %>% 
   column_to_rownames("StationYear")
 
-sac_all_list <- specaccum(sac_all, method = "random", permutations = 100,
-          conditioned = T, gamma = "jack1")
+sac_all_list <- specaccum(sac_all, method = "random",
+                          permutations = 100,
+                          conditioned = T,
+                          gamma = "jack1")
 
 ### POS
-sac_pos <- dat.ex.msp %>% 
+sac_pos <- dat2 %>% 
   filter(Collection.Method == "T",
          Site == "POS") %>% 
   mutate(StationYear = factor(StationYear)) %>% 
@@ -253,11 +245,13 @@ sac_pos <- dat.ex.msp %>%
               values_fill = list(count = 0)) %>% 
   column_to_rownames("StationYear")
 
-sac_pos_list <- specaccum(sac_pos, method = "random", permutations = 100,
-                          conditioned = T, gamma = "jack1")
+sac_pos_list <- specaccum(sac_pos, method = "random",
+                          permutations = 100,
+                          conditioned = T,
+                          gamma = "jack1")
 
 #### SCL
-sac_scl <- dat.ex.msp %>% 
+sac_scl <- dat2 %>% 
   filter(Collection.Method == "T",
          Site == "SCL") %>% 
   mutate(StationYear = factor(StationYear)) %>% 
@@ -268,11 +262,13 @@ sac_scl <- dat.ex.msp %>%
               values_fill = list(count = 0)) %>% 
   column_to_rownames("StationYear")
 
-sac_scl_list <- specaccum(sac_scl, method = "random", permutations = 100,
-                          conditioned = T, gamma = "jack1")
+sac_scl_list <- specaccum(sac_scl, method = "random",
+                          permutations = 100,
+                          conditioned = T,
+                          gamma = "jack1")
 
 ### BPF
-sac_bpf <- dat.ex.msp %>% 
+sac_bpf <- dat2 %>% 
   filter(Collection.Method == "T",
          Site == "BPF") %>% 
   mutate(StationYear = factor(StationYear)) %>% 
@@ -283,33 +279,43 @@ sac_bpf <- dat.ex.msp %>%
               values_fill = list(count = 0)) %>% 
   column_to_rownames("StationYear")
 
-sac_bpf_list <- specaccum(sac_bpf, method = "random", permutations = 100,
-                          conditioned = T, gamma = "jack1")
+sac_bpf_list <- specaccum(sac_bpf, method = "random",
+                          permutations = 100,
+                          conditioned = T,
+                          gamma = "jack1")
 
 # Results
 sac_all_result <- data.frame(site = "All Sites",
-                             nsamples = seq(1,58, 1),
+                             nsamples = seq(1,
+                                 nrow(data.frame(sac_all_list[3])),
+                                            1),
                              richness = sac_all_list[4],
                              sd = sac_all_list[5]) %>% 
   mutate(lower = richness - 1.96*sd,
          upper = richness + 1.96*sd)
 
 sac_pos_result <- data.frame(site = "POS",
-                             nsamples = seq(1,31, 1),
+                             nsamples = seq(1,
+                                    nrow(data.frame(sac_pos_list[3])),
+                                            1),
                              richness = sac_pos_list[4],
                              sd = sac_pos_list[5]) %>% 
   mutate(lower = richness - 1.96*sd,
          upper = richness + 1.96*sd)
 
 sac_scl_result <- data.frame(site = "SCL",
-                             nsamples = seq(1,13, 1),
+                             nsamples = seq(1,
+                                   nrow(data.frame(sac_scl_list[3])),
+                                            1),
                              richness = sac_scl_list[4],
                              sd = sac_scl_list[5]) %>% 
   mutate(lower = richness - 1.96*sd,
          upper = richness + 1.96*sd)
 
 sac_bpf_result <- data.frame(site = "BPF",
-                             nsamples = seq(1,14, 1),
+                             nsamples = seq(1,
+                                   nrow(data.frame(sac_bpf_list[3])),
+                                            1),
                              richness = sac_bpf_list[4],
                              sd = sac_bpf_list[5]) %>% 
   mutate(lower = richness - 1.96*sd,
@@ -342,7 +348,7 @@ sac_results %>%
 
 ```{r SAC_prep_trap_and_net, echo = F}
 ### ALL SITES
-sac_all_nt <- dat.ex.msp %>% 
+sac_all_nt <- dat2 %>% 
   mutate(StationYear = factor(StationYear)) %>% 
   group_by(StationYear, Short.label.name) %>% 
   tally(name = "count") %>% 
@@ -351,11 +357,13 @@ sac_all_nt <- dat.ex.msp %>%
               values_fill = list(count = 0)) %>% 
   column_to_rownames("StationYear")
 
-sac_all_list_nt <- specaccum(sac_all_nt, method = "random", permutations = 100,
-          conditioned = T, gamma = "jack1")
+sac_all_list_nt <- specaccum(sac_all_nt, method = "random",
+                             permutations = 100,
+                             conditioned = T,
+                             gamma = "jack1")
 
 ### POS
-sac_pos_nt <- dat.ex.msp %>% 
+sac_pos_nt <- dat2 %>% 
   filter(Site == "POS") %>% 
   mutate(StationYear = factor(StationYear)) %>% 
   group_by(StationYear, Short.label.name) %>% 
@@ -369,7 +377,7 @@ sac_pos_list_nt <- specaccum(sac_pos_nt, method = "random", permutations = 100,
                           conditioned = T, gamma = "jack1")
 
 #### SCL
-sac_scl_nt <- dat.ex.msp %>% 
+sac_scl_nt <- dat2 %>% 
   filter(Site == "SCL") %>% 
   mutate(StationYear = factor(StationYear)) %>% 
   group_by(StationYear, Short.label.name) %>% 
@@ -383,7 +391,7 @@ sac_scl_list_nt <- specaccum(sac_scl_nt, method = "random", permutations = 100,
                           conditioned = T, gamma = "jack1")
 
 ### BPF
-sac_bpf_nt <- dat.ex.msp %>% 
+sac_bpf_nt <- dat2 %>% 
   filter(Site == "BPF") %>% 
   mutate(StationYear = factor(StationYear)) %>% 
   group_by(StationYear, Short.label.name) %>% 
@@ -397,29 +405,37 @@ sac_bpf_list_nt <- specaccum(sac_bpf_nt, method = "random", permutations = 100,
                           conditioned = T, gamma = "jack1")
 
 # Results
-sac_all_result_nt <- data.frame(site = "All Sites",
-                             nsamples = seq(1,69, 1),
+sac_all_result_nt <- data.frame(site = "All Sites (N & T)",
+                             nsamples = seq(1,
+                                  nrow(data.frame(sac_all_list_nt[3])),
+                                    1),
                              richness = sac_all_list_nt[4],
                              sd = sac_all_list_nt[5]) %>% 
   mutate(lower = richness - 1.96*sd,
          upper = richness + 1.96*sd)
 
 sac_pos_result_nt <- data.frame(site = "POS",
-                             nsamples = seq(1,40, 1),
+                             nsamples = seq(1,
+                                nrow(data.frame(sac_pos_list_nt[3])),
+                                            1),
                              richness = sac_pos_list_nt[4],
                              sd = sac_pos_list_nt[5]) %>% 
   mutate(lower = richness - 1.96*sd,
          upper = richness + 1.96*sd)
 
 sac_scl_result_nt <- data.frame(site = "SCL",
-                             nsamples = seq(1,13, 1),
+                             nsamples = seq(1,
+                                  nrow(data.frame(sac_scl_list_nt[3])),
+                                            1),
                              richness = sac_scl_list_nt[4],
                              sd = sac_scl_list_nt[5]) %>% 
   mutate(lower = richness - 1.96*sd,
          upper = richness + 1.96*sd)
 
 sac_bpf_result_nt <- data.frame(site = "BPF",
-                             nsamples = seq(1,16, 1),
+                             nsamples = seq(1,
+                                  nrow(data.frame(sac_bpf_list_nt[3])),
+                                            1),
                              richness = sac_bpf_list_nt[4],
                              sd = sac_bpf_list_nt[5]) %>% 
   mutate(lower = richness - 1.96*sd,
@@ -445,16 +461,53 @@ sac_results_nt %>%
        fill = "Site") +
   theme(legend.position = c(0.78,0.4))
 
+
+sac_results <- bind_rows(sac_all_result, sac_pos_result,
+          sac_scl_result, sac_bpf_result)
+
 ```
 
 
+```{r SAC_figure_trap_and_net_trap, echo = F}
+
+
+sac_results_4 <- bind_rows(sac_all_result, sac_pos_result,
+          sac_scl_result, sac_bpf_result, sac_all_result_nt) %>% 
+  mutate(site = factor(site))
+
+
+level_order <- c("All Sites (N & T)",
+                 "All Sites",
+                 "POS", "SCL", "BPF")
+
+sac_results_4 %>% 
+  ggplot(aes(x = nsamples, y = richness,
+             fill = factor(site, level = level_order))) +
+  geom_line(aes(color = factor(site, level = level_order)),
+            linewidth = 1.1, show.legend = F) +
+  geom_ribbon(aes(ymin = lower, ymax = upper,
+                  fill = factor(site, level = level_order)),
+              alpha = 0.2) +
+  scale_color_manual(values = c("#000000", "maroon4",
+                                "#E69F00", "#56B4E9", "#009E73")) +
+  scale_fill_manual(values = c("#000", "maroon4",
+                               "#E69F00", "#56B4E9", "#009E73")) +
+  theme_cowplot(font_size = 20) +
+  labs(x = "No. sampling sites",
+       y = "Richness",
+       fill = "Site") +
+  theme(legend.position = c(0.66,0.3))
+
+
+
+```
 
 
 # Chao indices
 ```{r chao_indices, echo = F, cache = F}
 
 # OVERALL AGGREGATE
-chao_all <- dat.ex.msp %>% 
+chao_all <- dat2 %>% 
   filter(Collection.Method == "T") %>% 
   group_by(Short.label.name) %>% 
   tally(name = "count") %>% 
@@ -462,21 +515,23 @@ chao_all <- dat.ex.msp %>%
 
 chao_all <- data.frame(
   chao1 = sapply(seq_along(chao_all), function(i){
-    chao1(chao_all[[i]])}))
+    chao1(chao_all[[i]])}),
+  Site = "All Sites")
 
 # OVERALL AGGREGATE with net records
-chao_all_net <- dat.ex.msp %>% 
+chao_all_net <- dat2 %>% 
   group_by(Short.label.name) %>% 
   tally(name = "count") %>% 
   column_to_rownames("Short.label.name")
 
 chao_all_net <- data.frame(
   chao1 = sapply(seq_along(chao_all_net), function(i){
-    chao1(chao_all_net[[i]])}))
+    chao1(chao_all_net[[i]])}),
+  Site = "All Sites (N & T)")
 
 
 # Sites by season
-chao_site_season <- dat.ex.msp %>% 
+chao_site_season <- dat2 %>% 
   filter(Collection.Method == "T") %>% 
   unite("SiteSeason", c(Site, ToY), sep = "_") %>% 
   group_by(SiteSeason, Short.label.name) %>% 
@@ -494,7 +549,7 @@ chao_site_season <- data.frame(
                        names = c("Site", "Season"))
 
 # Sites
-chao_site <- dat.ex.msp %>% 
+chao_site <- dat2 %>% 
   filter(Collection.Method == "T") %>% 
   group_by(Site, Short.label.name) %>% 
   tally(name = "count") %>% 
@@ -509,7 +564,7 @@ chao_site <- data.frame(
   Site = colnames(chao_site))
 
 # Stations
-chao_stations <- dat.ex.msp %>% 
+chao_stations <- dat2 %>% 
   filter(Collection.Method == "T") %>% 
   group_by(Station, Short.label.name) %>% 
   tally(name = "count") %>% 
@@ -525,7 +580,7 @@ chao_stations <- data.frame(
 
 
 # Station by year
-chao_station_year <- dat.ex.msp %>% 
+chao_station_year <- dat2 %>% 
   filter(Collection.Method == "T") %>% 
   group_by(StationYear, Short.label.name) %>% 
   tally(name = "count") %>% 
@@ -535,7 +590,7 @@ chao_station_year <- dat.ex.msp %>%
   column_to_rownames("Short.label.name")
 
 # Station by year (raw values)
-station_year_raw <- dat.ex.msp %>% 
+station_year_raw <- dat2 %>% 
   filter(Collection.Method == "T") %>% 
   group_by(StationYear, Short.label.name) %>% 
   tally(name = "count") %>% 
@@ -559,6 +614,8 @@ chao_station_year <- data.frame(
   StationYear = colnames(chao_station_year)) %>% 
   separate_wider_delim(StationYear, delim = "_",
                        names = c("Station", "Year"))
+
+
 
 
 ```
@@ -631,6 +688,63 @@ chao_station_year %>%
 
 
 
+## SAC with 4 lines and Chao estimates
+```{r SAC_Chao_fig, echo = F, fig.width=6,fig.height=7}
+
+
+chao_sites_all <- bind_rows(
+  chao_all, chao_all_net, chao_site
+) %>% 
+  mutate(x_limit = c(78, 95, 14, 51, 13))
+
+sac_results_4 <- bind_rows(sac_all_result, sac_pos_result,
+          sac_scl_result, sac_bpf_result, sac_all_result_nt) %>% 
+  mutate(site = factor(site))
+
+
+level_order <- c("All Sites (N & T)",
+                 "All Sites",
+                 "POS", "SCL", "BPF")
+
+sac_results_4 %>% 
+  ggplot(aes(x = nsamples, y = richness,
+             fill = factor(site, level = level_order))) +
+  geom_line(aes(color = factor(site, level = level_order)),
+            linewidth = 1.1, show.legend = F) +
+  geom_ribbon(aes(ymin = lower, ymax = upper,
+                  fill = factor(site, level = level_order)),
+              alpha = 0.2) +
+  scale_color_manual(values = c("#000000", "maroon4",
+                                "#E69F00", "#56B4E9", "#009E73")) +
+  scale_fill_manual(values = c("#000", "maroon4",
+                               "#E69F00", "#56B4E9", "#009E73")) +
+  theme_cowplot(font_size = 20) +
+  labs(x = "No. sampling sites",
+       y = "Richness",
+       fill = "Site") +
+  theme(legend.position = c(0.57,0.3)) +
+  geom_segment(aes(x = 0, xend = 95,
+                   y = 139.04), color = "#000000",
+               linewidth = 1, linetype = "dotdash") +
+  geom_segment(aes(x = 0, xend = 78,
+                   y = 124.2), color = "maroon4",
+               linewidth = 1, linetype = "dotdash") +
+  geom_segment(aes(x = 0, xend = 52,
+                   y = 115.14), color = "#E69F00",
+               linewidth = 1, linetype = "dotdash") +
+  geom_segment(aes(x = 0, xend = 13,
+                   y = 92.04), color = "#56B4E9",
+               linewidth = 1, linetype = "dotdash") +
+  geom_segment(aes(x = 0, xend = 14,
+                   y = 79.75), color = "#009E73",
+               linewidth = 1, linetype = "dotdash") +
+  scale_y_continuous(breaks = c(79.75, 92.04, 115.14, 124.2, 139.04),
+                     labels = c(80, 92, 115, 124, 139))
+
+
+
+```
+
 
 # What is the turnover of species within sub-sites within years?
 
@@ -638,7 +752,8 @@ chao_station_year %>%
 
 POS <- dat2 %>% 
   filter(Site == "POS") %>% 
-  droplevels()
+  droplevels() %>% 
+  mutate(Year = factor(Year))
 
 pos.matrix.list <- lapply(levels(POS$Year),
                                  data = POS,
@@ -712,7 +827,8 @@ ggdraw(plot.y) +
 
 SCL <- dat2 %>% 
   filter(Site == "SCL") %>% 
-  droplevels()
+  droplevels() %>% 
+  mutate(Year = factor(Year))
 
 scl.matrix.list <- lapply(levels(SCL$Year),
                                  data = SCL,
@@ -772,7 +888,8 @@ ggdraw(plot.y.scl) +
 ```{r species_turnover_site_years_BPF, echo = F}
 BPF <- dat2 %>% 
   filter(Site == "BPF") %>% 
-  droplevels()
+  droplevels() %>% 
+  mutate(Year = factor(Year))
 
 BPF.matrix.list <- lapply(levels(BPF$Year),
                           data = BPF,

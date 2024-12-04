@@ -1,7 +1,7 @@
 BeeSearch Species Accumulation Curves and Chao Richness
 ================
 Dr. Riley M. Anderson
-October 29, 2024
+December 04, 2024
 
   
 
@@ -9,6 +9,8 @@ October 29, 2024
   - [Summary of Results](#summary-of-results)
 - [Species accumulation curves](#species-accumulation-curves)
 - [Chao indices](#chao-indices)
+  - [SAC with 4 lines and Chao
+    estimates](#sac-with-4-lines-and-chao-estimates)
 - [What is the turnover of species within sub-sites within
   years?](#what-is-the-turnover-of-species-within-sub-sites-within-years)
   - [POS](#pos)
@@ -29,9 +31,9 @@ Asymptote not reached with the total collection.
 
 | Site | A_mellifera | total | Percent |
 |:-----|------------:|------:|--------:|
-| BPF  |           8 |  1810 |    0.44 |
-| POS  |         329 | 19108 |    1.72 |
-| SCL  |         123 |  1886 |    6.52 |
+| BPF  |           8 |  1854 |    0.43 |
+| POS  |         444 | 21691 |    2.05 |
+| SCL  |         123 |  1896 |    6.49 |
 
 # Species accumulation curves
 
@@ -42,6 +44,8 @@ Asymptote not reached with the total collection.
 - Trap and net caught records
 
 ![](SAC_and_Chao_files/figure-gfm/SAC_figure_trap_and_net-1.png)<!-- -->
+
+![](SAC_and_Chao_files/figure-gfm/SAC_figure_trap_and_net_trap-1.png)<!-- -->
 
 # Chao indices
 
@@ -55,23 +59,23 @@ Chao1 minimum species richness is defined non-parametrically as:
 
 |  chao1 | Site |
 |-------:|:-----|
-|  92.79 | BPF  |
-| 108.46 | POS  |
-| 104.35 | SCL  |
+|  79.75 | BPF  |
+| 115.14 | POS  |
+|  92.04 | SCL  |
 
 - Chao indices by site and season
 
 |  chao1 | Site | Season |
 |-------:|:-----|:-------|
-|  42.33 | BPF  | early  |
-|  87.00 | BPF  | late   |
-|  81.00 | BPF  | mid    |
-|  78.29 | POS  | early  |
-| 105.50 | POS  | late   |
-|  89.00 | POS  | mid    |
-|  97.79 | SCL  | early  |
-|  56.12 | SCL  | late   |
-|  84.33 | SCL  | mid    |
+|  34.90 | BPF  | early  |
+|  86.00 | BPF  | late   |
+|  70.06 | BPF  | mid    |
+|  60.33 | POS  | early  |
+|  63.67 | POS  | late   |
+| 121.12 | POS  | mid    |
+|  87.50 | SCL  | early  |
+|  57.00 | SCL  | late   |
+|  71.08 | SCL  | mid    |
 
 ![](SAC_and_Chao_files/figure-gfm/chao_site_season-1.png)<!-- -->
 
@@ -82,103 +86,132 @@ sampling effort. Richness across sites converge in the mid-summer.
 
 - Chao indices by station
 
-| chao1 | Station |
-|------:|:--------|
-| 38.40 | BPF1    |
-| 62.17 | BPF2    |
-| 32.90 | BPF3    |
-| 79.00 | BPF4    |
-| 49.00 | BPF5    |
-| 43.10 | BPF6    |
-| 41.07 | BPF7    |
-| 44.50 | BPF8    |
-| 78.57 | POS1    |
-| 18.67 | POS10   |
-| 33.10 | POS11   |
-| 53.12 | POS12   |
-| 36.17 | POS13   |
-| 96.00 | POS2    |
-| 50.90 | POS20   |
-| 50.45 | POS21   |
-| 51.12 | POS22   |
-| 61.25 | POS23   |
-| 53.00 | POS24   |
-| 49.40 | POS25   |
-| 73.14 | POS3    |
-| 50.29 | POS4    |
-| 77.00 | POS5    |
-| 41.90 | POS6    |
-| 35.00 | POS7    |
-| 75.40 | POS8    |
-| 51.12 | POS9    |
-| 87.79 | SCL1    |
-| 84.12 | SCL2    |
-| 58.12 | SCL3    |
-| 74.56 | SCL4    |
-| 32.67 | SCL5    |
+|  chao1 | Station |
+|-------:|:--------|
+|  36.12 | BPF1    |
+|  57.00 | BPF2    |
+|  33.12 | BPF3    |
+| 112.50 | BPF4    |
+|  42.33 | BPF5    |
+|  40.00 | BPF6    |
+|  39.00 | BPF7    |
+|  44.50 | BPF8    |
+|  74.08 | POS1    |
+|  18.67 | POS10   |
+|  27.90 | POS11   |
+|  52.12 | POS12   |
+|  52.67 | POS13   |
+|  18.00 | POS14   |
+|  15.17 | POS15   |
+|  17.00 | POS16   |
+|  16.00 | POS17   |
+|  11.50 | POS18   |
+|  29.00 | POS19   |
+| 101.17 | POS2    |
+| 109.00 | POS20   |
+|  47.00 | POS21   |
+|  46.50 | POS22   |
+|  54.00 | POS23   |
+|  59.00 | POS24   |
+|  48.40 | POS25   |
+|  37.00 | POS26   |
+|  41.40 | POS27   |
+|  26.50 | POS28   |
+|  93.67 | POS3    |
+|  63.33 | POS4    |
+|  66.50 | POS5    |
+|  40.90 | POS6    |
+|  32.10 | POS7    |
+|  74.40 | POS8    |
+|  51.08 | POS9    |
+|  74.57 | SCL1    |
+|  83.12 | SCL2    |
+|  58.12 | SCL3    |
+|  64.25 | SCL4    |
+|  28.17 | SCL5    |
 
 - Chao indices by station and year
 
 |  chao1 | Station | Year |
 |-------:|:--------|:-----|
-|  73.00 | BPF1    | 2018 |
-|  56.17 | BPF1    | 2019 |
-|  46.17 | BPF2    | 2018 |
+|  62.50 | BPF1    | 2018 |
+|  46.17 | BPF1    | 2019 |
+|  41.67 | BPF2    | 2018 |
 |  41.67 | BPF2    | 2019 |
-|  32.12 | BPF3    | 2018 |
-|  34.50 | BPF3    | 2019 |
+|  29.00 | BPF3    | 2018 |
+|  31.12 | BPF3    | 2019 |
 |  24.90 | BPF4    | 2018 |
-|  44.12 | BPF4    | 2019 |
-|  32.12 | BPF5    | 2018 |
-|  48.90 | BPF5    | 2019 |
-|  25.12 | BPF6    | 2018 |
+|  45.00 | BPF4    | 2019 |
+|  31.12 | BPF5    | 2018 |
+|  41.10 | BPF5    | 2019 |
+|  22.50 | BPF6    | 2018 |
 |  62.00 | BPF6    | 2019 |
-|  41.07 | BPF7    | 2019 |
+|  39.00 | BPF7    | 2019 |
 |  44.50 | BPF8    | 2019 |
 |  18.67 | POS10   | 2017 |
-|  33.10 | POS11   | 2017 |
-|  34.25 | POS12   | 2017 |
-|  39.00 | POS12   | 2019 |
-|  36.17 | POS13   | 2018 |
+|  27.90 | POS11   | 2017 |
+|  30.00 | POS12   | 2017 |
+|  38.00 | POS12   | 2019 |
+|  28.50 | POS13   | 2017 |
+|  35.17 | POS13   | 2018 |
+|  51.00 | POS13   | 2020 |
+|  18.00 | POS14   | 2017 |
+|  15.17 | POS15   | 2017 |
+|  17.00 | POS16   | 2017 |
+|  16.00 | POS17   | 2017 |
+|  11.50 | POS18   | 2017 |
+|  29.00 | POS19   | 2017 |
+|  32.14 | POS1    | 2014 |
 |  40.00 | POS1    | 2015 |
-|  44.00 | POS1    | 2016 |
-|  64.17 | POS1    | 2019 |
-|  50.90 | POS20   | 2018 |
-|  50.45 | POS21   | 2019 |
-|  51.12 | POS22   | 2018 |
-|  61.25 | POS23   | 2018 |
+|  40.12 | POS1    | 2016 |
+|  58.00 | POS1    | 2019 |
+|  13.00 | POS20   | 2017 |
+|  40.00 | POS20   | 2018 |
+|  40.50 | POS20   | 2020 |
+|   6.00 | POS21   | 2017 |
+|  47.00 | POS21   | 2019 |
+|  46.50 | POS22   | 2018 |
+|  54.00 | POS23   | 2018 |
 |  53.00 | POS24   | 2018 |
-|  49.40 | POS25   | 2019 |
-|  46.08 | POS2    | 2015 |
-|  86.17 | POS2    | 2016 |
-|  41.12 | POS2    | 2019 |
-|  45.67 | POS3    | 2015 |
-|  45.40 | POS3    | 2016 |
-|  52.00 | POS3    | 2018 |
-|  45.25 | POS4    | 2016 |
-|  40.14 | POS4    | 2018 |
-|  72.25 | POS5    | 2017 |
-|  56.60 | POS5    | 2019 |
-|  41.00 | POS6    | 2017 |
-|  35.60 | POS6    | 2019 |
-|  35.00 | POS7    | 2017 |
-|  41.12 | POS8    | 2017 |
-|  58.50 | POS8    | 2019 |
-|  86.50 | POS9    | 2017 |
-|  43.50 | POS9    | 2018 |
-|  48.00 | SCL1    | 2014 |
-|  59.90 | SCL1    | 2015 |
-| 116.67 | SCL1    | 2016 |
+|  22.67 | POS24   | 2020 |
+|  48.40 | POS25   | 2019 |
+|  37.00 | POS26   | 2020 |
+|  41.40 | POS27   | 2020 |
+|  26.50 | POS28   | 2020 |
+|  31.25 | POS2    | 2014 |
+|  43.33 | POS2    | 2015 |
+|  79.67 | POS2    | 2016 |
+|  35.12 | POS2    | 2019 |
+|  44.17 | POS3    | 2014 |
+|  41.50 | POS3    | 2015 |
+|  39.00 | POS3    | 2016 |
+|  47.17 | POS3    | 2018 |
+|  44.25 | POS4    | 2016 |
+|  36.79 | POS4    | 2018 |
+|  47.00 | POS4    | 2020 |
+|  65.00 | POS5    | 2017 |
+|  48.40 | POS5    | 2019 |
+|  56.00 | POS6    | 2017 |
+|  34.60 | POS6    | 2019 |
+|  32.10 | POS7    | 2017 |
+|  40.12 | POS8    | 2017 |
+|  57.50 | POS8    | 2019 |
+|  64.50 | POS9    | 2017 |
+|  46.67 | POS9    | 2018 |
+|  35.33 | POS9    | 2020 |
+|  39.50 | SCL1    | 2014 |
+|  61.00 | SCL1    | 2015 |
+| 100.67 | SCL1    | 2016 |
 |  38.25 | SCL2    | 2014 |
-|  61.00 | SCL2    | 2015 |
-|  43.12 | SCL2    | 2016 |
+|  60.00 | SCL2    | 2015 |
+|  39.50 | SCL2    | 2016 |
 |  13.00 | SCL3    | 2014 |
 |  51.00 | SCL3    | 2015 |
 |  75.00 | SCL3    | 2016 |
-|  22.90 | SCL4    | 2014 |
-| 111.00 | SCL4    | 2015 |
-|  39.50 | SCL4    | 2016 |
-|  32.67 | SCL5    | 2016 |
+|  20.60 | SCL4    | 2014 |
+| 101.25 | SCL4    | 2015 |
+|  36.12 | SCL4    | 2016 |
+|  28.17 | SCL5    | 2016 |
 
 ![](SAC_and_Chao_files/figure-gfm/chao_station_year-1.png)<!-- -->
 
@@ -188,6 +221,10 @@ each substation within each site. Chao richness estimates are lifted by
 an additive parameter that accounts for rare species likely missed in
 the sampling. The data exclude some morphospecies (see methods), and all
 net caught records.
+
+## SAC with 4 lines and Chao estimates
+
+![](SAC_and_Chao_files/figure-gfm/SAC_Chao_fig-1.png)<!-- -->
 
 # What is the turnover of species within sub-sites within years?
 
