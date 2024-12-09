@@ -1,12 +1,17 @@
 BeeSearch Species Accumulation Curves and Chao Richness
 ================
 Dr. Riley M. Anderson
-December 04, 2024
+December 09, 2024
 
   
 
 - [Overview](#overview)
   - [Summary of Results](#summary-of-results)
+- [Honey bees](#honey-bees)
+- [Singeltons](#singeltons)
+- [Top 10 most abundant species](#top-10-most-abundant-species)
+- [Species collected in all 3 sites](#species-collected-in-all-3-sites)
+- [Only collected by net](#only-collected-by-net)
 - [Species accumulation curves](#species-accumulation-curves)
 - [Chao indices](#chao-indices)
   - [SAC with 4 lines and Chao
@@ -29,11 +34,132 @@ total records (all sites, all years), 2) at each site (all years)
 
 Asymptote not reached with the total collection.
 
-| Site | A_mellifera | total | Percent |
-|:-----|------------:|------:|--------:|
-| BPF  |           8 |  1854 |    0.43 |
-| POS  |         444 | 21691 |    2.05 |
-| SCL  |         123 |  1896 |    6.49 |
+# Honey bees
+
+| Site      | A_mellifera | total | Percent |
+|:----------|------------:|------:|--------:|
+| All sites |         575 | 25441 |    2.26 |
+| BPF       |           8 |  1854 |    0.43 |
+| POS       |         444 | 21691 |    2.05 |
+| SCL       |         123 |  1896 |    6.49 |
+
+# Singeltons
+
+    ## [1] 20
+
+| Species                     | Site |
+|:----------------------------|:-----|
+| Lasioglossum nigroviride    | BPF  |
+| Colletes kincaidii          | POS  |
+| Megachile onobrychidis      | POS  |
+| Andrena subtilis            | POS  |
+| Andrena gordoni             | POS  |
+| Lasioglossum punctatoventre | POS  |
+| Lasioglossum sedi           | POS  |
+| Megachile fidelis           | POS  |
+| Coelioxys gilensis          | POS  |
+| Andrena miranda             | POS  |
+| Andrena subaustralis        | POS  |
+| Megachile gravita           | POS  |
+| Agapostemon femoratus       | POS  |
+| Nomada formula              | POS  |
+| Andrena hippotes            | SCL  |
+| Andrena buckelli            | SCL  |
+| Osmia densa                 | SCL  |
+| Lasioglossum yukonae        | SCL  |
+| Andrena transnigra          | SCL  |
+| Lasioglossum ovaliceps      | SCL  |
+
+# Top 10 most abundant species
+
+| Species                 | Records |
+|:------------------------|--------:|
+| Halictus tripartitus    |   11787 |
+| Agapostemon texanus     |    2568 |
+| Bombus vosnesenskii     |    2148 |
+| Halictus rubicundus     |    1047 |
+| Ceratina acantha        |     867 |
+| Bombus flavifrons       |     782 |
+| Bombus mixtus           |     619 |
+| Apis mellifera          |     575 |
+| Melissodes microsticta  |     538 |
+| Lasioglossum villosulum |     484 |
+
+# Species collected in all 3 sites
+
+    ## [1] 51
+
+| Species                  |
+|:-------------------------|
+| Agapostemon texanus      |
+| Agapostemon virescens    |
+| Andrena angustitarsata   |
+| Andrena candida          |
+| Andrena nigrihirta       |
+| Andrena prunorum         |
+| Andrena salicifloris     |
+| Anthidium manicatum      |
+| Apis mellifera           |
+| Bombus fervidus          |
+| Bombus flavifrons        |
+| Bombus melanopygus       |
+| Bombus mixtus            |
+| Bombus sitkensis         |
+| Bombus vosnesenskii      |
+| Ceratina acantha         |
+| Ceratina nanula          |
+| Coelioxys rufitarsis     |
+| Colletes fulgidus        |
+| Halictus confusus        |
+| Halictus rubicundus      |
+| Halictus tripartitus     |
+| Hoplitis producta        |
+| Hylaeus modestus         |
+| Lasioglossum aff. tenax  |
+| Lasioglossum buccale     |
+| Lasioglossum cooleyi     |
+| Lasioglossum cressonii   |
+| Lasioglossum incompletum |
+| Lasioglossum kincaidii   |
+| Lasioglossum knereri     |
+| Lasioglossum laevissimum |
+| Lasioglossum nevadense   |
+| Lasioglossum pacatum     |
+| Lasioglossum pacificum   |
+| Lasioglossum ruidosense  |
+| Lasioglossum villosulum  |
+| Lasioglossum zonulum     |
+| Megachile melanophaea    |
+| Megachile montivaga      |
+| Megachile perihirta      |
+| Melissodes microsticta   |
+| Melissodes rivalis       |
+| Osmia albolateralis      |
+| Osmia dolerosa           |
+| Osmia giliarum           |
+| Osmia lignaria           |
+| Osmia proxima            |
+| Osmia pusilla            |
+| Osmia trifoliama         |
+| Osmia tristella          |
+
+# Only collected by net
+
+    ## [1] 11
+
+| Species                     |
+|:----------------------------|
+| Andrena vicina              |
+| Andrena pallidifovea        |
+| Lasioglossum titusi         |
+| Andrena subtilis            |
+| Andrena scurra              |
+| Andrena gordoni             |
+| Andrena piperi              |
+| Lasioglossum punctatoventre |
+| Lasioglossum sedi           |
+| Megachile fidelis           |
+| Coelioxys gilensis          |
 
 # Species accumulation curves
 

@@ -669,6 +669,10 @@ plot_grid(stelis2, epeolus2, triepeolus,
 # Species by time of year
 ```{r species_ridgeplot, echo = F, fig.height = 10}
 
+dat1 %>%
+  filter(str_detect(Short.label.name, "(?<!m)msp\\.")) %>% 
+  group_by(Short.label.name) %>% tally() %>% print(n = 35)
+
 more_than_20 <- dat1 %>%
   filter(!str_detect(Short.label.name, "(?<!m)sp\\."),
          !str_detect(Short.label.name, "(?<!m)msp\\.")) %>% 

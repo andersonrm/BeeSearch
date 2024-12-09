@@ -184,6 +184,7 @@ keep.Nomada <- dat2 %>% filter(Genus == "Nomada") %>%
 
 ```
 
+# Honey bees
 
 ```{r honey_bee_percents, echo = F}
 
@@ -201,16 +202,97 @@ honey_bees <- dat1 %>%
   select(Short.label.name) %>% 
   tally(name = "A_mellifera")
 
-honey_bees <- left_join(honey_bees, total_bees, by = "Site") %>% 
-  mutate(Percent = 100 * (A_mellifera/total))
 
-kable(honey_bees, format = "markdown", digits = 2)
+total_honey_bees <- dat1 %>% 
+  mutate(Site = factor("All sites")) %>% 
+  filter(Short.label.name == "Apis mellifera") %>% 
+  select(Site, Short.label.name) %>% 
+  group_by(Site) %>% tally(name = "A_mellifera") %>% 
+  mutate(total = nrow(dat1))
+  
+
+left_join(honey_bees, total_bees, by = "Site") %>% 
+  bind_rows(total_honey_bees, .) %>% 
+  mutate(Percent = 100 * (A_mellifera/total)) %>% 
+  kable(., format = "markdown", digits = 2)
 
 
 
 ```
 
+# Singeltons
+```{r singletons, echo = F}
 
+singles <- dat2 %>% 
+  filter(Genus != "Hylaeus") %>% 
+  group_by(Short.label.name) %>% 
+  tally() %>% 
+  filter(n == 1)
+
+singletons <- semi_join(dat2, singles, by = "Short.label.name") %>% 
+  select(Short.label.name, Site) %>% 
+  rename(Species = Short.label.name) %>% 
+  arrange(Site)
+
+nrow(singletons)
+
+kable(singletons, format = "markdown")
+
+```
+
+# Top 10 most abundant species
+```{r most_abundant, echo = F}
+
+dat2 %>% 
+  group_by(Short.label.name) %>% 
+  tally() %>% 
+  arrange(desc(n)) %>% 
+  head(10) %>% 
+  rename(Species = Short.label.name,
+         Records = n) %>% 
+  kable(., format = "markdown")
+
+
+```
+
+# Species collected in all 3 sites
+```{r all_three_sites_species, echo = F}
+
+species_all3_sites <- dat2 %>% 
+  group_by(Short.label.name) %>% 
+  summarize(Site_count = n_distinct(Site)) %>%
+  filter(Site_count == 3) %>% 
+  rename(Species = Short.label.name) %>% 
+  select(Species)
+
+nrow(species_all3_sites)
+
+kable(species_all3_sites, format = "markdown")
+
+```
+
+# Only collected by net
+```{r species_only_net_collected, echo = F}
+
+net_species <- dat2 %>% 
+  filter(Collection.Method == "N") %>% 
+  select(Short.label.name)
+
+trap_species <- dat2 %>% 
+  filter(Collection.Method == "T") %>% 
+  select(Short.label.name)
+
+net_only <- anti_join(net_species,
+                      trap_species,
+                      by = "Short.label.name") %>% 
+  distinct() %>% 
+  rename(Species = Short.label.name)
+
+nrow(net_only)
+
+kable(net_only, format = "markdown")
+
+```
 
 # Species accumulation curves
 
