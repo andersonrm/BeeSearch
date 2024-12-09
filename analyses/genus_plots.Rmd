@@ -72,11 +72,6 @@ library(knitr)
 # Import datasets
 dat1 <- read.csv("data/CABS1.csv")
 
-comp.sites <- read.csv("data/comparable.sites.csv")
-
-site.locs <- read.csv("data/site.locations.csv")
-
-
 ####################################
 
 ```
@@ -119,23 +114,6 @@ dat1 <- dat1 %>%
     TRUE ~ as.character(Sex)
   ))
 
-
-# keep the single record of morphospecies "Hylaeus sp. 2023_1"
-keep.Hylaeus <- dat1 %>% 
-  filter(str_detect(Short.label.name, "Hylaeus sp. 2023"))
-
-# remove any records where species is undetermined:
-dat2 <- dat1 %>% 
-  filter(!str_detect(Short.label.name, "(?<!m)sp\\."),
-         !str_detect(Short.label.name, "(?<!m)msp\\.")) %>% 
-  bind_rows(keep.Hylaeus)
-
-
-
-
-
-
-
 ```
 
 # Descriptive measures of genera
@@ -143,18 +121,18 @@ dat2 <- dat1 %>%
 ## All sites together
 ```{r genera_figs_all_sites, echo = F}
 
-genus.counts <- dat2 %>% 
+genus.counts <- dat1 %>% 
   filter(Collection.Method == "T") %>% 
   select(Genus, Short.label.name) %>% 
   group_by(Genus) %>% 
   distinct() %>% 
   tally(name = "Species")
 
-genus.props <- dat2 %>% 
+genus.props <- dat1 %>% 
   filter(Collection.Method == "T") %>% 
   group_by(Genus) %>% 
   tally(name = "Prop") %>% 
-  mutate(prop.abund = Prop/nrow(dat2))
+  mutate(prop.abund = Prop/nrow(dat1))
 
 genus <- left_join(genus.counts, genus.props, by = "Genus")
 
@@ -234,7 +212,7 @@ genus_plot_all <- genus %>%
 ## POS
 ```{r genera_figs_pos, echo = F}
 
-genus.counts.pos <- dat2 %>% 
+genus.counts.pos <- dat1 %>% 
   filter(Site == "POS" & 
            Collection.Method == "T") %>% 
   select(Genus, Short.label.name) %>% 
@@ -242,11 +220,11 @@ genus.counts.pos <- dat2 %>%
   distinct() %>% 
   tally(name = "Species")
 
-genus.props.pos <- dat2 %>% 
+genus.props.pos <- dat1 %>% 
   filter(Site == "POS" & Collection.Method == "T") %>% 
   group_by(Genus) %>% 
   tally(name = "Prop") %>% 
-  mutate(prop.abund = Prop/nrow(filter(dat2, Site == "POS" &
+  mutate(prop.abund = Prop/nrow(filter(dat1, Site == "POS" &
                                          Collection.Method == "T")))
 
 genus.pos <- left_join(genus.counts.pos, genus.props.pos, by = "Genus")
@@ -310,7 +288,7 @@ genus_plot_pos <- genus.pos %>%
 ## SCL
 ```{r genera_figs_scl, echo = F}
 
-genus.counts.scl <- dat2 %>% 
+genus.counts.scl <- dat1 %>% 
   filter(Site == "SCL" &
            Collection.Method == "T") %>% 
   select(Genus, Short.label.name) %>% 
@@ -318,12 +296,12 @@ genus.counts.scl <- dat2 %>%
   distinct() %>% 
   tally(name = "Species")
 
-genus.props.scl <- dat2 %>% 
+genus.props.scl <- dat1 %>% 
   filter(Site == "SCL" &
            Collection.Method == "T") %>% 
   group_by(Genus) %>% 
   tally(name = "Prop") %>% 
-  mutate(prop.abund = Prop/nrow(filter(dat2, Site == "SCL" &
+  mutate(prop.abund = Prop/nrow(filter(dat1, Site == "SCL" &
                                          Collection.Method == "T")))
 
 genus.scl <- left_join(genus.counts.scl, genus.props.scl, by = "Genus")
@@ -385,7 +363,7 @@ genus_plot_scl <- genus.scl %>%
 ## BPF
 ```{r genera_figs_bpf, echo = F}
 
-genus.counts.bpf <- dat2 %>% 
+genus.counts.bpf <- dat1 %>% 
   filter(Site == "BPF" &
            Collection.Method == "T") %>% 
   select(Genus, Short.label.name) %>% 
@@ -393,12 +371,12 @@ genus.counts.bpf <- dat2 %>%
   distinct() %>% 
   tally(name = "Species")
 
-genus.props.bpf <- dat2 %>% 
+genus.props.bpf <- dat1 %>% 
   filter(Site == "BPF" & 
            Collection.Method == "T") %>% 
   group_by(Genus) %>% 
   tally(name = "Prop") %>% 
-  mutate(prop.abund = Prop/nrow(filter(dat2, Site == "BPF" &
+  mutate(prop.abund = Prop/nrow(filter(dat1, Site == "BPF" &
                                          Collection.Method == "T")))
 
 genus.bpf <- left_join(genus.counts.bpf, genus.props.bpf, by = "Genus")
@@ -479,16 +457,16 @@ plot_grid(genus_plot_all, genus_plot_pos,
 ## All sites together (trap and net records)
 ```{r genera_figs_all_sites_trap_net, echo = F}
 
-genus.counts.tn <- dat2 %>% 
+genus.counts.tn <- dat1 %>% 
   select(Genus, Short.label.name) %>% 
   group_by(Genus) %>% 
   distinct() %>% 
   tally(name = "Species")
 
-genus.props.tn <- dat2 %>% 
+genus.props.tn <- dat1 %>% 
   group_by(Genus) %>% 
   tally(name = "Prop") %>% 
-  mutate(prop.abund = Prop/nrow(dat2))
+  mutate(prop.abund = Prop/nrow(dat1))
 
 genus.tn <- left_join(genus.counts.tn, genus.props.tn, by = "Genus")
 
@@ -559,18 +537,18 @@ genus_plot_trap_net <- genus.tn %>%
 ## All sites together (net records only)
 ```{r genera_figs_all_sites_nets, echo = F}
 
-genus.counts.net <- dat2 %>% 
+genus.counts.net <- dat1 %>% 
   filter(Collection.Method == "N") %>% 
   select(Genus, Short.label.name) %>% 
   group_by(Genus) %>% 
   distinct() %>% 
   tally(name = "Species")
 
-genus.props.net <- dat2 %>% 
+genus.props.net <- dat1 %>% 
   filter(Collection.Method == "N") %>% 
   group_by(Genus) %>% 
   tally(name = "Prop") %>% 
-  mutate(prop.abund = Prop/nrow(dat2))
+  mutate(prop.abund = Prop/nrow(dat1))
 
 genus.net <- left_join(genus.counts.net, genus.props.net, by = "Genus")
 
