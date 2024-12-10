@@ -1,7 +1,7 @@
 BeeSearch Multivariate Analyses
 ================
 Dr. Riley M. Anderson
-December 09, 2024
+December 10, 2024
 
   
 
@@ -31,9 +31,9 @@ What is this analysis about?
     ## 
     ## adonis2(formula = site_matrix ~ Site * Year, data = site_meta, method = "bray")
     ##           Df SumOfSqs      R2      F Pr(>F)   
-    ## Site       2   1.0050 0.05314 2.1105  0.006 **
-    ## Year       1   0.4331 0.02290 1.8188  0.075 . 
-    ## Site:Year  2   0.3298 0.01744 0.6926  0.809   
+    ## Site       2   1.0050 0.05314 2.1105  0.008 **
+    ## Year       1   0.4331 0.02290 1.8188  0.081 . 
+    ## Site:Year  2   0.3298 0.01744 0.6926  0.820   
     ## Residual  72  17.1432 0.90652                 
     ## Total     77  18.9111 1.00000                 
     ## ---
@@ -45,7 +45,7 @@ What is this analysis about?
     ## 
     ## Response: Distances
     ##           Df  Sum Sq  Mean Sq      F N.Perm Pr(>F)
-    ## Groups     6 0.13306 0.022176 1.5361    999  0.171
+    ## Groups     6 0.13306 0.022176 1.5361    999  0.183
     ## Residuals 71 1.02498 0.014436
     ## 
     ## Permutation test for homogeneity of multivariate dispersions
@@ -54,7 +54,7 @@ What is this analysis about?
     ## 
     ## Response: Distances
     ##           Df  Sum Sq  Mean Sq      F N.Perm Pr(>F)   
-    ## Groups     2 0.18685 0.093426 6.8005    999  0.004 **
+    ## Groups     2 0.18685 0.093426 6.8005    999  0.003 **
     ## Residuals 75 1.03036 0.013738                        
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
@@ -73,9 +73,9 @@ What is this analysis about?
     ## Resampling results across tuning parameters:
     ## 
     ##   mtry  Accuracy   Kappa    
-    ##     2   0.7229644  0.2671388
-    ##    55   0.8275113  0.6340112
-    ##   108   0.7948119  0.5768530
+    ##     2   0.6923958  0.1828966
+    ##    55   0.8299202  0.6348494
+    ##   108   0.8073789  0.5953123
     ## 
     ## Accuracy was used to select the optimal model using the largest value.
     ## The final value used for the model was mtry = 55.
@@ -86,33 +86,26 @@ What is this analysis about?
     ##                      Number of trees: 500
     ## No. of variables tried at each split: 55
     ## 
-    ##         OOB estimate of  error rate: 15.38%
+    ##         OOB estimate of  error rate: 14.1%
     ## Confusion matrix:
     ##     BPF POS SCL class.error
-    ## BPF  13   1   0  0.07142857
-    ## POS   2  48   1  0.05882353
-    ## SCL   0   8   5  0.61538462
+    ## BPF  12   2   0  0.14285714
+    ## POS   1  49   1  0.03921569
+    ## SCL   0   7   6  0.53846154
 
-|                          |    BPF |    POS |    SCL | MeanDecreaseAccuracy | MeanDecreaseGini |
-|:-------------------------|-------:|-------:|-------:|---------------------:|-----------------:|
-| Halictus tripartitus     |  8.534 | 12.413 |  3.964 |               13.345 |            3.562 |
-| Agapostemon texanus      | 10.107 |  8.470 | -0.027 |               10.786 |            2.603 |
-| Melissodes rivalis       |  1.665 |  7.682 |  1.279 |                7.984 |            1.886 |
-| Bombus melanopygus       |  8.665 |  2.562 |  2.745 |                8.081 |            1.827 |
-| Osmia albolateralis      |  5.614 |  6.701 |  3.748 |                8.405 |            1.689 |
-| Bombus flavifrons        |  6.294 |  6.559 |  6.689 |                9.181 |            1.664 |
-| Bombus fervidus          |  7.950 |  6.433 |  0.092 |                8.418 |            1.616 |
-| Halictus confusus        |  8.295 |  1.645 |  4.043 |                7.319 |            1.437 |
-| Apis mellifera           |  7.814 |  2.289 |  4.892 |                7.847 |            1.397 |
-| Bombus vosnesenskii      |  3.362 |  6.426 |  0.687 |                6.755 |            1.161 |
-| Lasioglossum incompletum |  4.464 |  1.163 |  1.531 |                4.138 |            0.834 |
-
-    ## # A tibble: 3 × 2
-    ##   Site   mean
-    ##   <fct> <dbl>
-    ## 1 BPF     2  
-    ## 2 POS    44.5
-    ## 3 SCL    21.2
+|                          |    BPF |    POS |   SCL | MeanDecreaseAccuracy | MeanDecreaseGini |
+|:-------------------------|-------:|-------:|------:|---------------------:|-----------------:|
+| Halictus tripartitus     |  8.342 | 11.734 | 5.702 |               12.930 |            3.439 |
+| Agapostemon texanus      | 10.306 |  8.460 | 0.523 |               10.848 |            2.756 |
+| Bombus melanopygus       |  8.207 |  4.355 | 3.057 |                8.658 |            1.796 |
+| Bombus flavifrons        |  6.449 |  6.395 | 6.791 |                9.811 |            1.783 |
+| Osmia albolateralis      |  6.433 |  6.085 | 3.078 |                7.938 |            1.645 |
+| Apis mellifera           |  7.592 |  4.177 | 2.978 |                7.618 |            1.623 |
+| Melissodes rivalis       |  2.279 |  7.759 | 2.792 |                7.533 |            1.607 |
+| Halictus confusus        |  8.542 |  1.890 | 2.859 |                7.621 |            1.408 |
+| Bombus fervidus          |  7.137 |  5.336 | 0.904 |                6.884 |            1.307 |
+| Bombus vosnesenskii      |  2.185 |  6.720 | 0.486 |                6.572 |            1.160 |
+| Lasioglossum incompletum |  4.572 |  1.803 | 1.720 |                4.252 |            0.925 |
 
 ![](composition_analyses_files/figure-gfm/random_forest_sites-1.png)<!-- -->
 
@@ -144,6 +137,19 @@ centroids. Bees species shown are the most representative (top 10th
 percentile of a random forest analysis) of the compositional differences
 among sites. Text size of the labels is proportional to variable
 importance score (mean decrease in Gini score).
+
+| Species              | BPF |   POS | SCL | MeanDecreaseAccuracy | MeanDecreaseGini |
+|:---------------------|----:|------:|----:|---------------------:|-----------------:|
+| Halictus tripartitus |  38 | 11603 | 146 |               12.930 |            3.439 |
+| Agapostemon texanus  |  24 |  2269 | 275 |               10.848 |            2.756 |
+| Bombus melanopygus   |  89 |    23 |   2 |                8.658 |            1.796 |
+| Osmia albolateralis  |   2 |   204 |   9 |                7.938 |            1.645 |
+| Apis mellifera       |   8 |   444 | 123 |                7.618 |            1.623 |
+| Melissodes rivalis   |  32 |    17 |  28 |                7.533 |            1.607 |
+| Halictus confusus    |  97 |   108 |   3 |                7.621 |            1.408 |
+| Bombus fervidus      |   9 |   196 |  51 |                6.884 |            1.307 |
+| Bombus vosnesenskii  | 248 |  1556 | 344 |                6.572 |            1.160 |
+| Bombus mixtus        | 135 |   433 |  51 |                   NA |               NA |
 
 ## Session Information
 

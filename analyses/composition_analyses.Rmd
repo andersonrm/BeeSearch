@@ -257,10 +257,6 @@ imp_vals_top <- data.frame(importance(rfmod_site)) %>%
 kable(imp_vals_top, format = "markdown", digits = 3)
 
 
-dat2 %>% filter(Short.label.name == "Agapostemon texanus") %>%
-  group_by(Site, StationYear) %>% tally() %>% 
-  group_by(Site) %>% 
-  summarise(mean = mean(n))
 
 MDSplot(rfmod_site, rf_matrix$Site)
 ```
@@ -311,7 +307,41 @@ site_scores %>%
 ```
 **Variation in community composition across sites.** Bee species are plotted on the first two axes of a three-dimensional non-metric multidimensional scaling ordination of the 58 combinations of station (subsite) and year, across the three sites. Small points are the individual station/year combinations. Large points are the centroids of the three sites. Ellipses are 95% confidence intervals around the site centroids.  Bees species shown are the most representative (top 10th percentile of a random forest analysis) of the compositional differences among sites. Text size of the labels is proportional to variable importance score (mean decrease in Gini score).
 
+```{r which_species_change, echo = F}
 
+imp_vals <- imp_vals_top %>% 
+  rownames_to_column(var = "Short.label.name") %>% 
+  select(-BPF, -SCL, -POS)
+
+
+which_species <- dat2 %>% 
+  filter(Short.label.name == "Bombus melanopygus" |
+         Short.label.name == "Halictus confusus"|
+           Short.label.name == "Melissodes rivalis"|
+           Short.label.name == "Bombus flavirons"|
+           Short.label.name == "Osmia albolateralis"|
+           Short.label.name == "Bombus vosnesenskii"|
+           Short.label.name == "Bombus mixtus"|
+           Short.label.name == "Bombus fervidus"|
+           Short.label.name == "Halictus tripartitus"|
+           Short.label.name == "Agapostemon texanus"|
+           Short.label.name == "Apis mellifera") %>% 
+  group_by(Short.label.name, Site) %>% 
+  tally() %>% 
+  pivot_wider(names_from = Site,
+              values_from = n,
+              values_fill = list(n = 0)) %>% 
+  left_join(., imp_vals, by = "Short.label.name") %>% 
+  rename(Species = Short.label.name) %>% 
+  arrange(desc(MeanDecreaseGini))
+
+kable(which_species, format = "markdown", digits = 3)
+
+write.csv(which_species,
+          "writing/supplemental/important_species_sites.csv",
+          row.names = F)
+
+```
 
 
 
