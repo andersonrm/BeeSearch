@@ -1,7 +1,7 @@
 BeeSearch Species Accumulation Curves and Chao Richness
 ================
 Dr. Riley M. Anderson
-December 09, 2024
+December 10, 2024
 
   
 
@@ -12,6 +12,8 @@ December 09, 2024
 - [Top 10 most abundant species](#top-10-most-abundant-species)
 - [Species collected in all 3 sites](#species-collected-in-all-3-sites)
 - [Only collected by net](#only-collected-by-net)
+- [Species for which ZERO males were collected (net and
+  trap)](#species-for-which-zero-males-were-collected-net-and-trap)
 - [Species accumulation curves](#species-accumulation-curves)
 - [Chao indices](#chao-indices)
   - [SAC with 4 lines and Chao
@@ -160,6 +162,45 @@ Asymptote not reached with the total collection.
 | Lasioglossum sedi           |
 | Megachile fidelis           |
 | Coelioxys gilensis          |
+
+# Species for which ZERO males were collected (net and trap)
+
+| Short.label.name            | female | male |
+|:----------------------------|-------:|-----:|
+| Agapostemon femoratus       |      1 |    0 |
+| Andrena crataegi            |      2 |    0 |
+| Andrena gordoni             |      1 |    0 |
+| Andrena hippotes            |      1 |    0 |
+| Andrena knuthiana           |      5 |    0 |
+| Andrena miranda             |      1 |    0 |
+| Andrena nigrocaerulea       |      5 |    0 |
+| Andrena pallidifovea        |      5 |    0 |
+| Andrena piperi              |      6 |    0 |
+| Andrena subtilis            |      1 |    0 |
+| Andrena thaspii             |      4 |    0 |
+| Bombus rufocinctus          |      2 |    0 |
+| Coelioxys gilensis          |      1 |    0 |
+| Coelioxys octodentata       |      3 |    0 |
+| Diadasia enavata            |      2 |    0 |
+| Halictus tripartitus        |  11787 |    0 |
+| Hoplitis albifrons          |      6 |    0 |
+| Hylaeus punctatus           |      4 |    0 |
+| Lasioglossum cordleyi       |      3 |    0 |
+| Lasioglossum kincaidii      |     31 |    0 |
+| Lasioglossum ovaliceps      |      1 |    0 |
+| Lasioglossum pacatum        |     52 |    0 |
+| Lasioglossum punctatoventre |      1 |    0 |
+| Lasioglossum ruidosense     |      6 |    0 |
+| Lasioglossum sedi           |      1 |    0 |
+| Lasioglossum titusi         |      2 |    0 |
+| Lasioglossum yukonae        |      1 |    0 |
+| Lasioglossum zephyrum       |      7 |    0 |
+| Megachile fidelis           |      1 |    0 |
+| Megachile onobrychidis      |      1 |    0 |
+| Nomada formula              |      1 |    0 |
+| Osmia densa                 |      1 |    0 |
+| Osmia phaceliae             |      3 |    0 |
+| Osmia texana                |      3 |    0 |
 
 # Species accumulation curves
 

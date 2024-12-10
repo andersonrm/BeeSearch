@@ -142,11 +142,11 @@ dat1 <- dat1 %>%
     TRUE ~ as.character(Short.label.name)
   )) %>% 
   # correct misindentification sex classification
-  mutate(Sex = case_when(
+  mutate(Sex = factor(case_when(
     Unique.Specimen.Number == 678 |
-      Unique.Specimen.Number == 679 ~ "Male",
+      Unique.Specimen.Number == 679 ~ "male",
     TRUE ~ as.character(Sex)
-  ))
+  )))
 
 
 
@@ -216,7 +216,12 @@ left_join(honey_bees, total_bees, by = "Site") %>%
   mutate(Percent = 100 * (A_mellifera/total)) %>% 
   kable(., format = "markdown", digits = 2)
 
+honey_bees_total <- left_join(honey_bees, total_bees, by = "Site") %>% 
+  bind_rows(total_honey_bees, .) %>% 
+  mutate(Percent = 100 * (A_mellifera/total)) 
 
+write.csv(honey_bees_total,
+          "writing/supplemental/honey_bees.csv", row.names = F)
 
 ```
 
@@ -238,6 +243,9 @@ nrow(singletons)
 
 kable(singletons, format = "markdown")
 
+write.csv(singletons,
+          "writing/supplemental/singletons.csv", row.names = F)
+
 ```
 
 # Top 10 most abundant species
@@ -252,6 +260,16 @@ dat2 %>%
          Records = n) %>% 
   kable(., format = "markdown")
 
+most_abundant <- dat2 %>% 
+  group_by(Short.label.name) %>% 
+  tally() %>% 
+  arrange(desc(n)) %>% 
+  head(10) %>% 
+  rename(Species = Short.label.name,
+         Records = n)
+
+write.csv(most_abundant,
+          "writing/supplemental/most_abundant_10.csv", row.names = F)
 
 ```
 
@@ -268,6 +286,10 @@ species_all3_sites <- dat2 %>%
 nrow(species_all3_sites)
 
 kable(species_all3_sites, format = "markdown")
+
+write.csv(species_all3_sites,
+          "writing/supplemental/species_found_all_3_sites.csv",
+          row.names = F)
 
 ```
 
@@ -291,6 +313,27 @@ net_only <- anti_join(net_species,
 nrow(net_only)
 
 kable(net_only, format = "markdown")
+
+write.csv(net_only,
+          "writing/supplemental/net_collected_only.csv", row.names = F)
+
+```
+
+# Species for which ZERO males were collected (net and trap)
+```{r only_females_species, echo = F}
+
+no_males <- dat2 %>% 
+  group_by(Short.label.name, Sex) %>% 
+  tally() %>% 
+  pivot_wider(names_from = Sex,
+              values_from = n,
+              values_fill = list(n = 0)) %>% 
+  filter(male == 0)
+
+kable(no_males, format = "markdown")
+
+write.csv(no_males,
+          "writing/supplemental/no_males.csv", row.names = F)
 
 ```
 

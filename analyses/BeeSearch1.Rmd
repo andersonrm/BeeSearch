@@ -129,11 +129,11 @@ dat1 <- dat1 %>%
     TRUE ~ as.character(Short.label.name)
   )) %>% 
   # correct misindentification sex classification
-  mutate(Sex = case_when(
+  mutate(Sex = factor(case_when(
     Unique.Specimen.Number == 678 |
-      Unique.Specimen.Number == 679 ~ "Male",
+      Unique.Specimen.Number == 679 ~ "male",
     TRUE ~ as.character(Sex)
-  ))
+  )))
 
 
 # Create data with all the incompatible sites (unequal sampling effort)
