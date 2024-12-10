@@ -221,7 +221,8 @@ genus_plot_all <- genus %>%
            label = "Unique\nspecies",
            color = "black",
            size = 5) +
-  scale_y_continuous(labels = function(y) abs(y)) +
+  scale_y_continuous(breaks = c(-60, -40, -20, 0, 10, 20),
+                     labels = function(y) abs(y)) +
   scale_fill_manual(values = color_mapping)
 
 ```
@@ -297,7 +298,8 @@ genus_plot_pos <- genus.pos %>%
            label = "Unique\nspecies",
            color = "black",
            size = 5) +
-  scale_y_continuous(labels = function(y) abs(y)) +
+  scale_y_continuous(breaks = c(-60, -40, -20, 0, 5, 15),
+                     labels = function(y) abs(y)) +
   scale_fill_manual(values = color_mapping)
 
 ```
@@ -372,7 +374,8 @@ genus_plot_scl <- genus.scl %>%
            label = "Unique\nspecies",
            color = "black",
            size = 5) +
-  scale_y_continuous(labels = function(y) abs(y)) +
+  scale_y_continuous(breaks = c(-20, -10, 0, 5, 10, 15, 20),
+                     labels = function(y) abs(y)) +
   scale_fill_manual(values = color_mapping)
 
 ```
@@ -453,7 +456,8 @@ genus_plot_bpf <- genus.bpf %>%
            label = "Unique\nspecies",
            color = "black",
            size = 5) +
-  scale_y_continuous(labels = function(y) abs(y)) +
+  scale_y_continuous(breaks = c(-40, -20, -10, 0, 5, 10, 15),
+                     labels = function(y) abs(y)) +
   scale_fill_manual(values = color_mapping)
 
 ```
@@ -545,7 +549,8 @@ genus_plot_trap_net <- genus.tn %>%
            label = "Unique\nspecies",
            color = "black",
            size = 5) +
-  scale_y_continuous(labels = function(y) abs(y)) +
+  scale_y_continuous(breaks = c(-50, -25, -10, 0, 5, 15, 25),
+                     labels = function(y) abs(y)) +
   scale_fill_manual(values = color_mapping.tn)
 
 ```
@@ -632,7 +637,8 @@ genus_plot_net <- genus.net %>%
            label = "Unique\nspecies",
            color = "black",
            size = 5) +
-  scale_y_continuous(labels = function(y) abs(y)) +
+  scale_y_continuous(breaks = c(-10, -5, 0, 5, 10, 15, 20),
+                     labels = function(y) abs(y)) +
   scale_fill_manual(values = color_mapping.net)
 
 ```
