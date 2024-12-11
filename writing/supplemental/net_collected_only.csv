@@ -1,12 +1,12 @@
-"Species"
-"Andrena vicina"
-"Andrena pallidifovea"
-"Lasioglossum titusi"
-"Andrena subtilis"
-"Andrena scurra"
-"Andrena gordoni"
-"Andrena piperi"
-"Lasioglossum punctatoventre"
-"Lasioglossum sedi"
-"Megachile fidelis"
-"Coelioxys gilensis"
+"Species","Net","Trap"
+"Andrena gordoni",1,0
+"Andrena pallidifovea",5,0
+"Andrena piperi",6,0
+"Andrena scurra",11,0
+"Andrena subtilis",1,0
+"Andrena vicina",5,0
+"Coelioxys gilensis",1,0
+"Lasioglossum punctatoventre",1,0
+"Lasioglossum sedi",1,0
+"Lasioglossum titusi",2,0
+"Megachile fidelis",1,0

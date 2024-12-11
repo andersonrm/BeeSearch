@@ -280,8 +280,15 @@ species_all3_sites <- dat2 %>%
   group_by(Short.label.name) %>% 
   summarize(Site_count = n_distinct(Site)) %>%
   filter(Site_count == 3) %>% 
-  rename(Species = Short.label.name) %>% 
-  select(Species)
+  semi_join(x = dat2, y = ., by = "Short.label.name") %>% 
+  group_by(Short.label.name, Site) %>% 
+  tally() %>% 
+  pivot_wider(names_from = Site,
+              values_from = n,
+              values_fill = list(n = 0)) %>% 
+  rename(Species = Short.label.name)
+
+
 
 nrow(species_all3_sites)
 
@@ -296,19 +303,15 @@ write.csv(species_all3_sites,
 # Only collected by net
 ```{r species_only_net_collected, echo = F}
 
-net_species <- dat2 %>% 
-  filter(Collection.Method == "N") %>% 
-  select(Short.label.name)
-
-trap_species <- dat2 %>% 
-  filter(Collection.Method == "T") %>% 
-  select(Short.label.name)
-
-net_only <- anti_join(net_species,
-                      trap_species,
-                      by = "Short.label.name") %>% 
-  distinct() %>% 
-  rename(Species = Short.label.name)
+net_only <- dat2 %>% 
+  group_by(Collection.Method, Short.label.name) %>% 
+  tally() %>% 
+  pivot_wider(names_from = Collection.Method,
+              values_from = n,
+              values_fill = list(n = 0)) %>% 
+  filter(N >= 0 & `T` == 0) %>% 
+  rename(Species = Short.label.name,
+         Net = N, Trap = `T`)
 
 nrow(net_only)
 
@@ -838,31 +841,31 @@ sac_results_4 %>%
             linewidth = 1.1, show.legend = F) +
   geom_ribbon(aes(ymin = lower, ymax = upper,
                   fill = factor(site, level = level_order)),
-              alpha = 0.2) +
-  scale_color_manual(values = c("#000000", "maroon4",
+              alpha = 0.6) +
+  scale_color_manual(values = c("#000", "maroon4",
                                 "#E69F00", "#56B4E9", "#009E73")) +
-  scale_fill_manual(values = c("#000", "maroon4",
+  scale_fill_manual(values = c("grey", "maroon4",
                                "#E69F00", "#56B4E9", "#009E73")) +
   theme_cowplot(font_size = 20) +
   labs(x = "No. sampling sites",
        y = "Richness",
-       fill = "Site") +
+       fill = "          Site") +
   theme(legend.position = c(0.57,0.3)) +
   geom_segment(aes(x = 0, xend = 95,
                    y = 139.04), color = "#000000",
-               linewidth = 1, linetype = "dotdash") +
+               linewidth = 1, linetype = "11") +
   geom_segment(aes(x = 0, xend = 78,
                    y = 124.2), color = "maroon4",
-               linewidth = 1, linetype = "dotdash") +
+               linewidth = 1, linetype = "11") +
   geom_segment(aes(x = 0, xend = 52,
                    y = 115.14), color = "#E69F00",
-               linewidth = 1, linetype = "dotdash") +
+               linewidth = 1, linetype = "11") +
   geom_segment(aes(x = 0, xend = 13,
                    y = 92.04), color = "#56B4E9",
-               linewidth = 1, linetype = "dotdash") +
+               linewidth = 1, linetype = "11") +
   geom_segment(aes(x = 0, xend = 14,
                    y = 79.75), color = "#009E73",
-               linewidth = 1, linetype = "dotdash") +
+               linewidth = 1, linetype = "11") +
   scale_y_continuous(breaks = c(79.75, 92.04, 115.14, 124.2, 139.04),
                      labels = c(80, 92, 115, 124, 139))
 
