@@ -31,9 +31,9 @@ What is this analysis about?
     ## 
     ## adonis2(formula = site_matrix ~ Site * Year, data = site_meta, method = "bray")
     ##           Df SumOfSqs      R2      F Pr(>F)   
-    ## Site       2   1.0050 0.05314 2.1105  0.008 **
-    ## Year       1   0.4331 0.02290 1.8188  0.081 . 
-    ## Site:Year  2   0.3298 0.01744 0.6926  0.820   
+    ## Site       2   1.0050 0.05314 2.1105  0.004 **
+    ## Year       1   0.4331 0.02290 1.8188  0.065 . 
+    ## Site:Year  2   0.3298 0.01744 0.6926  0.852   
     ## Residual  72  17.1432 0.90652                 
     ## Total     77  18.9111 1.00000                 
     ## ---
@@ -45,7 +45,7 @@ What is this analysis about?
     ## 
     ## Response: Distances
     ##           Df  Sum Sq  Mean Sq      F N.Perm Pr(>F)
-    ## Groups     6 0.13306 0.022176 1.5361    999  0.183
+    ## Groups     6 0.13306 0.022176 1.5361    999    0.2
     ## Residuals 71 1.02498 0.014436
     ## 
     ## Permutation test for homogeneity of multivariate dispersions
@@ -73,9 +73,9 @@ What is this analysis about?
     ## Resampling results across tuning parameters:
     ## 
     ##   mtry  Accuracy   Kappa    
-    ##     2   0.6923958  0.1828966
-    ##    55   0.8299202  0.6348494
-    ##   108   0.8073789  0.5953123
+    ##     2   0.7238942  0.2182074
+    ##    55   0.8300592  0.6083051
+    ##   108   0.8097529  0.5728593
     ## 
     ## Accuracy was used to select the optimal model using the largest value.
     ## The final value used for the model was mtry = 55.
@@ -86,26 +86,26 @@ What is this analysis about?
     ##                      Number of trees: 500
     ## No. of variables tried at each split: 55
     ## 
-    ##         OOB estimate of  error rate: 14.1%
+    ##         OOB estimate of  error rate: 15.38%
     ## Confusion matrix:
     ##     BPF POS SCL class.error
-    ## BPF  12   2   0  0.14285714
-    ## POS   1  49   1  0.03921569
-    ## SCL   0   7   6  0.53846154
+    ## BPF  13   1   0  0.07142857
+    ## POS   2  48   1  0.05882353
+    ## SCL   0   8   5  0.61538462
 
-|                          |    BPF |    POS |   SCL | MeanDecreaseAccuracy | MeanDecreaseGini |
-|:-------------------------|-------:|-------:|------:|---------------------:|-----------------:|
-| Halictus tripartitus     |  8.342 | 11.734 | 5.702 |               12.930 |            3.439 |
-| Agapostemon texanus      | 10.306 |  8.460 | 0.523 |               10.848 |            2.756 |
-| Bombus melanopygus       |  8.207 |  4.355 | 3.057 |                8.658 |            1.796 |
-| Bombus flavifrons        |  6.449 |  6.395 | 6.791 |                9.811 |            1.783 |
-| Osmia albolateralis      |  6.433 |  6.085 | 3.078 |                7.938 |            1.645 |
-| Apis mellifera           |  7.592 |  4.177 | 2.978 |                7.618 |            1.623 |
-| Melissodes rivalis       |  2.279 |  7.759 | 2.792 |                7.533 |            1.607 |
-| Halictus confusus        |  8.542 |  1.890 | 2.859 |                7.621 |            1.408 |
-| Bombus fervidus          |  7.137 |  5.336 | 0.904 |                6.884 |            1.307 |
-| Bombus vosnesenskii      |  2.185 |  6.720 | 0.486 |                6.572 |            1.160 |
-| Lasioglossum incompletum |  4.572 |  1.803 | 1.720 |                4.252 |            0.925 |
+|                      |    BPF |    POS |    SCL | MeanDecreaseAccuracy | MeanDecreaseGini |
+|:---------------------|-------:|-------:|-------:|---------------------:|-----------------:|
+| Halictus tripartitus |  8.210 | 13.248 |  4.292 |               13.367 |            4.007 |
+| Agapostemon texanus  |  9.868 |  8.692 | -0.318 |               10.697 |            2.772 |
+| Bombus melanopygus   |  9.067 |  5.467 |  3.886 |                9.472 |            1.939 |
+| Melissodes rivalis   |  2.317 |  7.969 |  3.319 |                7.714 |            1.803 |
+| Bombus flavifrons    |  7.203 |  4.543 |  4.911 |                8.203 |            1.723 |
+| Bombus fervidus      |  7.813 |  5.001 |  1.946 |                7.626 |            1.643 |
+| Osmia albolateralis  |  4.386 |  6.995 |  3.877 |                8.190 |            1.641 |
+| Apis mellifera       |  6.832 |  0.552 |  2.748 |                5.782 |            1.437 |
+| Halictus confusus    |  7.419 |  3.345 |  3.604 |                7.257 |            1.268 |
+| Bombus vosnesenskii  |  2.040 |  6.440 | -1.126 |                5.926 |            1.130 |
+| Bombus mixtus        | -0.661 |  4.432 | -0.033 |                3.614 |            0.864 |
 
 ![](composition_analyses_files/figure-gfm/random_forest_sites-1.png)<!-- -->
 
@@ -140,16 +140,29 @@ importance score (mean decrease in Gini score).
 
 | Species              | BPF |   POS | SCL | MeanDecreaseAccuracy | MeanDecreaseGini |
 |:---------------------|----:|------:|----:|---------------------:|-----------------:|
-| Halictus tripartitus |  38 | 11603 | 146 |               12.930 |            3.439 |
-| Agapostemon texanus  |  24 |  2269 | 275 |               10.848 |            2.756 |
-| Bombus melanopygus   |  89 |    23 |   2 |                8.658 |            1.796 |
-| Osmia albolateralis  |   2 |   204 |   9 |                7.938 |            1.645 |
-| Apis mellifera       |   8 |   444 | 123 |                7.618 |            1.623 |
-| Melissodes rivalis   |  32 |    17 |  28 |                7.533 |            1.607 |
-| Halictus confusus    |  97 |   108 |   3 |                7.621 |            1.408 |
-| Bombus fervidus      |   9 |   196 |  51 |                6.884 |            1.307 |
-| Bombus vosnesenskii  | 248 |  1556 | 344 |                6.572 |            1.160 |
-| Bombus mixtus        | 135 |   433 |  51 |                   NA |               NA |
+| Halictus tripartitus |  38 | 11603 | 146 |               13.367 |            4.007 |
+| Agapostemon texanus  |  24 |  2269 | 275 |               10.697 |            2.772 |
+| Bombus melanopygus   |  89 |    23 |   2 |                9.472 |            1.939 |
+| Melissodes rivalis   |  32 |    17 |  28 |                7.714 |            1.803 |
+| Bombus fervidus      |   9 |   196 |  51 |                7.626 |            1.643 |
+| Osmia albolateralis  |   2 |   204 |   9 |                8.190 |            1.641 |
+| Apis mellifera       |   8 |   444 | 123 |                5.782 |            1.437 |
+| Halictus confusus    |  97 |   108 |   3 |                7.257 |            1.268 |
+| Bombus vosnesenskii  | 248 |  1556 | 344 |                5.926 |            1.130 |
+| Bombus mixtus        | 135 |   433 |  51 |                3.614 |            0.864 |
+
+| Species              |   BPF |   POS |   SCL | MeanDecreaseAccuracy | MeanDecreaseGini |
+|:---------------------|------:|------:|------:|---------------------:|-----------------:|
+| Halictus tripartitus |  2.13 | 54.30 |  7.82 |                13.37 |             4.01 |
+| Agapostemon texanus  |  1.35 | 10.62 | 14.74 |                10.70 |             2.77 |
+| Bombus melanopygus   |  4.99 |  0.11 |  0.11 |                 9.47 |             1.94 |
+| Melissodes rivalis   |  1.79 |  0.08 |  1.50 |                 7.71 |             1.80 |
+| Bombus fervidus      |  0.50 |  0.92 |  2.73 |                 7.63 |             1.64 |
+| Osmia albolateralis  |  0.11 |  0.95 |  0.48 |                 8.19 |             1.64 |
+| Apis mellifera       |  0.45 |  2.08 |  6.59 |                 5.78 |             1.44 |
+| Halictus confusus    |  5.44 |  0.51 |  0.16 |                 7.26 |             1.27 |
+| Bombus vosnesenskii  | 13.90 |  7.28 | 18.44 |                 5.93 |             1.13 |
+| Bombus mixtus        |  7.57 |  2.03 |  2.73 |                 3.61 |             0.86 |
 
 ## Session Information
 

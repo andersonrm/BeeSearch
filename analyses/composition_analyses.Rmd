@@ -88,6 +88,9 @@ c24 <- c(
   "darkturquoise", "green1", "yellow4", "yellow3", "darkorange4"
 )
 
+####
+# Set seed
+set.seed(123)
 
 ```
 
@@ -341,6 +344,37 @@ write.csv(which_species,
           "writing/supplemental/important_species_sites.csv",
           row.names = F)
 
+total_by_site <- dat2 %>% group_by(Site) %>% tally(name = "total")
+
+imp_species_site <- dat2 %>% 
+  filter(Short.label.name == "Bombus melanopygus" |
+         Short.label.name == "Halictus confusus"|
+           Short.label.name == "Melissodes rivalis"|
+           Short.label.name == "Bombus flavirons"|
+           Short.label.name == "Osmia albolateralis"|
+           Short.label.name == "Bombus vosnesenskii"|
+           Short.label.name == "Bombus mixtus"|
+           Short.label.name == "Bombus fervidus"|
+           Short.label.name == "Halictus tripartitus"|
+           Short.label.name == "Agapostemon texanus"|
+           Short.label.name == "Apis mellifera") %>% 
+  group_by(Short.label.name, Site) %>% 
+  tally() %>% 
+  left_join(., total_by_site, by = "Site") %>% 
+  mutate(prop.abund = (n/total) * 100) %>% 
+  select(-n, -total) %>% 
+  pivot_wider(names_from = Site,
+              values_from = prop.abund,
+              values_fill = list(prop.abund = 0)) %>% 
+  left_join(., imp_vals, by = "Short.label.name") %>% 
+  rename(Species = Short.label.name) %>% 
+  arrange(desc(MeanDecreaseGini))
+
+
+kable(imp_species_site, format = "markdown", digits = 2)
+
+write.csv(imp_species_site,
+          "writing/supplemental/prop_imp_species.csv", row.names = F)
 ```
 
 
