@@ -234,7 +234,7 @@ genus.props <- dat2 %>%
   filter(Collection.Method == "T") %>% 
   group_by(Genus) %>% 
   tally(name = "Prop") %>% 
-  mutate(prop.abund = Prop/nrow(dat2))
+  mutate(prop.abund = Prop/nrow(filter(dat2,                                         Collection.Method == "T")))
 
 genus <- left_join(genus.counts, genus.props, by = "Genus")
 
@@ -501,7 +501,8 @@ genus.props.net <- dat2 %>%
   filter(Collection.Method == "N") %>% 
   group_by(Genus) %>% 
   tally(name = "Prop") %>% 
-  mutate(prop.abund = Prop/nrow(dat2))
+  mutate(prop.abund = Prop/nrow(filter(dat2,
+                                       Collection.Method == "N")))
 
 
 net_counts <- anti_join(all_counts_zeros,
@@ -640,7 +641,7 @@ C <- genus.net %>%
   annotate(geom = "text", x = 1, y = -13, label = " ") +
   annotate(geom = "text",
            x = 5,
-           y = -7, 
+           y = -30, 
            label = "Proportional\nabundance (%)",
            color = "black",
            size = 5) +
@@ -650,7 +651,7 @@ C <- genus.net %>%
            label = "Unique\nspecies",
            color = "black",
            size = 5) +
-  scale_y_continuous(breaks = c(-10, -5, 0, 5, 10, 15, 20),
+  scale_y_continuous(breaks = c(-50, -25, -10, 0, 5, 10, 15, 20),
                      labels = function(y) abs(y)) +
   scale_fill_manual(values = color_mapping.net)
 
@@ -697,13 +698,13 @@ E <- genus.bpf %>%
        y = "") +
   annotate(geom = "text", x = 1, y = 16, label = " ") +
   annotate(geom = "text",
-           x = 4.5,
+           x = 5,
            y = -20, 
            label = "Proportional\nabundance (%)",
            color = "black",
            size = 5) +
   annotate(geom = "text",
-           x = 4.4,
+           x = 5,
            y = 10, 
            label = "Unique\nspecies",
            color = "black",

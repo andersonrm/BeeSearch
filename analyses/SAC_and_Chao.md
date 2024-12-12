@@ -393,6 +393,8 @@ net caught records.
 
 ![](SAC_and_Chao_files/figure-gfm/SAC_Chao_fig-1.png)<!-- -->
 
+![](SAC_and_Chao_files/figure-gfm/sac_and_chao-1.png)<!-- -->
+
 # What is the turnover of species within sub-sites within years?
 
 ### POS
