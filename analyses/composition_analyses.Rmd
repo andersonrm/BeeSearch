@@ -278,6 +278,34 @@ imp_spp <- imp_vals_top %>%
 
 spp_scores <- right_join(spp_scores, imp_spp, by = "Species")
 
+# site_scores %>% 
+#   ggplot(aes(x = NMDS1, y = NMDS2)) +
+#   geom_point(aes(NMDS1, NMDS2, color = Site),
+#              size = 1) +
+#   stat_ellipse(aes(color = Site),
+#                show.legend = F) +
+#   geom_point(data = centroids_site,
+#              aes(x = NMDS1, y = NMDS2, fill = Site),
+#              size = 4,
+#              shape = 21, show.legend = F) +
+#   theme_cowplot() +
+#   ggrepel::geom_text_repel(data = spp_scores,
+#                            aes(x = NMDS1, y = NMDS2,
+#                                label = Species,
+#                                size = MeanDecreaseGini),
+#                            max.overlaps = 20) +
+#   scale_size_continuous(
+#     name = "      Mean\ndecrease Gini",
+#     limits = c(.4, 3),
+#     breaks = c(0.75, 2, 3),
+#     range = c(1, 6)) +
+#   guides(color = guide_legend(override.aes = list(size = 4, shape = 16))) +
+#   scale_color_manual(values = c("#E69F00", "#56B4E9", "#009E73"))+
+#   scale_fill_manual(values = c("#E69F00", "#56B4E9", "#009E73")) +
+#   labs(color = "        Site")
+
+##################
+
 site_scores %>% 
   ggplot(aes(x = NMDS1, y = NMDS2)) +
   geom_point(aes(NMDS1, NMDS2, color = Site),
@@ -299,12 +327,21 @@ site_scores %>%
     limits = c(.4, 3),
     breaks = c(0.75, 2, 3),
     range = c(1, 6)) +
-  guides(color = guide_legend(override.aes = list(size = 4, shape = 16))) +
-  scale_color_manual(values = c("#E69F00", "#56B4E9", "#009E73"))+
+  guides(
+    color = guide_legend(override.aes = list(size = 4, shape = 16)),
+    size = guide_legend()
+  ) +
+  scale_color_manual(values = c("#E69F00", "#56B4E9", "#009E73")) +
   scale_fill_manual(values = c("#E69F00", "#56B4E9", "#009E73")) +
-  labs(color = "        Site")
-
-
+  labs(color = "        Site") +
+  theme(
+    legend.position = c(.1, .8), # Moves legends inside the plot
+    legend.direction = "vertical", # Anchor justification
+    legend.box = "horizontal",
+    legend.box.just = "center",
+    legend.spacing.x = unit(1.8, "cm"),
+    legend.background = element_rect(fill = "white") 
+  )
 
 
 ```
