@@ -1,7 +1,7 @@
 BeeSearch Species Accumulation Curves and Chao Richness
 ================
 Dr. Riley M. Anderson
-December 11, 2024
+December 19, 2024
 
   
 
@@ -14,8 +14,12 @@ December 11, 2024
 - [Only collected by net](#only-collected-by-net)
 - [Species for which ZERO males were collected (net and
   trap)](#species-for-which-zero-males-were-collected-net-and-trap)
+- [All species with counts for site, collection method, and
+  sex](#all-species-with-counts-for-site-collection-method-and-sex)
 - [Species accumulation curves](#species-accumulation-curves)
 - [Chao indices](#chao-indices)
+  - [Chao indices by year, site, and collection
+    method](#chao-indices-by-year-site-and-collection-method)
   - [SAC with 4 lines and Chao
     estimates](#sac-with-4-lines-and-chao-estimates)
 - [What is the turnover of species within sub-sites within
@@ -35,6 +39,8 @@ total records (all sites, all years), 2) at each site (all years)
 ### Summary of Results
 
 Asymptote not reached with the total collection.
+
+    [1] 2221
 
 # Honey bees
 
@@ -201,6 +207,129 @@ Asymptote not reached with the total collection.
 | Osmia densa                 |      1 |    0 |
 | Osmia phaceliae             |      3 |    0 |
 | Osmia texana                |      3 |    0 |
+
+# All species with counts for site, collection method, and sex
+
+| Species                     | Total |   POS | BPF | SCL |  Trap | Net | female | male |
+|:----------------------------|------:|------:|----:|----:|------:|----:|-------:|-----:|
+| Halictus tripartitus        | 11787 | 11603 |  38 | 146 | 10831 | 956 |  11787 |    0 |
+| Agapostemon texanus         |  2568 |  2269 |  24 | 275 |  2554 |  14 |   2420 |  148 |
+| Bombus vosnesenskii         |  2148 |  1556 | 248 | 344 |  2102 |  46 |   2048 |  100 |
+| Halictus rubicundus         |  1047 |   666 | 220 | 161 |   936 | 111 |    936 |  111 |
+| Ceratina acantha            |   867 |   670 |  78 | 119 |   805 |  62 |    658 |  209 |
+| Bombus flavifrons           |   782 |   523 | 242 |  17 |   755 |  27 |    556 |  226 |
+| Bombus mixtus               |   619 |   433 | 135 |  51 |   572 |  47 |    532 |   87 |
+| Apis mellifera              |   575 |   444 |   8 | 123 |   362 | 213 |    571 |    4 |
+| Melissodes microsticta      |   538 |   389 |  67 |  82 |   503 |  35 |    379 |  159 |
+| Lasioglossum villosulum     |   484 |   348 |  98 |  38 |   307 | 177 |    414 |   70 |
+| Bombus fervidus             |   256 |   196 |   9 |  51 |   253 |   3 |    202 |   54 |
+| Lasioglossum incompletum    |   235 |   176 |   2 |  57 |   210 |  25 |    211 |   24 |
+| Lasioglossum nevadense      |   235 |   174 |  52 |   9 |   208 |  27 |    227 |    8 |
+| Megachile perihirta         |   216 |   169 |  25 |  22 |   203 |  13 |    173 |   43 |
+| Osmia albolateralis         |   215 |   204 |   2 |   9 |   203 |  12 |    133 |   82 |
+| Halictus confusus           |   208 |   108 |  97 |   3 |   191 |  17 |    143 |   65 |
+| Osmia proxima               |   160 |   117 |  30 |  13 |   150 |  10 |    152 |    8 |
+| Lasioglossum cooleyi        |   121 |    89 |  17 |  15 |   116 |   5 |    118 |    3 |
+| Lasioglossum zonulum        |   115 |    86 |  15 |  14 |   113 |   2 |    112 |    3 |
+| Megachile melanophaea       |   115 |   100 |   4 |  11 |   115 |   0 |     88 |   27 |
+| Bombus melanopygus          |   114 |    23 |  89 |   2 |   114 |   0 |     73 |   41 |
+| Lasioglossum knereri        |   105 |    77 |  22 |   6 |    95 |  10 |     83 |   22 |
+| Agapostemon virescens       |    92 |    88 |   1 |   3 |    88 |   4 |     67 |   25 |
+| Melissodes rivalis          |    77 |    17 |  32 |  28 |    77 |   0 |     29 |   48 |
+| Andrena salicifloris        |    72 |    28 |  21 |  23 |    54 |  18 |     19 |   53 |
+| Ceratina nanula             |    71 |    64 |   5 |   2 |    66 |   5 |     55 |   16 |
+| Hylaeus mesillae            |    71 |    69 |   0 |   2 |     6 |  65 |     36 |   35 |
+| Osmia giliarum              |    66 |    28 |  22 |  16 |    65 |   1 |      3 |   63 |
+| Osmia trifoliama            |    65 |    48 |  16 |   1 |    58 |   7 |     48 |   17 |
+| Andrena angustitarsata      |    62 |     6 |  44 |  12 |    22 |  40 |     13 |   49 |
+| Colletes fulgidus           |    56 |    38 |   1 |  17 |    38 |  18 |     48 |    8 |
+| Lasioglossum pacatum        |    52 |    36 |   9 |   7 |    51 |   1 |     52 |    0 |
+| Lasioglossum sisymbrii      |    48 |    46 |   0 |   2 |    27 |  21 |     34 |   14 |
+| Lasioglossum pacificum      |    45 |    42 |   1 |   2 |    33 |  12 |     41 |    4 |
+| Panurginus atriceps         |    45 |    23 |   0 |  22 |    37 |   8 |     29 |   16 |
+| Osmia dolerosa              |    43 |    39 |   1 |   3 |    42 |   1 |     34 |    9 |
+| Megachile montivaga         |    36 |    27 |   3 |   6 |    36 |   0 |     31 |    5 |
+| Lasioglossum cressonii      |    35 |    21 |   3 |  11 |    34 |   1 |     33 |    2 |
+| Lasioglossum kincaidii      |    31 |    28 |   1 |   2 |    31 |   0 |     31 |    0 |
+| Hoplitis producta           |    28 |     6 |  20 |   2 |    28 |   0 |     13 |   15 |
+| Lasioglossum aff. tenax     |    26 |    17 |   7 |   2 |    20 |   6 |     24 |    2 |
+| Megachile brevis            |    26 |    22 |   0 |   4 |    23 |   3 |     20 |    6 |
+| Andrena nigrihirta          |    25 |     1 |   1 |  23 |    25 |   0 |      1 |   24 |
+| Andrena prunorum            |    23 |    20 |   2 |   1 |    18 |   5 |     20 |    3 |
+| Osmia lignaria              |    23 |     2 |  10 |  11 |    23 |   0 |     16 |    7 |
+| Coelioxys rufitarsis        |    21 |    17 |   1 |   3 |    20 |   1 |      7 |   14 |
+| Hylaeus modestus            |    20 |    13 |   2 |   5 |    19 |   1 |     19 |    1 |
+| Anthidium oblongatum        |    19 |    16 |   0 |   3 |    16 |   3 |     14 |    5 |
+| Heriades carinatus          |    19 |     3 |   0 |  16 |    15 |   4 |     17 |    2 |
+| Andrena candida             |    18 |     9 |   4 |   5 |    17 |   1 |     13 |    5 |
+| Megachile angelarum         |    15 |     8 |   0 |   7 |    11 |   4 |      5 |   10 |
+| Lasioglossum laevissimum    |    14 |     9 |   2 |   3 |     6 |   8 |     10 |    4 |
+| Osmia pusilla               |    14 |     6 |   7 |   1 |    13 |   1 |      6 |    8 |
+| Anthidium manicatum         |    13 |     7 |   5 |   1 |    13 |   0 |      9 |    4 |
+| Megachile gemula            |    12 |     9 |   0 |   3 |    12 |   0 |      5 |    7 |
+| Osmia pinorum               |    12 |     1 |  11 |   0 |    12 |   0 |      0 |   12 |
+| Andrena scurra              |    11 |    11 |   0 |   0 |     0 |  11 |      5 |    6 |
+| Andrena hemileuca           |    10 |     3 |   0 |   7 |     9 |   1 |      1 |    9 |
+| Coelioxys sodalis           |     9 |     9 |   0 |   0 |     9 |   0 |      3 |    6 |
+| Lasioglossum buccale        |     8 |     4 |   1 |   3 |     8 |   0 |      7 |    1 |
+| Lasioglossum inconditum     |     8 |     1 |   7 |   0 |     8 |   0 |      7 |    1 |
+| Osmia tristella             |     8 |     6 |   1 |   1 |     6 |   2 |      6 |    2 |
+| Lasioglossum zephyrum       |     7 |     0 |   0 |   7 |     7 |   0 |      7 |    0 |
+| Megachile rotundata         |     7 |     0 |   2 |   5 |     7 |   0 |      3 |    4 |
+| Andrena piperi              |     6 |     6 |   0 |   0 |     0 |   6 |      6 |    0 |
+| Bombus sitkensis            |     6 |     1 |   3 |   2 |     6 |   0 |      2 |    4 |
+| Coelioxys porterae          |     6 |     5 |   0 |   1 |     6 |   0 |      1 |    5 |
+| Epeolus compactus           |     6 |     5 |   0 |   1 |     4 |   2 |      0 |    6 |
+| Hoplitis albifrons          |     6 |     3 |   3 |   0 |     6 |   0 |      6 |    0 |
+| Lasioglossum ruidosense     |     6 |     1 |   4 |   1 |     5 |   1 |      6 |    0 |
+| Andrena frigida             |     5 |     5 |   0 |   0 |     4 |   1 |      2 |    3 |
+| Andrena knuthiana           |     5 |     5 |   0 |   0 |     3 |   2 |      5 |    0 |
+| Andrena nigrocaerulea       |     5 |     5 |   0 |   0 |     5 |   0 |      5 |    0 |
+| Andrena pallidifovea        |     5 |     5 |   0 |   0 |     0 |   5 |      5 |    0 |
+| Andrena vicina              |     5 |     5 |   0 |   0 |     0 |   5 |      2 |    3 |
+| Andrena thaspii             |     4 |     3 |   1 |   0 |     3 |   1 |      4 |    0 |
+| Hylaeus punctatus           |     4 |     3 |   0 |   1 |     1 |   3 |      4 |    0 |
+| Megachile lapponica         |     4 |     0 |   0 |   4 |     3 |   1 |      1 |    3 |
+| Osmia coloradensis          |     4 |     1 |   0 |   3 |     4 |   0 |      2 |    2 |
+| Stelis subcaerulea          |     4 |     4 |   0 |   0 |     4 |   0 |      0 |    4 |
+| Andrena perplexa            |     3 |     2 |   0 |   1 |     3 |   0 |      2 |    1 |
+| Andrena rufosignata         |     3 |     3 |   0 |   0 |     3 |   0 |      2 |    1 |
+| Coelioxys octodentata       |     3 |     3 |   0 |   0 |     3 |   0 |      3 |    0 |
+| Lasioglossum cordleyi       |     3 |     1 |   2 |   0 |     2 |   1 |      3 |    0 |
+| Nomada suavis               |     3 |     3 |   0 |   0 |     3 |   0 |      1 |    2 |
+| Osmia phaceliae             |     3 |     2 |   0 |   1 |     3 |   0 |      3 |    0 |
+| Osmia texana                |     3 |     2 |   0 |   1 |     2 |   1 |      3 |    0 |
+| Andrena crataegi            |     2 |     2 |   0 |   0 |     1 |   1 |      2 |    0 |
+| Andrena trevoris            |     2 |     0 |   1 |   1 |     2 |   0 |      1 |    1 |
+| Andrena vicinoides          |     2 |     0 |   0 |   2 |     2 |   0 |      0 |    2 |
+| Anthophora terminalis       |     2 |     0 |   1 |   1 |     2 |   0 |      1 |    1 |
+| Bombus rufocinctus          |     2 |     2 |   0 |   0 |     1 |   1 |      2 |    0 |
+| Diadasia enavata            |     2 |     2 |   0 |   0 |     2 |   0 |      2 |    0 |
+| Epeolus olympiellus         |     2 |     2 |   0 |   0 |     2 |   0 |      1 |    1 |
+| Lasioglossum titusi         |     2 |     2 |   0 |   0 |     0 |   2 |      2 |    0 |
+| Megachile frigida           |     2 |     1 |   1 |   0 |     2 |   0 |      1 |    1 |
+| Osmia bucephala             |     2 |     1 |   1 |   0 |     2 |   0 |      1 |    1 |
+| Osmia caerulescens          |     2 |     1 |   1 |   0 |     2 |   0 |      1 |    1 |
+| Agapostemon femoratus       |     1 |     1 |   0 |   0 |     1 |   0 |      1 |    0 |
+| Andrena buckelli            |     1 |     0 |   0 |   1 |     1 |   0 |      0 |    1 |
+| Andrena gordoni             |     1 |     1 |   0 |   0 |     0 |   1 |      1 |    0 |
+| Andrena hippotes            |     1 |     0 |   0 |   1 |     1 |   0 |      1 |    0 |
+| Andrena miranda             |     1 |     1 |   0 |   0 |     1 |   0 |      1 |    0 |
+| Andrena subaustralis        |     1 |     1 |   0 |   0 |     1 |   0 |      0 |    1 |
+| Andrena subtilis            |     1 |     1 |   0 |   0 |     0 |   1 |      1 |    0 |
+| Andrena transnigra          |     1 |     0 |   0 |   1 |     1 |   0 |      0 |    1 |
+| Coelioxys gilensis          |     1 |     1 |   0 |   0 |     0 |   1 |      1 |    0 |
+| Colletes kincaidii          |     1 |     1 |   0 |   0 |     1 |   0 |      0 |    1 |
+| Lasioglossum nigroviride    |     1 |     0 |   1 |   0 |     1 |   0 |      0 |    1 |
+| Lasioglossum ovaliceps      |     1 |     0 |   0 |   1 |     1 |   0 |      1 |    0 |
+| Lasioglossum punctatoventre |     1 |     1 |   0 |   0 |     0 |   1 |      1 |    0 |
+| Lasioglossum sedi           |     1 |     1 |   0 |   0 |     0 |   1 |      1 |    0 |
+| Lasioglossum yukonae        |     1 |     0 |   0 |   1 |     1 |   0 |      1 |    0 |
+| Megachile fidelis           |     1 |     1 |   0 |   0 |     0 |   1 |      1 |    0 |
+| Megachile gravita           |     1 |     1 |   0 |   0 |     1 |   0 |      0 |    1 |
+| Megachile onobrychidis      |     1 |     1 |   0 |   0 |     1 |   0 |      1 |    0 |
+| Nomada formula              |     1 |     1 |   0 |   0 |     1 |   0 |      1 |    0 |
+| Osmia densa                 |     1 |     0 |   0 |   1 |     1 |   0 |      1 |    0 |
 
 # Species accumulation curves
 
@@ -380,7 +509,7 @@ sampling effort. Richness across sites converge in the mid-summer.
 |  36.12 | SCL4    | 2016 |
 |  28.17 | SCL5    | 2016 |
 
-![](SAC_and_Chao_files/figure-gfm/chao_station_year-1.png)<!-- -->
+![](SAC_and_Chao_files/figure-gfm/chao_station_year-1.png)<!-- -->![](SAC_and_Chao_files/figure-gfm/chao_station_year-2.png)<!-- -->
 
 **Species richness across sites and sampling years** Points are mean
 Chao1 estimated species richness, triangles are raw species counts at
@@ -389,9 +518,13 @@ an additive parameter that accounts for rare species likely missed in
 the sampling. The data exclude some morphospecies (see methods), and all
 net caught records.
 
+## Chao indices by year, site, and collection method
+
+![](SAC_and_Chao_files/figure-gfm/chao_fig_B-1.png)<!-- -->
+
 ## SAC with 4 lines and Chao estimates
 
-![](SAC_and_Chao_files/figure-gfm/SAC_Chao_fig-1.png)<!-- -->
+![](SAC_and_Chao_files/figure-gfm/SAC_Chao_fig-1.png)<!-- -->![](SAC_and_Chao_files/figure-gfm/SAC_Chao_fig-2.png)<!-- -->
 
 ![](SAC_and_Chao_files/figure-gfm/sac_and_chao-1.png)<!-- -->
 

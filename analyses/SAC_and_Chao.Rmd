@@ -127,7 +127,8 @@ dat1 <- dat1 %>%
                          JD > 205 ~ "late",
                          TRUE ~ "mid"),
          # Create a station/year column for grouping
-         StationYear = paste(Station, Year, sep = "_")) %>% 
+         StationYear = paste(Station, Year, sep = "_"),
+         SiteYear = paste(Site, Year, sep = "_")) %>% 
   filter(Station != "",
          Site != "") %>% # remove empty station & site records
   # convert M/F to male/female to avoid "F = FALSE" misinterpretation
@@ -179,7 +180,13 @@ keep.Nomada <- dat2 %>% filter(Genus == "Nomada") %>%
   filter(!str_detect(Short.label.name, "Nomada msp\\.") |
            n >= 10)
 
+dat3 <- dat1 %>% 
+  filter(!str_detect(Short.label.name, "(?<!m)sp\\."),
+         !str_detect(Short.label.name, "(?<!m)msp\\.")) 
 
+dat1 %>% 
+  filter(Collection.Method == "N") %>% 
+  nrow()
 
 
 ```
@@ -338,6 +345,58 @@ kable(no_males, format = "markdown")
 write.csv(no_males,
           "writing/supplemental/no_males.csv", row.names = F)
 
+```
+
+# All species with counts for site, collection method, and sex
+```{r all_species_table, echo = F}
+
+
+site_species <- dat3 %>%
+  group_by(Short.label.name,
+           Site) %>% 
+  tally() %>% 
+  pivot_wider(names_from = Site,
+              values_from = n,
+              values_fill = list(n = 0))
+
+all_species <- dat3 %>% 
+  group_by(Short.label.name) %>% 
+  tally(name = "Total")
+
+collection_species <- dat3 %>% 
+  group_by(Short.label.name,
+           Collection.Method) %>% 
+  tally() %>% 
+  pivot_wider(names_from = Collection.Method,
+              values_from = n,
+              values_fill = list(n = 0))
+
+sex_species <- dat3 %>%
+  group_by(Short.label.name,
+           Sex) %>% 
+  tally() %>% 
+  pivot_wider(names_from = Sex,
+              values_from = n,
+              values_fill = list(n = 0))
+
+wide_species <- left_join(all_species,
+                          site_species,
+                          by = "Short.label.name")
+wide_species <- left_join(wide_species, collection_species,
+                          by = "Short.label.name")
+wide_species <- left_join(wide_species, sex_species,
+                          by = "Short.label.name")
+
+wide_species <- wide_species %>% 
+  rename(Species = Short.label.name,
+         Trap = `T`,
+         Net = N) %>% 
+  arrange(desc(Total))
+
+kable(wide_species, format = "markdown")
+
+write.csv(wide_species,
+          file = "writing/supplemental/wide_species.csv")
 ```
 
 # Species accumulation curves
@@ -743,9 +802,49 @@ chao_station_year <- data.frame(
   separate_wider_delim(StationYear, delim = "_",
                        names = c("Station", "Year"))
 
+# Sites by year
+chao_site_year <- dat2 %>% 
+  filter(Collection.Method == "T") %>% 
+  group_by(SiteYear, Short.label.name) %>% 
+  tally(name = "count") %>% 
+  pivot_wider(names_from = SiteYear,
+              values_from = count,
+              values_fill = list(count = 0)) %>% 
+  column_to_rownames("Short.label.name")
 
+chao_site_year <- data.frame(
+  chao1 = sapply(seq_along(chao_site_year), function(i){
+    chao1(chao_site_year[[i]])}),
+  SiteYear = colnames(chao_site_year))
 
+# Trap by year
+chao_trap_year <- dat2 %>% 
+  filter(Collection.Method == "T") %>% 
+  group_by(Year, Short.label.name) %>% 
+  tally(name = "count") %>% 
+  pivot_wider(names_from = Year,
+              values_from = count,
+              values_fill = list(count = 0)) %>% 
+  column_to_rownames("Short.label.name")
 
+chao_trap_year <- data.frame(
+  chao1 = sapply(seq_along(chao_trap_year), function(i){
+    chao1(chao_trap_year[[i]])}),
+  Year = colnames(chao_trap_year))
+
+# Trap and Net by year
+chao_trapnet_year <- dat2 %>% 
+  group_by(Year, Short.label.name) %>% 
+  tally(name = "count") %>% 
+  pivot_wider(names_from = Year,
+              values_from = count,
+              values_fill = list(count = 0)) %>% 
+  column_to_rownames("Short.label.name")
+
+chao_trapnet_year <- data.frame(
+  chao1 = sapply(seq_along(chao_trapnet_year), function(i){
+    chao1(chao_trapnet_year[[i]])}),
+  Year = colnames(chao_trapnet_year))
 ```
 From Anne Chao 1989:
 
@@ -808,7 +907,8 @@ chao_station_year %>%
   theme(legend.position = c(0.8, 0.85))
 
 
-B <- chao_station_year %>% 
+
+chao_station_year %>% 
   mutate(Year = as.numeric(Year),
          Site = substr(Station, 1,3)) %>% 
   group_by(Site, Year) %>% 
@@ -837,7 +937,87 @@ B <- chao_station_year %>%
 
 **Species richness across sites and sampling years** Points are mean Chao1 estimated species richness, triangles are raw species counts at each substation within each site. Chao richness estimates are lifted by an additive parameter that accounts for rare species likely missed in the sampling. The data exclude some morphospecies (see methods), and all net caught records.
 
+## Chao indices by year, site, and collection method
+```{r chao_fig_B, echo = F}
 
+chao_trap_year <- chao_trap_year %>%
+  mutate(Site = "All Sites")
+
+chao_trapnet_year <- chao_trapnet_year %>% 
+  mutate(Site = "All Sites (N & T)")
+
+chao_site_year <- chao_site_year %>% 
+  separate_wider_delim(SiteYear,
+                       delim = "_",
+                       names = c("Site", "Year"))
+
+chao_fig <- bind_rows(chao_trapnet_year,
+                      chao_trap_year,
+                      chao_site_year) %>% 
+  rename(rich = chao1)
+
+site_year <- dat2 %>% 
+  filter(Collection.Method == "T") %>% 
+  group_by(Short.label.name, SiteYear) %>% 
+  tally() %>% 
+  group_by(SiteYear) %>% 
+  tally() %>% 
+  separate_wider_delim(SiteYear,
+                       delim = "_",
+                       names = c("Site", "Year")) %>% 
+  mutate(Site2 = Site,
+         Year = factor(Year)) %>% select(-Site) %>% 
+  rename(Site = Site2)
+
+trap_year <- dat2 %>% 
+  filter(Collection.Method == "T") %>% 
+  group_by(Short.label.name, Year) %>% 
+  tally() %>% group_by(Year) %>%  tally() %>% 
+  mutate(Site = "All Sites",
+         Year = factor(Year))
+
+trapnet_year <- dat2 %>% 
+  group_by(Short.label.name, Year) %>% 
+  tally() %>% group_by(Year) %>% tally() %>% 
+  mutate(Site = "All Sites (N & T)",
+         Year = factor(Year))
+
+raw_fig <- bind_rows(trapnet_year,
+                     trap_year, site_year) %>% 
+  rename(rich = n)
+
+
+B <- chao_fig %>% 
+  ggplot(aes(x = Year, y = rich,
+             color = factor(Site, level = level_order),
+             group = Site)) +
+  geom_point(size = 2.5, shape = 15) +
+  geom_line(linewidth = 1.1, linetype = "dashed") +
+  geom_point(data = raw_fig,
+             aes(x = Year, y = rich,
+                 color = factor(Site, level = level_order)),
+             alpha = 0.3) +
+  geom_line(data = raw_fig,
+            aes(x = Year, y = rich, group = Site,
+                color = factor(Site, level = level_order)),
+            linewidth = 0.7,
+            alpha = 0.3) +
+  scale_color_manual(values = c("#000", "maroon4",
+                                "#E69F00", "#56B4E9", "#009E73"),
+                     labels = c("All Sites\n(N & T)",
+                                "All Sites",
+                                "POS", "SCL", "BPF")) +
+  labs(x = "", y = "Richness", color = "") +
+  theme_cowplot(font_size = 18) +
+  expand_limits(y = 175) +
+  theme(
+    legend.position = c(.15, .9), # Moves legends inside the plot
+    legend.direction = "horizontal",
+    legend.text.position = "bottom",
+    legend.ticks.length = unit(0.5, "cm"))
+B
+
+```
 
 ## SAC with 4 lines and Chao estimates
 ```{r SAC_Chao_fig, echo = F, fig.width=6,fig.height=7}
@@ -869,10 +1049,10 @@ sac_results_4 %>%
                                 "#E69F00", "#56B4E9", "#009E73")) +
   scale_fill_manual(values = c("grey", "maroon4",
                                "#E69F00", "#56B4E9", "#009E73")) +
-  theme_cowplot(font_size = 20) +
+  theme_cowplot(font_size = 18) +
   labs(x = "No. sampling sites",
        y = "Richness",
-       fill = "          Site") +
+       fill = "") +
   theme(legend.position = c(0.57,0.3)) +
   geom_segment(aes(x = 0, xend = 95,
                    y = 139.04), color = "#000000",
@@ -904,11 +1084,14 @@ A <- sac_results_4 %>%
                                 "#E69F00", "#56B4E9", "#009E73")) +
   scale_fill_manual(values = c("grey", "maroon4",
                                "#E69F00", "#56B4E9", "#009E73")) +
-  theme_cowplot(font_size = 20) +
+  theme_cowplot(font_size = 18) +
   labs(x = "No. sampling sites",
        y = "Richness",
-       fill = "          Site") +
-  theme(legend.position = c(0.5,0.3)) +
+       fill = "") +
+  theme(
+    legend.position = c(.45, .4), # Moves legends inside the plot
+    legend.direction = "vertical",
+    legend.text.position = "left") +
   geom_segment(aes(x = 0, xend = 95,
                    y = 139.04), color = "#000000",
                linewidth = 1, linetype = "11") +
@@ -927,7 +1110,7 @@ A <- sac_results_4 %>%
   scale_y_continuous(breaks = c(79.75, 92.04, 115.14, 124.2, 139.04),
                      labels = c(80, 92, 115, 124, 139))
 
-
+A
 
 ```
 
@@ -935,7 +1118,8 @@ A <- sac_results_4 %>%
 
 plot_grid(A, B,
           labels = c("A", "B"),
-          ncol = 2)
+          ncol = 2,
+          rel_widths = c(1, 1.2))
 
 
 ```
