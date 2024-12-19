@@ -1089,7 +1089,7 @@ A <- sac_results_4 %>%
        y = "Richness",
        fill = "") +
   theme(
-    legend.position = c(.45, .4), # Moves legends inside the plot
+    legend.position = c(.45, .3), # Moves legends inside the plot
     legend.direction = "vertical",
     legend.text.position = "left") +
   geom_segment(aes(x = 0, xend = 95,
