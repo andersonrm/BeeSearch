@@ -725,6 +725,37 @@ dat_ridges_species %>%
 
 ```
 
+```{r species_by_genus, echo = F}
+
+dat_ridges_species %>% 
+  ggplot(aes(x = week,
+             y = Short.label.name,
+             fill = Short.label.name)) +
+  geom_density_ridges(scale = 3, rel_min_height = 0.01) +
+  theme_ridges(grid = F) +
+  theme(legend.position = "none") +
+  scale_x_continuous(breaks = c(10, 20, 30, 40),
+                     labels = c("3 March", "15 May",
+                                "24 July", "3 October")) +
+  labs(x = "", y = "") +
+  geom_vline(xintercept = 12.6,
+             color = "grey50", linetype = "dashed") +
+  geom_vline(xintercept = 25.3,
+             color = "grey50", linetype = "dashed") +
+  geom_vline(xintercept = 38.4,
+             color = "grey50", linetype = "dashed") +
+  annotate(geom = "text", x = 7, y = 52, label = " ") +
+  annotate(geom = "text", x = 8, y = 50, label = "Winter") +
+  annotate(geom = "text", x = 20, y = 50, label = "Spring") +
+  annotate(geom = "text", x = 32, y = 50, label = "Summer") +
+  annotate(geom = "text", x = 42, y = 50, label = "Fall") +
+  geom_text(data = more_than_20, aes(x = 43, y = Short.label.name,
+                                     label = n), size = 3)
+
+
+
+```
+
 **Species-level seasonal distributions.** Density is estimated uniformly across all species with Silverman's method. Sample sizes displayed on the right are the total number of records for each species. Species displayed are those for which sample sizes were $\ge$ 20. Vertical dashed lines correspond to 21 March, 21 June, and 21 September.
 
 # Phenology by phylogeny

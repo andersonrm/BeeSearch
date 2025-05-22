@@ -243,16 +243,22 @@ rfmod_site <- randomForest(y = rf_matrix$Site,
                            importance = T, nPerm = 999,
                            proximity = T)
 
+fit_control <- trainControl(method = "repeatedcv",
+                            number = 10,
+                            repeats = 10)
 
 train(y = rf_matrix$Site,
       x = select(rf_matrix,
                  -Year, -Station,
                  -StationYear, -Site),
-      method = "rf", na.action = na.omit)
+      method = "rf", na.action = na.omit,
+      trControl = fit_control)
 
 update(rfmod_site, mtry = 55)
 
+plot(rfmod_site)
 
+# get the top 10th %tile of important species
 imp_vals_top <- data.frame(importance(rfmod_site)) %>% 
   arrange(desc(MeanDecreaseGini)) %>% 
   filter(MeanDecreaseGini > quantile(MeanDecreaseGini, 0.9))
@@ -278,33 +284,7 @@ imp_spp <- imp_vals_top %>%
 
 spp_scores <- right_join(spp_scores, imp_spp, by = "Species")
 
-# site_scores %>% 
-#   ggplot(aes(x = NMDS1, y = NMDS2)) +
-#   geom_point(aes(NMDS1, NMDS2, color = Site),
-#              size = 1) +
-#   stat_ellipse(aes(color = Site),
-#                show.legend = F) +
-#   geom_point(data = centroids_site,
-#              aes(x = NMDS1, y = NMDS2, fill = Site),
-#              size = 4,
-#              shape = 21, show.legend = F) +
-#   theme_cowplot() +
-#   ggrepel::geom_text_repel(data = spp_scores,
-#                            aes(x = NMDS1, y = NMDS2,
-#                                label = Species,
-#                                size = MeanDecreaseGini),
-#                            max.overlaps = 20) +
-#   scale_size_continuous(
-#     name = "      Mean\ndecrease Gini",
-#     limits = c(.4, 3),
-#     breaks = c(0.75, 2, 3),
-#     range = c(1, 6)) +
-#   guides(color = guide_legend(override.aes = list(size = 4, shape = 16))) +
-#   scale_color_manual(values = c("#E69F00", "#56B4E9", "#009E73"))+
-#   scale_fill_manual(values = c("#E69F00", "#56B4E9", "#009E73")) +
-#   labs(color = "        Site")
 
-##################
 
 site_scores %>% 
   ggplot(aes(x = NMDS1, y = NMDS2)) +

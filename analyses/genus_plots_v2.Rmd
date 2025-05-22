@@ -596,7 +596,8 @@ plot_grid(genus_plot_trap_net, genus_plot_net,
 
 ```{r all_plots_3_column, echo = F, fig.width=12, fig.height=11}
 
-A <- genus_plot_trap_net
+A <- genus_plot_trap_net +
+  theme(axis.text.y = element_text(face = "italic"))
 
 B <- genus %>% 
   ggplot(aes(x = fct_reorder(Genus, Species2, .desc = F),
@@ -682,7 +683,8 @@ D <- genus.pos %>%
            size = 5) +
   scale_y_continuous(breaks = c(-60, -40, -20, 0, 5, 15),
                      labels = function(y) abs(y)) +
-  scale_fill_manual(values = color_mapping)
+  scale_fill_manual(values = color_mapping) +
+  theme(axis.text.y = element_text(face = 'italic'))
 
 E <- genus.bpf %>% 
   ggplot(aes(x = fct_reorder(Genus, Species2, .desc = F),
