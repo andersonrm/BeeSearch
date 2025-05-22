@@ -234,7 +234,8 @@ dat_ridges %>%
   annotate(geom = "text", x = 41, y = 21.5, label = "Fall",
            size = 5) +
   geom_text(data = genus_records, aes(x = 43, y = Genus,
-                                      label = n), size = 3)
+                                      label = n), size = 3) +
+  theme(axis.text.y = element_text(face = "italic"))
 
 
 
@@ -312,7 +313,8 @@ nomada <- dat_ridges_parasite %>%
   geom_text(data = filter(parasite_records,
                           Genus == "Nomada" | Genus == "Andrena" |
                           Genus == "Agapostemon"),
-            aes(x = 43, y = Genus, label = n), size = 3)
+            aes(x = 43, y = Genus, label = n), size = 3) +
+  theme(axis.text.y = element_text(face = "italic"))
 
 ```
 
@@ -354,7 +356,8 @@ stelis <- dat_ridges_parasite %>%
                           Genus == "Stelis" | Genus == "Osmia" |
                           Genus == "Megachile"),
             aes(x = 11, y = Genus, label = n), size = 3) +
-  scale_y_discrete(position = "right")
+  scale_y_discrete(position = "right") +
+  theme(axis.text.y = element_text(face = "italic"))
 
 ##########################################
 stelis2 <- dat_ridges_parasite %>% 
@@ -391,7 +394,8 @@ stelis2 <- dat_ridges_parasite %>%
   geom_text(data = filter(parasite_records,
                           Genus == "Stelis" | Genus == "Osmia" |
                           Genus == "Megachile"),
-            aes(x = 43, y = Genus, label = n), size = 3)
+            aes(x = 43, y = Genus, label = n), size = 3) +
+  theme(axis.text.y = element_text(face = "italic"))
 
 ```
 
@@ -433,7 +437,8 @@ sphecodes <- dat_ridges_parasite %>%
   geom_text(data = filter(parasite_records,
                           Genus == "Sphecodes" | Genus == "Halictus" |
            Genus == "Lasioglossum" | Genus == "Agapostemon"),
-            aes(x = 43, y = Genus, label = n), size = 3)
+            aes(x = 43, y = Genus, label = n), size = 3) +
+  theme(axis.text.y = element_text(face = "italic"))
 
 ```
 
@@ -472,7 +477,8 @@ epeolus <- dat_ridges_parasite %>%
   geom_text(data = filter(parasite_records,
                           Genus == "Epeolus" | Genus == "Colletes"),
             aes(x = 17, y = Genus, label = n), size = 3) +
-  scale_y_discrete(position = "right")
+  scale_y_discrete(position = "right") +
+  theme(axis.text.y = element_text(face = "italic"))
 
 ###############################################3
 epeolus2 <- dat_ridges_parasite %>% 
@@ -506,7 +512,8 @@ epeolus2 <- dat_ridges_parasite %>%
   annotate(geom = "text", x = 41, y = 7, label = "Fall") +
   geom_text(data = filter(parasite_records,
                           Genus == "Epeolus" | Genus == "Colletes"),
-            aes(x = 43, y = Genus, label = n), size = 3)
+            aes(x = 43, y = Genus, label = n), size = 3) +
+  theme(axis.text.y = element_text(face = "italic"))
 
 ```
 
@@ -542,7 +549,8 @@ triepeolus <- dat_ridges_parasite %>%
   geom_text(data = filter(parasite_records,
                           Genus == "Triepeolus" |
                           Genus == "Melissodes"),
-            aes(x = 50, y = c(.7, 1.8), label = n), size = 3)
+            aes(x = 50, y = c(.7, 1.8), label = n), size = 3) +
+  theme(axis.text.y = element_text(face = "italic"))
 
 
 
@@ -584,7 +592,11 @@ coelioxys <- dat_ridges_parasite %>%
                           Genus == "Coelioxys" |
                           Genus == "Megachile"),
             aes(x = 11, y = Genus, label = n), size = 3) +
-  scale_y_discrete(position = "right")
+  scale_y_discrete(position = "right") +
+  theme(axis.text.y = element_text(face = "italic"))
+
+
+
 
 coelioxys2 <- dat_ridges_parasite %>% 
   filter(Genus == "Coelioxys" | Genus == "Megachile") %>% 
@@ -618,7 +630,8 @@ coelioxys2 <- dat_ridges_parasite %>%
   geom_text(data = filter(parasite_records,
                           Genus == "Coelioxys" |
                           Genus == "Megachile"),
-            aes(x = 45, y = Genus, label = n), size = 3)
+            aes(x = 45, y = Genus, label = n), size = 3) +
+  theme(axis.text.y = element_text(face = "italic"))
 
 ```
 
@@ -720,7 +733,8 @@ dat_ridges_species %>%
   annotate(geom = "text", x = 32, y = 50, label = "Summer") +
   annotate(geom = "text", x = 42, y = 50, label = "Fall") +
   geom_text(data = more_than_20, aes(x = 43, y = Short.label.name,
-                                     label = n), size = 3)
+                                     label = n), size = 3) +
+  theme(axis.text.y = element_text(face = "italic"))
 
 
 ```
@@ -750,7 +764,8 @@ dat_ridges_species %>%
   annotate(geom = "text", x = 32, y = 50, label = "Summer") +
   annotate(geom = "text", x = 42, y = 50, label = "Fall") +
   geom_text(data = more_than_20, aes(x = 43, y = Short.label.name,
-                                     label = n), size = 3)
+                                     label = n), size = 3) +
+  theme(axis.text.y = element_text(face = "italic"))
 
 
 
@@ -793,7 +808,8 @@ dat_ridges %>%
   annotate(geom = "text", x = 32, y = 24, label = "Summer",
            size = 5) +
   annotate(geom = "text", x = 41, y = 24, label = "Fall",
-           size = 5) 
+           size = 5)  +
+  theme(axis.text.y = element_text(face = "italic"))
 
 
 ```

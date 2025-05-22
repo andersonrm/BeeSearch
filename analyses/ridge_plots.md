@@ -1,7 +1,7 @@
 BeeSearch ridge plots
 ================
 Dr. Riley M. Anderson
-December 04, 2024
+May 22, 2025
 
   
 
@@ -86,7 +86,48 @@ estimation.
 
 # Species by time of year
 
+    ## # A tibble: 35 × 2
+    ##    Short.label.name             n
+    ##    <chr>                    <int>
+    ##  1 Nomada msp. 2016A_CABS       5
+    ##  2 Nomada msp. 2016B_CABS       3
+    ##  3 Nomada msp. 2016C_CABS      13
+    ##  4 Nomada msp. 2016D_CABS       1
+    ##  5 Nomada msp. 2016E_CABS       1
+    ##  6 Nomada msp. 2016F_CABS       1
+    ##  7 Nomada msp. 2017A_CABS       2
+    ##  8 Nomada msp. 2019B_2_CABS     2
+    ##  9 Nomada msp. 2019B_CABS       4
+    ## 10 Nomada msp. 2023A_CABS      13
+    ## 11 Nomada msp. 2023C_CABS       6
+    ## 12 Nomada msp. 2023E_CABS       6
+    ## 13 Nomada msp. 2023F_CABS       1
+    ## 14 Nomada msp. 2023G_CABS       2
+    ## 15 Nomada msp. 2023I_CABS       2
+    ## 16 Nomada msp. 2023J_CABS       1
+    ## 17 Osmia msp. BS0038            1
+    ## 18 Osmia msp. BS0049            1
+    ## 19 Osmia msp. BS0051            1
+    ## 20 Osmia msp. BS0056            1
+    ## 21 Osmia msp. BS0058            2
+    ## 22 Sphecodes msp. BS0001       22
+    ## 23 Sphecodes msp. BS0002       10
+    ## 24 Sphecodes msp. BS0003      147
+    ## 25 Sphecodes msp. BS0017       88
+    ## 26 Sphecodes msp. BS0018       14
+    ## 27 Sphecodes msp. BS0019        4
+    ## 28 Sphecodes msp. BS0020        1
+    ## 29 Sphecodes msp. BS0021        1
+    ## 30 Sphecodes msp. BS0022        1
+    ## 31 Sphecodes msp. BS0023        6
+    ## 32 Sphecodes msp. BS0060        1
+    ## 33 Sphecodes msp. BS0061        3
+    ## 34 Sphecodes msp. BS0062        6
+    ## 35 Triepeolus msp. BS0063       3
+
 ![](ridge_plots_files/figure-gfm/species_ridgeplot-1.png)<!-- -->
+
+![](ridge_plots_files/figure-gfm/species_by_genus-1.png)<!-- -->
 
 **Species-level seasonal distributions.** Density is estimated uniformly
 across all species with Silverman’s method. Sample sizes displayed on

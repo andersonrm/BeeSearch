@@ -1,7 +1,7 @@
 BeeSearch Multivariate Analyses
 ================
 Dr. Riley M. Anderson
-December 12, 2024
+May 22, 2025
 
   
 
@@ -68,14 +68,14 @@ What is this analysis about?
     ##   3 classes: 'BPF', 'POS', 'SCL' 
     ## 
     ## No pre-processing
-    ## Resampling: Bootstrapped (25 reps) 
-    ## Summary of sample sizes: 78, 78, 78, 78, 78, 78, ... 
+    ## Resampling: Cross-Validated (10 fold, repeated 10 times) 
+    ## Summary of sample sizes: 71, 71, 70, 71, 68, 71, ... 
     ## Resampling results across tuning parameters:
     ## 
     ##   mtry  Accuracy   Kappa    
-    ##     2   0.7238942  0.2182074
-    ##    55   0.8300592  0.6083051
-    ##   108   0.8097529  0.5728593
+    ##     2   0.7365833  0.2812095
+    ##    55   0.8641706  0.6900381
+    ##   108   0.8508770  0.6626181
     ## 
     ## Accuracy was used to select the optimal model using the largest value.
     ## The final value used for the model was mtry = 55.
@@ -86,12 +86,14 @@ What is this analysis about?
     ##                      Number of trees: 500
     ## No. of variables tried at each split: 55
     ## 
-    ##         OOB estimate of  error rate: 15.38%
+    ##         OOB estimate of  error rate: 16.67%
     ## Confusion matrix:
     ##     BPF POS SCL class.error
-    ## BPF  13   1   0  0.07142857
+    ## BPF  12   2   0  0.14285714
     ## POS   2  48   1  0.05882353
     ## SCL   0   8   5  0.61538462
+
+![](composition_analyses_files/figure-gfm/random_forest_sites-1.png)<!-- -->
 
 |                      |    BPF |    POS |    SCL | MeanDecreaseAccuracy | MeanDecreaseGini |
 |:---------------------|-------:|-------:|-------:|---------------------:|-----------------:|
@@ -107,7 +109,7 @@ What is this analysis about?
 | Bombus vosnesenskii  |  2.040 |  6.440 | -1.126 |                5.926 |            1.130 |
 | Bombus mixtus        | -0.661 |  4.432 | -0.033 |                3.614 |            0.864 |
 
-![](composition_analyses_files/figure-gfm/random_forest_sites-1.png)<!-- -->
+![](composition_analyses_files/figure-gfm/random_forest_sites-2.png)<!-- -->
 
 **Random Forest classification of site by species composition.** The
 model was tuned without pre-processing. Bootstrapped resampling used 25

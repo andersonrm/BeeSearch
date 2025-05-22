@@ -301,7 +301,8 @@ site_scores %>%
                            aes(x = NMDS1, y = NMDS2,
                                label = Species,
                                size = MeanDecreaseGini),
-                           max.overlaps = 20) +
+                           max.overlaps = 20,
+                           fontface = "italic") +
   scale_size_continuous(
     name = "      Mean\ndecrease Gini",
     limits = c(.4, 3),
@@ -321,7 +322,7 @@ site_scores %>%
     legend.box.just = "center",
     legend.spacing.x = unit(1.8, "cm"),
     legend.background = element_rect(fill = "white") 
-  )
+  ) 
 
 
 ```
