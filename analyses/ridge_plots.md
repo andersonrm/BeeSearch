@@ -1,7 +1,7 @@
 BeeSearch ridge plots
 ================
 Dr. Riley M. Anderson
-May 22, 2025
+July 09, 2025
 
   
 
@@ -144,7 +144,7 @@ dashed lines correspond to 21 March, 21 June, and 21 September.
 
     R version 4.2.3 (2023-03-15 ucrt)
     Platform: x86_64-w64-mingw32/x64 (64-bit)
-    Running under: Windows 10 x64 (build 19045)
+    Running under: Windows 10 x64 (build 22631)
 
     Matrix products: default
 
