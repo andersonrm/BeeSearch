@@ -63,7 +63,7 @@ library(tidyverse) # Needed for data wrangling: dplyr, tidyr, ggplot2
 library(cowplot) # Needed for publication-quality ggplots
 library(knitr)
 library(ggridges)
-
+library(sjPlot)
 
 # @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 # @@@@@ Data Preparation
@@ -168,6 +168,41 @@ genus_levels <- levels(genus$Genus)
 
 color_mapping <- setNames(c24, genus_levels)
 ```
+
+
+# Abundance over time
+```{r abundance_over_time, echo = F}
+
+abundance <- dat1 %>% 
+  # filter(Short.label.name != "Halictus tripartitus") %>% 
+  group_by(StationYear, Year, Site) %>% 
+  tally()
+  
+abundance %>% 
+  ggplot(aes(x = Year, y = n)) +
+  geom_jitter(width = 0.1, height = 0) +
+  geom_smooth(method = 'lm',
+              alpha = 0.3) +
+  facet_wrap(~Site) +
+  scale_y_continuous(transform = "log10") +
+  theme_bw() +
+  theme(strip.background = element_blank()) +
+  labs(y = "Abundance")
+
+pos_mod1 <- lm(n ~ Year, data = filter(abundance, Site == "POS"))
+
+# plot_model(pos_mod1, type = "diag")
+
+bpf_mod1 <- lm(n ~ Year, data = filter(abundance, Site == "BPF"))
+
+# plot_model(bpf_mod1, type = "diag")
+
+scl_mod1 <- lm(n ~ Year, data = filter(abundance, Site == "SCL"))
+
+# plot_model(scl_mod1, type = "diag")
+
+```
+
 
 
 # Genus by time of year
@@ -638,7 +673,7 @@ coelioxys2 <- dat_ridges_parasite %>%
 ### Parasite-host composite
 ```{r parasite_host_composite, echo = F, fig.width = 12, fig.height = 10}
 
-plot_grid(nomada, stelis, sphecodes,
+cowplot::plot_grid(nomada, stelis, sphecodes,
           epeolus, triepeolus, coelioxys,
           labels = c("A", "B", "C", "D", "E", "F"),
           nrow = 3, rel_widths = c(0.9, 1),
@@ -653,7 +688,7 @@ plot_grid(nomada, stelis, sphecodes,
 ### Parasite-host composite (3 good combos)
 ```{r para_host_composite_3, echo = F, fig.width = 8, fig.height = 7}
 
-plot_grid(nomada, sphecodes, coelioxys2,
+cowplot::plot_grid(nomada, sphecodes, coelioxys2,
           labels = c("A", "B", "C"),
           nrow = 3,
           greedy = FALSE)
@@ -667,7 +702,7 @@ plot_grid(nomada, sphecodes, coelioxys2,
 ### Parasite-host composite (3 bad combos)
 ```{r parasite_host_composite_3_bad, echo = F, fig.width = 8, fig.height = 7}
 
-plot_grid(stelis2, epeolus2, triepeolus,
+cowplot::plot_grid(stelis2, epeolus2, triepeolus,
           labels = c("A", "B", "C"),
           nrow = 3,
           greedy = FALSE)
